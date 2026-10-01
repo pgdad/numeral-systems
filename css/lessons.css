@@ -2,3 +2,18 @@
    lessons.css: per-lesson styles. Scope everything under .lesson-<id>
    (for example .lesson-base10, .lesson-binary) so lessons never clash.
    ========================================================================== */
+
+/* ---------- Demo lesson (js/lessons/00-demo.js) ---------- */
+.lesson-demo .demo-row { display: flex; gap: clamp(1rem, 4vw, 3rem); align-items: center; justify-content: center; flex-wrap: wrap; }
+.lesson-demo .demo-shape { width: clamp(5rem, 16vw, 9rem); height: auto; }
+.lesson-demo .demo-counting { display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); }
+.lesson-demo .demo-number {
+  font-family: var(--font-digits); font-weight: 900; font-size: var(--fs-digit-lg); line-height: 1;
+  color: var(--theme-color); font-variant-numeric: tabular-nums;
+}
+.lesson-demo .demo-animals { display: flex; flex-wrap: wrap; gap: var(--sp-3); justify-content: center; }
+.lesson-demo .demo-animal {
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-pill);
+  background: var(--bg-accent); font-weight: 800; font-size: 1.4rem;
+}
+.lesson-demo .demo-press { font-size: 1.5rem; min-height: 4rem; }

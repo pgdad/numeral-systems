@@ -1,7 +1,17 @@
 /* ==========================================================================
-   components.css: shell components (home cards, placeholders).
+   components.css: shell components (home cards, placeholders, player).
    Phase 03 adds styles for hands, tiles, odometer, place-value, column-add, etc.
    ========================================================================== */
+
+/* ---------- Theme color per number system (DECISIONS D8) ---------- */
+.theme-base10 { --theme-color: var(--c-base10); }
+.theme-binary { --theme-color: var(--c-binary); }
+.theme-octal { --theme-color: var(--c-octal); }
+.theme-hex { --theme-color: var(--c-hex); }
+.theme-silly, .theme-animals { --theme-color: var(--c-animals); }
+.theme-colors { --theme-color: var(--c-green); }
+.theme-addition { --theme-color: var(--c-addition); }
+.theme-playground { --theme-color: var(--c-playground); }
 
 /* ---------- Home ---------- */
 .hero { margin: var(--sp-4) 0 var(--sp-6); }
@@ -13,7 +23,7 @@
 }
 
 .lesson-card {
-  --card-color: var(--c-base10);
+  --card-color: var(--theme-color, var(--c-base10));
   position: relative;
   display: flex; flex-direction: column; gap: var(--sp-2);
   padding: var(--sp-5) var(--sp-5) var(--sp-4);
@@ -28,14 +38,6 @@
 a.lesson-card:hover { transform: translateY(-4px) rotate(-.5deg); border-color: var(--card-color); }
 a.lesson-card:active { transform: translateY(1px); }
 .lesson-card.is-soon { opacity: .72; box-shadow: var(--shadow-sm); }
-
-.lesson-card.theme-base10 { --card-color: var(--c-base10); }
-.lesson-card.theme-binary { --card-color: var(--c-binary); }
-.lesson-card.theme-octal  { --card-color: var(--c-octal); }
-.lesson-card.theme-hex    { --card-color: var(--c-hex); }
-.lesson-card.theme-silly  { --card-color: var(--c-animals); }
-.lesson-card.theme-addition { --card-color: var(--c-addition); }
-.lesson-card.theme-playground { --card-color: var(--c-playground); }
 
 .card-number {
   position: absolute; top: var(--sp-3); right: var(--sp-4);
@@ -66,3 +68,131 @@ a.lesson-card:active { transform: translateY(1px); }
   text-align: center; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow);
 }
 .placeholder .lead { margin-left: auto; margin-right: auto; }
+
+/* ---------- Player (Phase 02) ---------- */
+.player { display: grid; gap: var(--sp-4); }
+
+.player-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2) var(--sp-4); }
+.player-head h1 { font-size: var(--fs-h2); margin: 0; }
+.scene-title {
+  margin: 0; padding: .15rem .8rem; border-radius: var(--radius-pill);
+  background: var(--theme-color); color: #fff; font-weight: 800; font-size: var(--fs-small);
+}
+
+.player-frame {
+  position: relative;
+  min-height: clamp(18rem, 52vh, 38rem);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 3px solid var(--line);
+  border-top: 10px solid var(--theme-color);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+}
+.player-stage {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-5);
+  padding: var(--sp-5);
+  min-width: 0;
+}
+
+.player-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  display: grid; place-items: center;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.btn-start {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
+  width: 9rem; height: 9rem; border-radius: 50%;
+  border: 6px solid #fff; background: var(--theme-color); color: #fff;
+  font-weight: 900; font-size: 1.3rem; cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform var(--dur) var(--ease-bounce);
+  animation: pulse-ring 2s ease-out infinite;
+}
+.btn-start .icon { width: 3.5rem; height: 3.5rem; margin-left: .4rem; }
+.btn-start:hover { transform: scale(1.06); }
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--theme-color) 55%, transparent), var(--shadow); }
+  70% { box-shadow: 0 0 0 22px transparent, var(--shadow); }
+  100% { box-shadow: 0 0 0 0 transparent, var(--shadow); }
+}
+
+.end-card { position: relative; text-align: center; padding: var(--sp-5); }
+.end-title { font-size: var(--fs-h1); font-weight: 900; margin: 0; color: var(--theme-color); }
+.end-sub { color: var(--ink-soft); }
+.end-actions { display: flex; flex-wrap: wrap; gap: var(--sp-3); justify-content: center; }
+.confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+.confetti i {
+  position: absolute; top: -1rem; width: .7rem; height: 1.1rem; border-radius: 2px;
+  animation-name: confetti-fall; animation-timing-function: cubic-bezier(.3,.6,.6,1); animation-fill-mode: forwards;
+}
+@keyframes confetti-fall {
+  to { top: 105%; transform: rotate(720deg) translateX(3rem); }
+}
+
+.player-progress { height: .6rem; border-radius: var(--radius-pill); background: var(--line); overflow: hidden; }
+.player-progress-fill { height: 100%; width: 0; background: var(--theme-color); border-radius: inherit; transition: width .4s ease; }
+
+.player-chapters { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; }
+.chapter-dot {
+  width: 2.75rem; height: 2.75rem; border-radius: 50%;
+  border: 3px solid var(--theme-color); background: var(--surface); color: var(--theme-color);
+  font-weight: 900; cursor: pointer;
+}
+.chapter-dot.is-done { background: color-mix(in srgb, var(--theme-color) 25%, var(--surface)); }
+.chapter-dot.is-current { background: var(--theme-color); color: #fff; transform: scale(1.1); }
+
+.player-controls {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3);
+}
+.control-group { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; }
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-width: var(--tap); height: var(--tap); padding: 0 .6rem;
+  border: 3px solid var(--ink); border-radius: 16px;
+  background: var(--surface); color: var(--ink); cursor: pointer;
+  font-weight: 800; font-size: 1.05rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-bounce), background var(--dur);
+}
+.icon-btn .icon { width: 1.6rem; height: 1.6rem; flex: none; }
+.icon-btn:hover { transform: translateY(-2px); }
+.icon-btn:active { transform: translateY(2px); box-shadow: none; }
+.icon-btn[disabled] { opacity: .4; cursor: not-allowed; transform: none; }
+.icon-btn[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.icon-btn[aria-pressed="false"] { opacity: .75; }
+.icon-btn-main { min-width: 4rem; background: var(--theme-color); border-color: var(--theme-color); color: #fff; }
+.next-btn .next-label { display: none; }
+.next-btn.is-cta {
+  background: var(--theme-color); border-color: var(--theme-color); color: #fff; padding: 0 var(--sp-4);
+  animation: nudge 1.4s ease-in-out infinite;
+}
+.next-btn.is-cta .next-label { display: inline; }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+.speed-btn { min-width: 3.4rem; }
+
+/* Captions (narration) */
+.captions .cap-sentence.is-done { opacity: .55; }
+.captions .cap-sentence.is-current { color: #ffd23f; }
+.captions .cap-word.is-current { background: rgba(255, 210, 63, .3); border-radius: 6px; box-shadow: 0 0 0 2px rgba(255, 210, 63, .3); }
+
+/* Full screen: hide app chrome, give the stage the room */
+:root.is-fullscreen .app-header, :root.is-fullscreen .app-footer { display: none; }
+:root.is-fullscreen .stage { max-width: none; padding-top: var(--sp-3); padding-bottom: var(--sp-3); }
+:root.is-fullscreen .player-frame { min-height: calc(100vh - 16rem); }
+
+@media (max-width: 560px) {
+  .player { gap: var(--sp-3); }
+  .player-frame { min-height: clamp(14rem, 40vh, 24rem); }
+  .player-stage { padding: var(--sp-3); }
+  .player-controls { justify-content: center; gap: var(--sp-2); }
+  .control-group { gap: .35rem; justify-content: center; }
+  .icon-btn { min-width: 2.75rem; height: 2.75rem; padding: 0 .45rem; border-radius: 14px; }
+  .icon-btn .icon { width: 1.4rem; height: 1.4rem; }
+  .btn-start { width: 7rem; height: 7rem; font-size: 1.1rem; }
+  .chapter-dot { width: 2.5rem; height: 2.5rem; }
+  .captions { font-size: 1.1rem; padding: var(--sp-3) var(--sp-4); }
+}

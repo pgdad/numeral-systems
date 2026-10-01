@@ -82,3 +82,16 @@ Digit arrays are most significant first. "Place" indexes everywhere else (`chang
 `NumSys.digitsets.speak(n, set)` and addition narration from `NumSys.addition.explainStep(step, set)`.
 Lessons generate math narration from these rather than hand-typing it, so text and math can't disagree.
 Custom digit sets allow bases 2–36. Text digits must be single characters, and labels must be unique.
+
+## D13. Player behavior contract (for every lesson)
+- A step's `do(ctx)` must reach the **same end state** whether it runs animated or with `ctx.instant = true`.
+  The player rebuilds a scene by calling `setup` and then each earlier step's `do` in instant mode, in order.
+  Do all animation through `NS.anim.*(el, ctx, …)` or `ctx.wait(ms)` so instant, speed, reduced motion and
+  abort are handled for you. Never use raw `setTimeout` in a step.
+- `ctx` = `{lesson, scene, stage, state, instant, speed, reducedMotion, signal, abortSignal, anim, player, wait(ms), sound(name)}`.
+  `setup(stage, ctx)` returns the scene state object, which steps read as `ctx.state`.
+- `do` may return a Promise. A rejected AbortError is normal (the user skipped). Other errors are logged and
+  the player moves on.
+- Interactive scenes (`interactive: true`) wire their own event handlers in `setup`. The player never
+  auto-advances past them.
+- Narration ids are `<lessonId>.<sceneId>.<stepIndex>`. Renaming a scene id orphans its recorded audio (Phase 10).

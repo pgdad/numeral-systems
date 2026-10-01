@@ -52,12 +52,13 @@ A polished, reliable player that lesson phases can rely on. A demo lesson proves
    Add a test that every registered lesson step has non-empty `say`.
 
 ## Acceptance criteria
-- [ ] `#/lesson/demo` plays with voice in Chrome and Firefox (Linux/Win/Mac). Captions match the speech.
-- [ ] Step mode, autoplay, previous/next, replay, speed and mute all work. Skipping mid-animation leaves no glitches.
-- [ ] Deep link `#/lesson/demo/1/2` opens at that step with the correct visual state.
-- [ ] With speech unavailable (simulate by stubbing `speechSynthesis` away), captions-only auto-advance works.
-- [ ] Reduced-motion users get instant or fade-only transitions.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] `#/lesson/demo` plays with voice in Chrome and Firefox (Linux/Win/Mac). Captions match the speech.
+      *(Verified in headless Chromium and Firefox with a recording speech stub: every sentence spoken, in order, matching the captions. Hearing a real voice on Win/Mac needs a person. See PROGRESS.)*
+- [x] Step mode, autoplay, previous/next, replay, speed and mute all work. Skipping mid-animation leaves no glitches.
+- [x] Deep link `#/lesson/demo/1/2` opens at that step with the correct visual state.
+- [x] With speech unavailable (simulate by stubbing `speechSynthesis` away), captions-only auto-advance works.
+- [x] Reduced-motion users get instant or fade-only transitions.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 Open `index.html#/lesson/demo` and click Play.

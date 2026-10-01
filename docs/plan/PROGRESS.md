@@ -8,7 +8,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 |---|---|---|---|---|
 | 00 | Foundation & app shell | done | 2026-10-01 | 24 tests; smoke OK in Chromium + Firefox |
 | 01 | Numeral & addition engine | done | 2026-10-01 | 67 tests (Node + Chromium + Firefox) |
-| 02 | Scene player & narration | todo | | |
+| 02 | Scene player & narration | done | 2026-10-01 | 84 tests + 5 player smoke scenarios (Chromium + Firefox) |
 | 03 | Visual components | todo | | |
 | 04 | Lesson: Base‑10 & fingers | todo | | |
 | 05 | Lesson: Binary on two hands | todo | | |
@@ -20,7 +20,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 02 (Scene player & narration). 03 needs 01 and 02.
+**Next phase:** 03 (Visual components). Then 04–09 in any order.
 
 ---
 
@@ -90,3 +90,35 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   If a TTS voice reads "A" as the article "uh", Phase 02 or 10 can change the hex digit `speak` values.
 - Known issues: none.
 - How to see it: `node --test tests/`, or open `tests/browser.html`. There's no UI yet.
+
+### Phase 02 — Scene player & narration — 2026-10-01 — done
+- Built: `js/engine/anim.js` (Web Animations helpers: fadeIn/fadeOut/pop/moveTo/bounce/wiggle/highlight/countUp/
+  stagger/parallel/wait; all honor `ctx.instant`/`speed`/`reducedMotion`/`signal`), `js/engine/sound.js`
+  (synthesized pop/click/ding/whoosh/tada/carry and meow/woof/ribbit/oink/quack; mute and volume),
+  `js/engine/narrator.js` (speech → recorded file → timed captions; sentence and word caption highlighting),
+  `js/engine/audio-manifest.js` (empty), `js/engine/player-state.js` (pure position logic), `js/engine/player.js`,
+  and the hidden demo lesson `js/lessons/00-demo.js` (3 scenes, 8 steps, the last scene interactive).
+- How the player works (details in DECISIONS D13): every step = narration + `do(ctx)` in parallel. Jumping
+  re-runs `setup` and replays earlier steps with `ctx.instant = true`. Every run has its own AbortController. The URL
+  tracks the position (`#/lesson/:id/:scene/:step`, via `router.replace`; this works on `file://` in Chrome and Firefox).
+  Autoplay stops at interactive scenes, where the Next button turns into a big "I'm done!" button. At the end of a lesson
+  there is a celebration overlay with confetti, plus Watch again / Next lesson / Home.
+- Controls: prev/play-pause/next, replay step, restart part, chapter dots, autoplay, speed (¾/1/1¼),
+  voice on/off, sound effects on/off, and full screen (the whole page, so captions come along, with a CSS fallback where
+  the Fullscreen API is missing). Keys: Space, ←/→, Esc. The player pauses when the tab is hidden. Settings persist in
+  localStorage (`numsys.player.speed`, `numsys.player.autoplay`, `numsys.narrator.voiceOn`, `numsys.sound.muted`).
+- Tests: `tests/specs/{player-state,narrator}.spec.js`, plus the player scenarios in `tools/smoke.js`: autoplay with a
+  speech stub (checks every spoken sentence matches the lesson text), no-speech captions-only timing, deep link
+  `#/lesson/demo/1/2` state plus Prev, rapid clicking and keyboard, and reduced motion.
+- Deviations: the player uses the global `#captions` bar rather than one of its own. Full screen covers the whole
+  document so the bar stays visible. Player icons are inline SVG paths in `player.js` (`NS.player.ICONS`); Phase 03
+  may move them to `icons.js`. "Pause" stops the current step, and Play replays that step from its start.
+- **Needs a human check:** headless browsers have no real voices, so a person should open
+  `index.html#/lesson/demo`, press Start, and confirm the voice sounds right on Windows/Mac (Chrome, Edge, Safari).
+  If hex letters or anything else are mispronounced, adjust the `speak` text (Phase 01 note).
+- Known issues: none found. Safari is untested (no Safari here). It relies on the Start button as the user gesture
+  that unlocks speech.
+- For Phase 03+: lesson `do(ctx)` functions should use `NS.anim` helpers (or pass `ctx` to their own) so that
+  instant, abort and reduced motion work automatically. `ctx.sound(name)` is silent in instant mode. Read state
+  from `ctx.state` (whatever `setup` returned). To smoke-test a new route, add it to `EXTRA_ROUTES` in `tools/smoke.js`.
+- How to see it: open `index.html#/lesson/demo` and press Start. (The demo is hidden from the home menu.)

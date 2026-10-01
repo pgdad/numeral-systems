@@ -16,6 +16,13 @@
       'js/core/numeral.js',
       'js/core/digitsets.js',
       'js/core/addition.js',
+      'js/engine/anim.js',
+      'js/engine/sound.js',
+      'js/engine/audio-manifest.js',
+      'js/engine/narrator.js',
+      'js/engine/player-state.js',
+      'js/engine/player.js',
+      'js/lessons/00-demo.js',
       'js/app.js'
     ],
     specs: [
@@ -25,7 +32,9 @@
       'tests/specs/app.spec.js',
       'tests/specs/numeral.spec.js',
       'tests/specs/digitsets.spec.js',
-      'tests/specs/addition.spec.js'
+      'tests/specs/addition.spec.js',
+      'tests/specs/player-state.spec.js',
+      'tests/specs/narrator.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);
