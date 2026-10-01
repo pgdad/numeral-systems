@@ -75,3 +75,10 @@ Routed views that later phases provide use `mount(stage, ...) → { destroy() }`
 New top-level routes (e.g. `#/gallery`, `#/movie`) are added to `ROUTES` in `js/core/router.js`, to the
 `render()` switch in `js/app.js`, and to `EXTRA_ROUTES` in `tools/smoke.js`.
 Every view has one element with class `view-heading` (it receives focus on navigation).
+
+## D12. Engine conventions
+Digit arrays are most significant first. "Place" indexes everywhere else (`changedPlaces`,
+`addSteps().column`, `placeValues().power`) are powers: 0 = ones place. Spoken forms come from
+`NumSys.digitsets.speak(n, set)` and addition narration from `NumSys.addition.explainStep(step, set)`.
+Lessons generate math narration from these rather than hand-typing it, so text and math can't disagree.
+Custom digit sets allow bases 2–36. Text digits must be single characters, and labels must be unique.

@@ -45,11 +45,11 @@ Well-tested modules `js/core/numeral.js`, `js/core/digitsets.js` and `js/core/ad
 5. Add the new files to `index.html` and `tests/load-app.js`.
 
 ## Acceptance criteria
-- [ ] All CONTENT.md worked examples are verified by tests.
-- [ ] Round-trip property test: for bases 2..16 and n in 0..5000, `fromDigits(toDigits(n,b),b) === n`.
-- [ ] `speak()` outputs match the expected strings for the CONTENT.md examples.
-- [ ] `parse()` rejects invalid digits with friendly messages.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] All CONTENT.md worked examples are verified by tests.
+- [x] Round-trip property test: for bases 2..16 and n in 0..5000, `fromDigits(toDigits(n,b),b) === n`.
+- [x] `speak()` outputs match the expected strings for the CONTENT.md examples.
+- [x] `parse()` rejects invalid digits with friendly messages.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 Open `tests/browser.html` and run `node --test tests/`.

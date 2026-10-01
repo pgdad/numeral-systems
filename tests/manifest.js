@@ -13,13 +13,19 @@
       'js/core/util.js',
       'js/core/lessons.js',
       'js/core/router.js',
+      'js/core/numeral.js',
+      'js/core/digitsets.js',
+      'js/core/addition.js',
       'js/app.js'
     ],
     specs: [
       'tests/specs/util.spec.js',
       'tests/specs/lessons.spec.js',
       'tests/specs/router.spec.js',
-      'tests/specs/app.spec.js'
+      'tests/specs/app.spec.js',
+      'tests/specs/numeral.spec.js',
+      'tests/specs/digitsets.spec.js',
+      'tests/specs/addition.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);
