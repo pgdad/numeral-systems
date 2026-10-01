@@ -1,0 +1,42 @@
+# Counting Is Fun: Number Systems for Grandkids
+
+A browser app with animated, narrated lessons about how we write numbers:
+
+1. **Base‑10 on your fingers.** Why we count in tens.
+2. **Binary on two hands.** Ten fingers can count to **1023**, not just 10!
+3. **Octal and hexadecimal.** Including the secret hex codes inside colors.
+4. **Silly number systems.** Numbers made of cats, dogs and frogs, and numbers made of colors.
+5. **Adding in every system.** Animated carrying, from tens to cats.
+6. **Playground.** A converter, make-your-own number system, and quizzes.
+
+It's just files: double-click `index.html` and it runs on PC or Mac with no
+install and no internet. To publish it, copy the folder to any static host or CDN
+(S3 + CloudFront, Akamai, Netlify, GitHub Pages). See `deploy/`.
+
+## Building it (one phase per Claude session)
+
+The build is split into standalone phases. Each one runs in a fresh Claude Code
+session. All plans and progress are checked into this repo:
+
+| File | Purpose |
+|---|---|
+| `CLAUDE.md` | Rules every session follows (read automatically) |
+| `docs/plan/PLAN.md` | Architecture, conventions, phase list |
+| `docs/plan/PROGRESS.md` | Status of each phase and handoff notes |
+| `docs/plan/phases/` | One detailed spec per phase |
+| `docs/plan/CONTENT.md` | Lesson scripts and narration |
+| `docs/plan/DECISIONS.md` | Settled design decisions |
+
+**To start a session**, open Claude Code in this folder and type:
+
+```
+/next-phase
+```
+
+or just say:
+
+```
+Do the next phase.
+```
+
+To pick a particular phase, say `Do phase 5.` To see where things stand, say `What's the status?`
