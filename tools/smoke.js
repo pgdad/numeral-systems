@@ -30,7 +30,8 @@ const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',').map((s) =
 const shotsDir = process.env.SMOKE_SCREENSHOTS;
 const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
-const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0'];
+const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0',
+  '#/lesson/binary/3/2', '#/lesson/binary/5/0'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -346,6 +347,25 @@ async function lessonScenarios(browser, failures) {
       for (let i = 0; i < 7; i++) await fingers[i].click();
       const stars = await page.waitForFunction(() => document.querySelector('.b10-star-count').textContent === '1', null, { timeout: 3000 }).catch(() => null);
       if (!stars) failures.push(`${label}: seven fingers did not complete the first challenge`);
+    }
+    if (id === 'binary') {
+      // Fingers are labelled buttons; challenge 1 is "five" = right middle (4) + right pinky (1).
+      const finger = (name) => page.$(`.bin-try .hand-finger[aria-label^="${name},"]`);
+      const thumb = await finger('left thumb');
+      const aria = thumb && await thumb.getAttribute('aria-label');
+      if (aria !== 'left thumb, worth 32, down') failures.push(`${label}: left thumb is labelled "${aria}"`);
+      await (await finger('right middle')).click();
+      await (await finger('right pinky')).click();
+      const stars = await page.waitForFunction(() => document.querySelector('.bin-star-count').textContent === '1' &&
+        document.querySelector('.bin-try .bin-strip').getAttribute('aria-label') === 'Binary 0000000101', null, { timeout: 3000 }).catch(() => null);
+      if (!stars) failures.push(`${label}: showing five did not complete the first challenge`);
+      // A deep link rebuilds the hands: after reading 1011 the fingers show eleven.
+      await page.evaluate(() => { location.hash = '#/lesson/binary/4/1'; });
+      const eleven = await page.waitForFunction(() => {
+        const svg = document.querySelector('.bin-reading .hands-svg');
+        return svg && /3 fingers up: right index, right ring, right pinky$/.test(svg.getAttribute('aria-label'));
+      }, null, { timeout: 5000 }).catch(() => null);
+      if (!eleven) failures.push(`${label}: deep link #/lesson/binary/4/1 does not show eleven on the fingers`);
     }
     console.log(`smoke: ${label} autoplay OK (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
     await context.close();

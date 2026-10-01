@@ -189,6 +189,20 @@
     return { group: wave, parts: parts };
   }
 
+  // Horizontal centre of each finger (display order) as a fraction of the hands' width.
+  // Lets a lesson line things up under the fingers (e.g. a row of binary digits).
+  function fingerSpots(mode) {
+    mode = mode === 'left' || mode === 'right' ? mode : 'both';
+    var sides = mode === 'both' ? ['left', 'right'] : [mode];
+    var total = sides.length * HAND_W + (sides.length - 1) * GAP + 24;
+    return displayOrder(mode).map(function (pos) {
+      var lx = GEOM[pos.finger].labelX;
+      if (pos.hand === 'left') lx = HAND_W - lx;
+      lx += sides.indexOf(pos.hand) * (HAND_W + GAP);
+      return (lx + 12) / total;
+    });
+  }
+
   // ---------- Component ----------
 
   function create(opts) {
@@ -246,7 +260,12 @@
       fingers.forEach(function (f) {
         f.outer.classList.toggle('is-down', !f.up);
         f.badge.classList.toggle('is-on', f.up);
-        if (toggleCb) f.outer.setAttribute('aria-pressed', String(f.up));
+        if (toggleCb) {
+          f.outer.setAttribute('aria-pressed', String(f.up));
+          // "left thumb, worth 32, down"
+          f.outer.setAttribute('aria-label', fingerName(f.hand, f.finger) + (labelsOn ? ', worth ' + f.value : '') +
+            (f.up ? ', up' : ', down'));
+        }
       });
     }
 
@@ -328,6 +347,7 @@
       labels: function (on, values, ctx) {
         labelsOn = !!on;
         el.classList.toggle('has-labels', labelsOn);
+        describe();
         if (labelsOn) setLabelValues(values);
         if (!labelsOn) {
           fingers.forEach(function (f) { f.badge.style.display = 'none'; });
@@ -348,7 +368,6 @@
         fingers.forEach(function (f) {
           f.outer.setAttribute('tabindex', '0');
           f.outer.setAttribute('role', 'button');
-          f.outer.setAttribute('aria-label', fingerName(f.hand, f.finger) + (labelsOn ? ', worth ' + f.value : ''));
         });
         describe();
         return function off() {
@@ -409,6 +428,7 @@
     fingersToBits: fingersToBits,
     countToFingers: countToFingers,
     fingerIndex: fingerIndex,
+    fingerSpots: fingerSpots,
     getSkinTone: getSkinTone,
     setSkinTone: setSkinTone,
     skinPicker: skinPicker,

@@ -11,7 +11,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 02 | Scene player & narration | done | 2026-10-01 | 84 tests + 5 player smoke scenarios (Chromium + Firefox) |
 | 03 | Visual components | done | 2026-10-01 | 110 tests + gallery smoke (Chromium + Firefox) |
 | 04 | Lesson: Base‑10 & fingers | done | 2026-10-01 | 119 tests + lesson autoplay smoke (Chromium + Firefox) |
-| 05 | Lesson: Binary on two hands | todo | | |
+| 05 | Lesson: Binary on two hands | done | 2026-10-01 | 134 tests + binary autoplay/challenge smoke (Chromium + Firefox) |
 | 06 | Lesson: Octal & Hex | todo | | |
 | 07 | Lesson: Silly systems | todo | | |
 | 08 | Lesson: Addition | todo | | |
@@ -20,7 +20,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 05 (Binary on two hands). Phases 05–09 can run in any order.
+**Next phase:** 06 (Octal & Hex). Phases 06–09 can run in any order.
 
 ---
 
@@ -203,3 +203,48 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   - Put pure checker logic on `lesson.helpers` for tests.
   - The new `lessonScenarios` smoke covers each new lesson automatically. Remember the D5 rule: don't stop on 4 or 128 alone.
 - How to see it: open `index.html` and click the "Base‑10" card, or go to `index.html#/lesson/base10`.
+
+### Phase 05 — Lesson: Binary on two hands — 2026-10-01 — done
+- Built: `js/lessons/02-binary.js` (id `binary`, order 20, 7 scenes, 24 steps) and its styles in `css/lessons.css`
+  (all scoped under `.lesson-binary`, prefix `bin-`).
+  - 2.1 switches: the hands count 1–10 the usual way, then make fists. A row of binary digits appears under the fingers,
+    the right pinky flicks up/down for "up = 1", "down = 0", then "binary" and a blinking computer chip.
+  - 2.2 values: the value badges appear one at a time (1, 2, then 4, 8, 16 on cues, then 32…512), then compare strips
+    Base‑10 1000×10… vs Binary 8×2….
+  - 2.3 count: 0, 1, 2 ("just like carrying"), 3 (2 + 1), then an auto count 4→31 that speeds up (900ms → 250ms per number).
+    Changed digits flash. Readouts: the digit row (leading zeros dimmed), Decimal, and "Fingers add up to 16 + 8 + … = 31".
+    **Added step:** "One hand can count to thirty-one".
+  - 2.4 how high: all ten fingers go up, each badge flies into a running sum while the narrator reads it (one sentence each).
+    Then 1023 with tada and a star burst, "0, 1, 2, … 1023 → 1024 numbers", and "2 × 2 × … (ten 2s) = 1024".
+  - 2.5 reading: tiles 1011. Each spoken digit raises its finger, then "8 + 0 + 2 + 1 = 11". Second example 10010, then "down fingers
+    count as zero", "16 + 2 = 18".
+  - 2.6 try (interactive): a challenge card (stars, prompt, Show me, Skip) and clickable hands with the digit row, Decimal and the
+    finger sum. Challenges: 5, 10, your age (number box + OK), 100, 1023, then 7, 42, 512 in a loop (met ones are skipped).
+    "Show me" animates the answer, says the breakdown ("eight plus one makes nine"), then puts the fingers down: "Now you try!".
+    It doesn't award a star. Ages 4 and 128 ask for next year's age instead (D5).
+  - 2.7 Did you know? (task 6): a chip card about billions of switches. This is a narrated scene *after* the interactive one, so
+    "I'm done!" leads to it and then to the end celebration.
+- Engine/component changes (DECISIONS D16):
+  - `NS.hands.fingerSpots(mode)`: each finger's x position as a fraction of the hands' width. Used to line up the binary
+    digits under the fingers.
+  - Interactive finger aria-labels now say the state and update live: "left thumb, worth 32, down" (worth only when the
+    badges are on). `aria-pressed` is kept.
+- Tests: `tests/specs/lesson-binary.spec.js`, 15 tests. They cover registration, words-only narration, 1023 = sum of the
+  badges, `bitValues`/`placeTerms`/`breakdown`, D5 finger spot checks (1, 2, 3, 4, 5, 11, 18, 31, 100, 1023), never resting on
+  4/128, the challenge checker, the age logic, `nextChallenge`, and `fingerSpots`. `tools/smoke.js` checks the binary aria-label,
+  solves "five" by clicking the labelled fingers, and checks the deep link `#/lesson/binary/4/1` shows eleven. Binary routes are in `EXTRA_ROUTES`.
+- Verified: scratchpad Playwright played every step and compared each step with the deep link to the next one. There were 0 mismatches in
+  Chromium, Firefox, reduced motion, and at 400px. The hands' state was logged per step: 0 → 1 → 2 → 3 → 31, 1023, 11, 18.
+  The interactive scene passed with mouse, keyboard (Enter/Space on fingers, Enter in the age box) and touch at 400px, in both browsers.
+  Screenshots were checked at 1280×900 and 400px, plus frames mid-flight.
+- Known issues / needs a human:
+  - Listen with a real voice. The 2.4 "add them up" line is ten short sentences, and 2.5 reads digits as "One. Zero. One. One."
+  - Safari is untested.
+  - At 1280×900, scene 2.4 is tall enough that the sticky captions cover the controls until you scroll. Phase 11 could make
+    the captions overlay smarter.
+  - A captions-only autoplay takes ~98s at test speed. With real speech, expect about 4–5 minutes to the sandbox.
+- For later phases: `makeBoard()` in this file (hands + digit row) is a good model for octal/hex "fingers" if needed.
+  `flyText()` flies a text chip from any element, SVG included. Find fingers in tests by aria-label prefix
+  (`.hand-finger[aria-label^="right pinky,"]`), not DOM order (SVG order ≠ display order). Number inputs inside a lesson need
+  `novalidate`, or the browser silently blocks submits for out-of-range values.
+- How to see it: open `index.html` and click the "Binary" card (the green "101"), or go to `index.html#/lesson/binary`.

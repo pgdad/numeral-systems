@@ -117,3 +117,12 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   so captions show too. It is skipped while the player is still speaking the step (`ctx.player.getMode() === 'playing'`).
 - Lesson controls that handle Enter/Space call `preventDefault()`. The player ignores keys that are already handled.
 - Pure lesson logic that needs tests (challenge checkers etc.) is exposed on the lesson definition as `helpers`.
+
+## D16. Binary hands readouts (Phase 05)
+- The binary digits of a hands display sit in a row **under the fingers**, one digit per finger, positioned with
+  `NS.hands.fingerSpots(mode)` (fractions of the hands' width). Leading zeros are dimmed and changed digits flash.
+- Interactive fingers announce their state: aria-label "left thumb, worth 32, down" (worth only when value badges are shown),
+  updated on every change. `aria-pressed` is also set.
+- The D5 middle-finger policy applies to challenges too: no challenge target is 4 or 128, and an age of 4 or 128 becomes "next birthday" (+1).
+- A lesson may put a short narrated scene after its interactive scene (binary's "Did you know?"). The player stops at the interactive
+  scene; "I'm done!" continues to it.

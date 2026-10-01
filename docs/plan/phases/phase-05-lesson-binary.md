@@ -26,11 +26,11 @@ to the 1023 reveal to reading binary, then ends with an interactive finger-binar
 7. Tests: the challenge checker, the sum-of-values breakdown helper, and the registration checks.
 
 ## Acceptance criteria
-- [ ] The 1023 claim is presented clearly and correctly. Narration and visuals agree.
-- [ ] Spot-checked finger states are correct for 1, 2, 3, 4, 5, 11, 18, 31, 100 and 1023.
-- [ ] Autoplay runs start to finish. Deep links and Prev restore the correct hand state.
-- [ ] The interactive scene works with mouse, touch and keyboard (fingers are focusable buttons with aria-labels such as "left thumb, worth 32, down").
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] The 1023 claim is presented clearly and correctly. Narration and visuals agree. (Scene 2.4: each value badge flies into a running sum built from the same `bitValues(1023)` list the narration reads; unit-tested.)
+- [x] Spot-checked finger states are correct for 1, 2, 3, 4, 5, 11, 18, 31, 100 and 1023. (Unit test + per-step hand/strip check in the browser.)
+- [x] Autoplay runs start to finish. Deep links and Prev restore the correct hand state. (0 deep-link mismatches in Chromium, Firefox and reduced motion; smoke checks `#/lesson/binary/4/1`.)
+- [x] The interactive scene works with mouse, touch and keyboard (fingers are focusable buttons with aria-labels such as "left thumb, worth 32, down"). (Mouse, keyboard, and touch at 400px, in Chromium and Firefox.)
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 `index.html#/lesson/binary`
