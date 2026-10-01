@@ -52,12 +52,12 @@ check script that later sessions run before committing.
 12. **`.editorconfig`** (2 spaces, LF, UTF-8).
 
 ## Acceptance criteria
-- [ ] Double-clicking `index.html` shows the home screen with no console errors (Chrome and Firefox).
-- [ ] `#/about` shows an about page (what the app is, credits). `#/nonsense` goes home.
-- [ ] `tools/check.sh` passes. The lint catches a deliberately added `type="module"` (verify, then remove it).
-- [ ] `node --test tests/` runs at least 8 meaningful tests, all passing.
-- [ ] The layout looks good at 400px, 1024px and 1920px widths.
-- [ ] PROGRESS.md is updated and committed.
+- [x] Double-clicking `index.html` shows the home screen with no console errors (Chrome and Firefox).
+- [x] `#/about` shows an about page (what the app is, credits). `#/nonsense` goes home.
+- [x] `tools/check.sh` passes. The lint catches a deliberately added `type="module"` (verify, then remove it).
+- [x] `node --test tests/` runs at least 8 meaningful tests, all passing.
+- [x] The layout looks good at 400px, 1024px and 1920px widths.
+- [x] PROGRESS.md is updated and committed.
 
 ## How to see it
 Open `index.html` in a browser.

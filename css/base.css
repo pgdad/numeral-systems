@@ -1,0 +1,202 @@
+/* ==========================================================================
+   base.css: design tokens, reset, layout, typography, buttons (DECISIONS D8)
+   System fonts only; no network assets.
+   ========================================================================== */
+
+:root {
+  /* Number-system colors (one per system, used across lessons) */
+  --c-base10: #2f6fde;      /* blue */
+  --c-binary: #1f9d55;      /* green */
+  --c-octal: #7b4fd6;       /* purple */
+  --c-hex: #f07b16;         /* orange */
+  --c-animals: #9a6235;     /* brown */
+  --c-colors: linear-gradient(90deg, #e53935, #fbc02d, #43a047, #1e88e5, #8e24aa);
+  --c-addition: #d6336c;    /* pink */
+  --c-playground: #0b8f8f;  /* teal */
+
+  /* Color-digit palette (DECISIONS D6) */
+  --c-red: #e53935;
+  --c-yellow: #fbc02d;
+  --c-green: #43a047;
+
+  /* Neutrals */
+  --bg: #fff8ec;
+  --bg-accent: #ffeccc;
+  --surface: #ffffff;
+  --surface-2: #f6f1ff;
+  --ink: #23263a;
+  --ink-soft: #565b78;
+  --line: #e4ddd0;
+  --focus: #1a73e8;
+  --shadow: 0 6px 0 rgba(35, 38, 58, .12), 0 12px 24px rgba(35, 38, 58, .08);
+  --shadow-sm: 0 3px 0 rgba(35, 38, 58, .12);
+
+  /* Type scale (base 20px) */
+  --font: ui-rounded, "SF Pro Rounded", "Nunito", "Varela Round", "Segoe UI", system-ui, -apple-system,
+          "Helvetica Neue", Arial, sans-serif;
+  --font-digits: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --fs-base: 1.25rem;       /* 20px */
+  --fs-small: 1rem;
+  --fs-lead: 1.4rem;
+  --fs-h1: clamp(1.8rem, 1.2rem + 2.6vw, 3rem);
+  --fs-h2: clamp(1.4rem, 1.1rem + 1.2vw, 2rem);
+  --fs-digit-md: clamp(3rem, 2rem + 4vw, 5rem);       /* ~48-80px */
+  --fs-digit-lg: clamp(4rem, 2.5rem + 6vw, 7.5rem);   /* ~64-120px */
+
+  /* Spacing, radii, motion */
+  --sp-1: .25rem; --sp-2: .5rem; --sp-3: .75rem; --sp-4: 1rem; --sp-5: 1.5rem; --sp-6: 2rem; --sp-7: 3rem;
+  --radius: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+  --ease-bounce: cubic-bezier(.34, 1.56, .64, 1);
+  --dur: .25s;
+  --tap: 3rem;              /* minimum touch target */
+  --content-max: 72rem;
+}
+
+/* Optional dark theme (settings panel arrives in Phase 11) */
+:root[data-theme="dark"] {
+  --bg: #171a2b;
+  --bg-accent: #20243a;
+  --surface: #242842;
+  --surface-2: #2c2f4f;
+  --ink: #f4f1ea;
+  --ink-soft: #b8bad0;
+  --line: #3a3e5e;
+  --shadow: 0 6px 0 rgba(0, 0, 0, .35), 0 12px 24px rgba(0, 0, 0, .3);
+  --shadow-sm: 0 3px 0 rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}
+
+/* ---------- Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%, var(--bg-accent) 0, transparent 40%),
+    radial-gradient(circle at 100% 30%, var(--bg-accent) 0, transparent 35%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+img, svg { max-width: 100%; }
+h1, h2, h3 { line-height: 1.15; margin: 0 0 var(--sp-4); }
+h1 { font-size: var(--fs-h1); letter-spacing: -.01em; }
+h2 { font-size: var(--fs-h2); }
+p { margin: 0 0 var(--sp-4); }
+a { color: var(--c-base10); }
+button { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.view-heading:focus { outline: none; }
+
+.skip-link {
+  position: absolute; left: var(--sp-4); top: -4rem; z-index: 100;
+  background: var(--ink); color: var(--surface); padding: var(--sp-2) var(--sp-4); border-radius: var(--radius);
+}
+.skip-link:focus { top: var(--sp-4); }
+
+/* ---------- Layout ---------- */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-3);
+  padding: var(--sp-3) clamp(var(--sp-4), 4vw, var(--sp-7));
+  padding-top: max(var(--sp-3), env(safe-area-inset-top));
+}
+.brand {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  text-decoration: none; color: var(--ink); font-weight: 800; font-size: 1.35rem;
+}
+.brand-mark {
+  display: inline-grid; grid-template-columns: repeat(3, .7rem); gap: .2rem;
+  padding: .45rem .5rem; border-radius: 14px; background: var(--c-base10); box-shadow: var(--shadow-sm);
+}
+.brand-mark i { width: .7rem; height: .7rem; border-radius: 50%; background: #ffd23f; }
+.brand-mark i:nth-child(2) { background: rgba(255, 255, 255, .35); }
+.app-nav { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.app-nav a {
+  display: inline-flex; align-items: center; min-height: var(--tap);
+  padding: 0 var(--sp-4); border-radius: var(--radius-pill);
+  color: var(--ink); text-decoration: none; font-weight: 700; font-size: var(--fs-small);
+}
+.app-nav a:hover { background: var(--surface); }
+.app-nav a[aria-current="page"] { background: var(--ink); color: var(--surface); }
+
+.stage {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--sp-4) clamp(var(--sp-4), 4vw, var(--sp-7)) var(--sp-7);
+}
+.stage:focus { outline: none; }
+
+.captions {
+  position: sticky; bottom: 0; z-index: 10;
+  margin: 0 auto; width: min(100%, var(--content-max));
+  padding: var(--sp-4) var(--sp-5);
+  padding-bottom: max(var(--sp-4), env(safe-area-inset-bottom));
+  background: var(--ink); color: var(--surface);
+  font-size: var(--fs-lead); font-weight: 600; text-align: center;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.app-footer {
+  padding: var(--sp-4); text-align: center; color: var(--ink-soft); font-size: var(--fs-small);
+  padding-bottom: max(var(--sp-4), env(safe-area-inset-bottom));
+}
+
+/* ---------- Typography helpers ---------- */
+.lead { font-size: var(--fs-lead); color: var(--ink-soft); max-width: 40em; }
+.muted { color: var(--ink-soft); }
+.prose { max-width: 42em; }
+.prose li { margin-bottom: var(--sp-2); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-2);
+  min-height: var(--tap); min-width: var(--tap);
+  padding: 0 var(--sp-5);
+  border: 3px solid var(--ink); border-radius: var(--radius-pill);
+  background: var(--surface); color: var(--ink);
+  font-weight: 800; font-size: var(--fs-base); text-decoration: none; cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur) var(--ease-bounce), box-shadow var(--dur);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(2px); box-shadow: none; }
+.btn-primary { background: var(--c-base10); border-color: var(--c-base10); color: #fff; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; transform: none; }
+
+.badge {
+  display: inline-flex; align-items: center; padding: .1rem .7rem;
+  border-radius: var(--radius-pill); background: var(--surface-2); color: var(--ink-soft);
+  font-size: .85rem; font-weight: 700;
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  :root { --fs-base: 1.125rem; --fs-lead: 1.2rem; }
+  .brand-name { font-size: 1.15rem; }
+  .app-nav a { padding: 0 var(--sp-3); }
+}

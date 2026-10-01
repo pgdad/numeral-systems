@@ -45,7 +45,8 @@ the Web Animations API (`element.animate`). There is no canvas requirement and n
   `NumSys.hands`, ...).
 - A file can only use namespaces from files loaded **before** it in `index.html`.
 - Pure-logic files (`js/core/*`, lesson registration) must run in Node too.
-  `tests/load-app.js` loads them in order into a `vm` context for tests.
+  `tests/load-app.js` loads the files listed in `tests/manifest.js` in order into a DOM-less
+  `vm` context.
 
 ### Lesson / scene contract (defined in Phase 2, used by Phases 4–10)
 
@@ -112,8 +113,8 @@ js/components/hands.js  place-value.js  digit-tile.js  odometer.js  column-add.j
 js/lessons/01-base10.js  02-binary.js  03-octal-hex.js  04-silly.js  05-addition.js  06-playground.js
 js/app.js
 assets/svg/  assets/audio/
-tests/load-app.js  tests/*.test.js  tests/browser.html
-tools/check.sh  tools/lint-rules.js  tools/narration-export.js  tools/build-dist.sh
+tests/manifest.js  harness.js  load-app.js  specs.test.js  specs/*.spec.js  browser.html
+tools/check.sh  tools/lint-rules.js  tools/smoke.js  tools/narration-export.js  tools/build-dist.sh
 deploy/README.md  deploy/s3-cloudfront.sh  deploy/akamai.md  deploy/headers.md
 docs/plan/...              (this plan)
 ```

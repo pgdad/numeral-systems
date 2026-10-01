@@ -1,0 +1,68 @@
+/* ==========================================================================
+   components.css: shell components (home cards, placeholders).
+   Phase 03 adds styles for hands, tiles, odometer, place-value, column-add, etc.
+   ========================================================================== */
+
+/* ---------- Home ---------- */
+.hero { margin: var(--sp-4) 0 var(--sp-6); }
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: var(--sp-5);
+}
+
+.lesson-card {
+  --card-color: var(--c-base10);
+  position: relative;
+  display: flex; flex-direction: column; gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 3px solid var(--line);
+  border-top: 12px solid var(--card-color);
+  box-shadow: var(--shadow);
+  color: var(--ink); text-decoration: none;
+  transition: transform var(--dur) var(--ease-bounce), border-color var(--dur);
+}
+a.lesson-card:hover { transform: translateY(-4px) rotate(-.5deg); border-color: var(--card-color); }
+a.lesson-card:active { transform: translateY(1px); }
+.lesson-card.is-soon { opacity: .72; box-shadow: var(--shadow-sm); }
+
+.lesson-card.theme-base10 { --card-color: var(--c-base10); }
+.lesson-card.theme-binary { --card-color: var(--c-binary); }
+.lesson-card.theme-octal  { --card-color: var(--c-octal); }
+.lesson-card.theme-hex    { --card-color: var(--c-hex); }
+.lesson-card.theme-silly  { --card-color: var(--c-animals); }
+.lesson-card.theme-addition { --card-color: var(--c-addition); }
+.lesson-card.theme-playground { --card-color: var(--c-playground); }
+
+.card-number {
+  position: absolute; top: var(--sp-3); right: var(--sp-4);
+  width: 2rem; height: 2rem; display: grid; place-items: center;
+  border-radius: 50%; background: var(--surface-2); color: var(--ink-soft);
+  font-weight: 800; font-size: .95rem;
+}
+.card-glyph {
+  font-family: var(--font-digits);
+  font-size: var(--fs-digit-md); font-weight: 900; line-height: 1;
+  color: var(--card-color); letter-spacing: .02em;
+  min-height: 1em;
+}
+.card-glyph-dots { display: inline-flex; gap: .2em; align-items: center; }
+.card-glyph-dots .dot { width: .6em; height: .6em; border-radius: 50%; display: inline-block; }
+.dot-red { background: var(--c-red); }
+.dot-yellow { background: var(--c-yellow); clip-path: polygon(50% 0, 100% 100%, 0 100%); border-radius: 0 !important; }
+.dot-green { background: var(--c-green); border-radius: 6px !important; }
+.card-title { font-size: 1.35rem; font-weight: 800; line-height: 1.2; }
+.card-blurb { color: var(--ink-soft); font-size: var(--fs-small); flex: 1; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; gap: var(--sp-2); margin-top: var(--sp-2); }
+.card-go { font-weight: 800; color: var(--card-color); }
+.badge-soon { background: var(--bg-accent); color: var(--ink); }
+
+/* ---------- Placeholder views ---------- */
+.placeholder {
+  max-width: 40rem; margin: var(--sp-7) auto; padding: var(--sp-6);
+  text-align: center; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+}
+.placeholder .lead { margin-left: auto; margin-right: auto; }

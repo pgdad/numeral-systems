@@ -61,3 +61,17 @@ in `css/base.css`. Supports light mode (the default) and an optional dark mode.
 ## D9. Language
 English only for now. All user-facing strings and narration live in the lesson
 files (and `js/core/strings.js` for the shell), so translation can be added later.
+
+## D10. Tests: one spec format for Node and browser
+Specs are classic scripts in `tests/specs/*.spec.js` using `describe/it/expect` from `tests/harness.js`.
+`tests/manifest.js` lists the Node-safe app scripts (in `index.html` order) and the specs. Node runs them via
+`tests/specs.test.js`; the browser runs them via `tests/browser.html`. Tests use
+`NumSys.lessons.createRegistry()` and never mutate the global lesson registry.
+
+## D11. View mounting contract
+Routed views that later phases provide use `mount(stage, ...) → { destroy() }`. `app.js` calls
+`destroy()` before every route change and clears `#stage`. Provided by:
+`NumSys.player.mount(stage, lesson, {scene, step})` (Phase 02) and `NumSys.playground.mount(stage)` (Phase 09).
+New top-level routes (e.g. `#/gallery`, `#/movie`) are added to `ROUTES` in `js/core/router.js`, to the
+`render()` switch in `js/app.js`, and to `EXTRA_ROUTES` in `tools/smoke.js`.
+Every view has one element with class `view-heading` (it receives focus on navigation).

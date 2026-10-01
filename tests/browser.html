@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NumSys tests</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem; color: #23263a; background: #fff8ec; }
+    h1 { margin: 0 0 .5rem; }
+    #summary { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
+    .pass { color: #1f7a3f; } .fail { color: #c62828; }
+    .suite { margin: 1rem 0 .25rem; font-weight: 700; }
+    .test { margin-left: 1rem; }
+    pre { margin: .25rem 0 .5rem 2rem; white-space: pre-wrap; color: #c62828; }
+  </style>
+</head>
+<body>
+  <h1>NumSys unit tests</h1>
+  <div id="summary">Running…</div>
+  <div id="results"></div>
+
+  <!-- Same files as Node: tests/manifest.js lists the app scripts and spec files. -->
+  <script src="manifest.js"></script>
+  <script src="harness.js"></script>
+  <script>
+    // Load app scripts then specs synchronously, in manifest order (works on file://).
+    (function () {
+      var m = window.NUMSYS_TEST_MANIFEST;
+      m.app.concat(m.specs).forEach(function (rel) {
+        document.write('<script src="../' + rel + '"><\/script>');
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      var results = document.getElementById('results');
+      var summary = document.getElementById('summary');
+      var pass = 0, fail = 0;
+
+      function line(cls, text) {
+        var d = document.createElement('div');
+        d.className = cls;
+        d.textContent = text;
+        results.appendChild(d);
+        return d;
+      }
+
+      var queue = [];
+      NumSysTest.suites.forEach(function (suite) {
+        queue.push({ suite: suite });
+        suite.tests.forEach(function (t) { queue.push({ test: t }); });
+      });
+
+      function next() {
+        if (!queue.length) {
+          summary.textContent = (fail ? '✗ ' : '✓ ') + pass + ' passed, ' + fail + ' failed';
+          summary.className = fail ? 'fail' : 'pass';
+          document.title = (fail ? 'FAIL' : 'PASS') + ' · NumSys tests';
+          return;
+        }
+        var item = queue.shift();
+        if (item.suite) { line('suite', item.suite.name); next(); return; }
+        Promise.resolve().then(function () { return item.test.fn(); }).then(function () {
+          pass++;
+          line('test pass', '✓ ' + item.test.name);
+        }, function (err) {
+          fail++;
+          line('test fail', '✗ ' + item.test.name);
+          var pre = document.createElement('pre');
+          pre.textContent = err && err.stack ? err.stack : String(err);
+          results.appendChild(pre);
+        }).then(next);
+      }
+      next();
+    })();
+  </script>
+</body>
+</html>

@@ -56,14 +56,26 @@ All planning state lives in this repo. Nothing relies on session memory.
 
 ## Commands
 
-- `tools/check.sh`: runs all checks (unit tests and static rule lint). Must pass before committing.
+- `tools/check.sh`: runs all checks (unit tests, static rule lint, and the optional browser smoke test). Must pass before committing.
 - `node --test tests/`: unit tests only.
+- `node tools/smoke.js`: headless-browser smoke test. It needs Playwright, which is optional:
+  set `PLAYWRIGHT_MODULE=/path/to/node_modules/playwright` if it isn't installed globally. Add
+  `SMOKE_SCREENSHOTS=<dir>` for screenshots at 400/1024/1920px. Add new routes to `EXTRA_ROUTES` in it.
 - To view the app, open `index.html` in a browser. Or run
   `python3 -m http.server 8000` and visit http://localhost:8000.
-- `tests/browser.html`: runs the unit tests in a browser.
+- `tests/browser.html`: runs the same unit tests in a browser.
+
+## Tests
+
+- Write specs as classic scripts in `tests/specs/*.spec.js` using the globals `describe`, `it` and
+  `expect(x).toBe/toEqual/toThrow/toMatch/toContain/toBeTruthy/toRejectWith` (from `tests/harness.js`).
+  Each spec runs both under `node --test` (via `tests/specs.test.js`) and in `tests/browser.html`.
+- `tests/manifest.js` lists the Node-safe app scripts (same order as `index.html`) and the spec files.
+  The lint fails if a spec file is missing from it, or if its app files are out of order versus `index.html`.
+- Use `NumSys.lessons.createRegistry()` for an isolated registry in tests. Never mutate the global one.
 
 ## Repo map
 
 See `docs/plan/PLAN.md` § "Directory layout". The script load order lives in
-`index.html`. When you add a JS file, add its `<script>` tag in the right place,
-and also add it to the manifest in `tests/load-app.js` so Node tests can load it.
+`index.html`. When you add a JS file, add its `<script>` tag in the right group, and
+also add it to `tests/manifest.js` (same order) so the tests load it.

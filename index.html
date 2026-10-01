@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Animated, talking lessons for kids about number systems: base-10, binary on two hands, octal, hex, and silly animal and color numbers.">
+  <title>Counting Is Fun!</title>
+  <link rel="icon" type="image/svg+xml" href="assets/svg/favicon.svg">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/lessons.css">
+</head>
+<body>
+  <a class="skip-link" href="#stage">Skip to content</a>
+
+  <header class="app-header">
+    <a class="brand" href="#/" data-nav="home" aria-label="Counting Is Fun! Home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-name">Counting Is Fun!</span>
+    </a>
+    <nav class="app-nav" aria-label="Main">
+      <a href="#/" data-nav="home">Home</a>
+      <a href="#/playground" data-nav="playground">Playground</a>
+      <a href="#/about" data-nav="about">About</a>
+    </nav>
+  </header>
+
+  <main id="stage" class="stage" tabindex="-1">
+    <noscript><p class="lead">This app needs JavaScript turned on. Please enable it and reload the page.</p></noscript>
+  </main>
+
+  <!-- Narration captions; filled by the player (Phase 02). -->
+  <div id="captions" class="captions" aria-live="polite" hidden></div>
+
+  <footer class="app-footer">
+    <span>Made with love for curious grandkids.</span>
+  </footer>
+
+  <!--
+    SCRIPT LOAD ORDER — classic scripts only (ES module scripts are blocked on file://).
+    Each file is an IIFE that attaches to window.NumSys and may only use files loaded above it.
+    When you add a JS file:
+      1. add its <script> tag in the right group below, and
+      2. add it to tests/manifest.js (in the same order) if it is safe to load in Node.
+    tools/lint-rules.js fails if a file under js/ is missing here.
+  -->
+  <!-- core -->
+  <script src="js/core/namespace.js"></script>
+  <script src="js/core/strings.js"></script>
+  <script src="js/core/util.js"></script>
+  <script src="js/core/lessons.js"></script>
+  <script src="js/core/router.js"></script>
+  <!-- engine (Phase 02) -->
+  <!-- components (Phase 03) -->
+  <!-- lessons (Phase 04+) -->
+  <!-- boot (must be last) -->
+  <script src="js/app.js"></script>
+</body>
+</html>

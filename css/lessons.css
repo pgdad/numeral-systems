@@ -1,0 +1,4 @@
+/* ==========================================================================
+   lessons.css: per-lesson styles. Scope everything under .lesson-<id>
+   (for example .lesson-base10, .lesson-binary) so lessons never clash.
+   ========================================================================== */
