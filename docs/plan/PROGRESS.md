@@ -12,7 +12,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 03 | Visual components | done | 2026-10-01 | 110 tests + gallery smoke (Chromium + Firefox) |
 | 04 | Lesson: Base‑10 & fingers | done | 2026-10-01 | 119 tests + lesson autoplay smoke (Chromium + Firefox) |
 | 05 | Lesson: Binary on two hands | done | 2026-10-01 | 134 tests + binary autoplay/challenge smoke (Chromium + Firefox) |
-| 06 | Lesson: Octal & Hex | todo | | |
+| 06 | Lesson: Octal & Hex | done | 2026-10-01 | 144 tests + octal-hex autoplay/mixer/counter smoke (Chromium + Firefox) |
 | 07 | Lesson: Silly systems | todo | | |
 | 08 | Lesson: Addition | todo | | |
 | 09 | Playground & games | todo | | |
@@ -20,7 +20,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 06 (Octal & Hex). Phases 06–09 can run in any order.
+**Next phase:** 07 (Silly systems). Phases 07–09 can run in any order.
 
 ---
 
@@ -248,3 +248,49 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   (`.hand-finger[aria-label^="right pinky,"]`), not DOM order (SVG order ≠ display order). Number inputs inside a lesson need
   `novalidate`, or the browser silently blocks submits for out-of-range values.
 - How to see it: open `index.html` and click the "Binary" card (the green "101"), or go to `index.html#/lesson/binary`.
+
+### Phase 06 — Lesson: Octal & Hex — 2026-10-01 — done
+- Built: `js/lessons/03-octal-hex.js` (id `octal-hex`, order 30, theme hex, glyph `7F`, 5 scenes, 21 steps) and its styles in
+  `css/lessons.css` (all scoped under `.lesson-octal-hex`, prefix `oh-`).
+  - 3.1 any: Base‑10 and Binary digit strips, then "Any number of digits?". A purple one-eyed alien (2 hands × 4 fingers) pops in and
+    waves, and its fingers glow. The Octal strip 0–7 is read aloud. An octal odometer counts 4 → 5, 6, 7, then rolls to 10 ("that means
+    eight") and 11, with a Decimal readout beside it. An octal place-value board (Sixty-fours ×8 Eights ×8 Ones) has its places
+    highlighted on cue. **Added step:** "one-one in octal means one eight, plus one more: nine" (0 + 8 + 1 = 9).
+  - 3.2 hex: an orange creature with four hands (16 fingers). Tiles 0–9 appear, then six blank tiles flip into A–F. "A is ten … F is
+    fifteen", one sentence each, lights each letter and pops "= 10" … "= 15" under it. A hex odometer counts D → E, F, rolls to 10
+    ("means sixteen"), then 11. A HEX stamp lands at the end.
+  - 3.3 nibbles: a big four-fingered hand (badges 8 4 2 1, binary digits under the fingers) next to a hex tile cycles 0 → F in sync.
+    Then 1111 = F and 1010 = A ("1111 1010 → FA"). Then the human hands show all ten fingers (ten ones), the bits slide apart (FLIP
+    animation) into dashed groups 11 | 1111 | 1111, hex tiles 3, F, F pop under the groups, and "3FF = 1023".
+  - 3.4 colors: a swatch with `#FF0000` split into RR GG BB (colored underlines and labels). Three display-only sliders appear, then the
+    sliders glide red → green → blue → yellow, then orange, pink and sky blue (each color name is shown).
+  - 3.5 try (interactive), with two tabs:
+    - **Colors:** three real `<input type="range">` sliders (0–255) with `<label>`s and −/+ buttons (step 0x11), the hex pair and decimal
+      value per channel, the swatch, and `#RRGGBB`. Challenges: yellow, purple, white, black, then "your favorite color" (a This one!
+      button gives the star). Show me glides to an answer, then back. Matching uses a tolerance (Euclidean RGB distance ≤ 64, or a purple rule).
+    - **Counter:** decimal (4 places), octal (4) and hex (3) odometers with −1 / +1 / +10, range 0–4095 (7777 / FFF). A ±1 that rolls a
+      system over makes its box glow and plays the carry sound. A status line and debounced speech say all three forms.
+- Engine/component changes: none. The characters, the four-finger hand, the mixer and the counter are lesson-local.
+- Tests: `tests/specs/lesson-octal-hex.spec.js` (10 tests). They cover registration, words-only narration, length, A–F sentences
+  generated from the digit set, the cue positions of the octal and hex rollovers, `nibbles`/`nibbleHex` (1023 → 3 F F, 0xFA → F A, plus a sweep
+  up to 5000 against `numeral.format`), color codes (`hex2`, `rgbToCode`, `codeToRgb`, `speakCode`), tolerance matching per
+  challenge, `nextChallenge`, `stepChannel`, `counterNext`, and `changedPlaces`. `tools/smoke.js` makes yellow with the keyboard (End on the green slider) and
+  checks the star and `aria-valuetext`, counts 16 on the counter (expects 16 = octal 20 = hex 10), and deep-links `#/lesson/octal-hex/2/4`
+  (nibble groups). New routes are in `EXTRA_ROUTES`.
+- Verified: a scratchpad Playwright walker played all 21 steps and compared each with the deep link to the next one: 0 mismatches in
+  Chromium, Firefox, reduced motion and at 400px. The interactive scene passed with mouse, keyboard and touch at 400px in both browsers
+  (sliders, −/+, Show me, Skip, This one!, counter rollovers). Screenshots were checked at 1280×900 and 400px.
+- Known issues / needs a human:
+  - Listen with a real voice: hex letters are read bare ("F F", "three F F", "E. F."). Check a voice doesn't say "A" as "uh".
+  - Safari is untested. The range sliders use `-webkit-slider-thumb` styling, which should work there.
+  - At 1280×900, scenes 3.1 (last steps) and 3.3 (regrouping) are tall enough that the sticky captions cover the player controls
+    (same as binary 2.4). At 400px the captions bar covers the lower sliders until you scroll. Phase 11's captions work should fix both.
+  - The "white" tolerance accepts very pale colors (e.g. #FFFFCC). That's intended for kids.
+- For later phases:
+  - `makeMixer()` in this file (accessible sliders, `aria-valuetext` "255, hex F F", glide animation) and the dec/oct/hex counter are
+    good starting points for the Phase 09 converter/playground. Move them into `js/components/` if they get reused.
+  - Testing range inputs with Playwright: centre the element first (the sticky captions bar can cover it). For touch, tap raw
+    coordinates with `page.touchscreen.tap`; `page.tap(selector, {position})` misreports interception.
+- How to see it: open `index.html` and click the orange "7F" card "Octal & Hexadecimal", or go to `index.html#/lesson/octal-hex`
+  (`#/lesson/octal-hex/4/0` jumps to "You try it!").
+

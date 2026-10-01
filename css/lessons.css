@@ -288,3 +288,231 @@
   .lesson-binary .bin-doubles { font-size: 1rem; }
   .lesson-binary .bin-switch { width: 1.7rem; height: 2rem; font-size: 1.1rem; }
 }
+
+/* ---------- Lesson 3: Octal & Hex (js/lessons/03-octal-hex.js) ---------- */
+.lesson-octal-hex .oh-scene { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); position: relative; }
+.lesson-octal-hex .oh-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--sp-4) var(--sp-5); width: 100%; }
+.lesson-octal-hex .oh-panel { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.lesson-octal-hex .oh-panel[hidden] { display: none; }
+
+/* Characters (alien, creature, four-fingered hand) */
+.lesson-octal-hex .oh-critter-wrap { flex: 0 1 15rem; width: 15rem; max-width: 40vw; }
+.lesson-octal-hex .oh-creature-wrap { flex-basis: 15rem; }
+.lesson-octal-hex .oh-critter { display: block; width: 100%; height: auto; overflow: visible; }
+.lesson-octal-hex .oh-alien { --oh-skin: #b197fc; --oh-dark: #5f3dc4; }
+.lesson-octal-hex .oh-creature { --oh-skin: #ffa94d; --oh-dark: #c2410c; }
+.lesson-octal-hex .oh-four { --oh-skin: #ffa94d; --oh-dark: #c2410c; position: relative; width: clamp(8rem, 18vw, 11rem); }
+.lesson-octal-hex .oh-skin, .lesson-octal-hex .oh-body { fill: var(--oh-skin); stroke: var(--ink); stroke-width: 4; }
+.lesson-octal-hex .oh-tip { fill: color-mix(in srgb, var(--oh-skin) 55%, #fff); }
+.lesson-octal-hex .oh-finger.is-down .oh-tip { opacity: 0; }
+.lesson-octal-hex .oh-flex, .lesson-octal-hex .oh-wave { transform-box: fill-box; transform-origin: 50% 100%; }
+.lesson-octal-hex .oh-finger.is-glowing .oh-skin { stroke: #ffc400; stroke-width: 8; }
+.lesson-octal-hex .oh-arm-line { fill: none; stroke: var(--ink); stroke-width: 26; stroke-linecap: round; }
+.lesson-octal-hex .oh-arm { fill: none; stroke: var(--oh-skin); stroke-width: 18; stroke-linecap: round; }
+.lesson-octal-hex .oh-line { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; }
+.lesson-octal-hex .oh-ball { fill: #ffd43b; stroke: var(--ink); stroke-width: 4; }
+.lesson-octal-hex .oh-eye { fill: #fff; stroke: var(--ink); stroke-width: 4; }
+.lesson-octal-hex .oh-pupil { fill: var(--ink); }
+.lesson-octal-hex .oh-shine { fill: #fff; }
+.lesson-octal-hex .oh-spot { fill: var(--oh-dark); opacity: .35; }
+.lesson-octal-hex .oh-mouth { fill: #7a1f1f; stroke: var(--ink); stroke-width: 4; stroke-linejoin: round; }
+.lesson-octal-hex .oh-tooth { fill: #fff; stroke: var(--ink); stroke-width: 2; }
+.lesson-octal-hex .oh-crease { fill: none; stroke: var(--ink); stroke-width: 2.5; opacity: .35; stroke-linecap: round; }
+.lesson-octal-hex .oh-sleeve { fill: var(--c-hex); stroke: var(--ink); stroke-width: 4; }
+.lesson-octal-hex .oh-four-svg { display: block; width: 100%; height: auto; }
+.lesson-octal-hex .oh-badge rect { fill: var(--c-hex); }
+.lesson-octal-hex .oh-badge text { fill: #fff; font: 900 17px var(--font-digits); }
+.lesson-octal-hex .oh-strip { position: relative; height: 2.6rem; margin-top: .2rem; }
+.lesson-octal-hex .oh-bit {
+  position: absolute; top: 0; transform: translateX(-50%); width: 1.9rem; height: 2.4rem; display: grid; place-items: center;
+  border-radius: .5rem; font: 900 1.6rem/1 var(--font-digits); background: color-mix(in srgb, var(--c-binary) 14%, var(--surface));
+}
+.lesson-octal-hex .oh-bit.is-one { background: var(--c-binary); color: #fff; }
+
+/* 3.1 any base */
+.lesson-octal-hex .oh-any-right { flex: 1 1 22rem; max-width: 36rem; display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.lesson-octal-hex .oh-strips { display: flex; flex-direction: column; gap: var(--sp-2); align-items: flex-start; }
+.lesson-octal-hex .oh-strip-row { display: flex; align-items: center; gap: var(--sp-2); }
+.lesson-octal-hex .oh-strip-row[hidden], .lesson-octal-hex .oh-any[hidden] { display: none; }
+.lesson-octal-hex .oh-strip-name { font-weight: 900; color: var(--theme-color); min-width: 4.6rem; text-align: right; }
+.lesson-octal-hex .oh-strip-tiles { display: flex; flex-wrap: wrap; gap: .3rem; }
+.lesson-octal-hex .oh-strip-tiles .digit-tile.tile-sm { --tile: clamp(2.1rem, 1.4rem + 1.6vw, 3rem); }
+.lesson-octal-hex .oh-any {
+  font-size: var(--fs-h2); font-weight: 900; color: var(--c-hex); padding: var(--sp-1) var(--sp-4);
+  border: 4px dashed var(--c-hex); border-radius: var(--radius-lg); align-self: center;
+}
+.lesson-octal-hex .oh-countbox { display: flex; align-items: flex-end; gap: var(--sp-5); flex-wrap: wrap; justify-content: center; }
+.lesson-octal-hex .oh-countbox[hidden] { display: none; }
+.lesson-octal-hex .oh-countbox-odo, .lesson-octal-hex .oh-dec { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); }
+.lesson-octal-hex .oh-countbox .odometer.odo-size-lg { --odo: clamp(3.4rem, 2.4rem + 3vw, 5rem); }
+.lesson-octal-hex .oh-odo-name { font-size: .85rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--theme-color); }
+.lesson-octal-hex .oh-odo-name-dec { color: var(--c-base10); }
+.lesson-octal-hex .oh-dec-num { font: 900 var(--fs-digit-md)/1 var(--font-digits); color: var(--c-base10); min-width: 2ch; text-align: center; border-radius: var(--radius); }
+.lesson-octal-hex .oh-pv { max-width: 100%; }
+
+/* 3.2 hex digits */
+.lesson-octal-hex .oh-hex-right { flex: 1 1 24rem; max-width: 40rem; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.lesson-octal-hex .oh-hex-grid { display: grid; grid-template-columns: repeat(8, auto); gap: .35rem .4rem; justify-content: center; }
+.lesson-octal-hex .oh-hex-cell { display: flex; flex-direction: column; align-items: center; gap: .15rem; min-height: 4.6rem; }
+.lesson-octal-hex .oh-hex-grid .digit-tile.tile-sm { --tile: clamp(2.3rem, 1.5rem + 2vw, 3.4rem); }
+.lesson-octal-hex .oh-tag { font: 900 1rem/1 var(--font-digits); color: var(--c-base10); white-space: nowrap; }
+.lesson-octal-hex .oh-hex-bottom { position: relative; display: flex; align-items: center; justify-content: center; gap: var(--sp-5); flex-wrap: wrap; }
+.lesson-octal-hex .oh-stamp {
+  font: 900 clamp(2.4rem, 1.5rem + 3vw, 4rem)/1 var(--font-digits); letter-spacing: .12em; color: var(--c-hex);
+  border: 6px solid var(--c-hex); border-radius: .8rem; padding: .3rem .8rem; transform: rotate(-10deg);
+  background: color-mix(in srgb, var(--c-hex) 10%, var(--surface));
+}
+
+/* 3.3 hex and binary */
+.lesson-octal-hex .oh-pairs { gap: var(--sp-4) clamp(1.5rem, 5vw, 4rem); }
+.lesson-octal-hex .oh-pair-col { display: flex; align-items: center; gap: var(--sp-3); }
+.lesson-octal-hex .oh-equals { font: 900 2.4rem var(--font-digits); color: var(--ink-soft); }
+.lesson-octal-hex .oh-pair-col .digit-tile.tile-lg { --tile: clamp(4.5rem, 3rem + 4vw, 7rem); }
+.lesson-octal-hex .oh-byte { display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; justify-content: center; font: 900 clamp(1.4rem, 1rem + 1.5vw, 2.2rem)/1.2 var(--font-digits); }
+.lesson-octal-hex .oh-byte-bin { color: var(--c-binary); }
+.lesson-octal-hex .oh-byte strong { color: var(--c-hex); }
+.lesson-octal-hex .oh-arrow { color: var(--ink-soft); }
+.lesson-octal-hex .oh-small-hands { width: 100%; max-width: min(22rem, 34vh); }
+.lesson-octal-hex .oh-small-hands .hands { max-width: none; }
+.lesson-octal-hex .oh-groups { display: flex; justify-content: center; gap: 0; }
+.lesson-octal-hex .oh-group { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); border-radius: var(--radius); padding: .3rem 0; transition: padding .3s, background-color .3s; }
+.lesson-octal-hex .oh-group-bits { display: flex; gap: .3rem; padding: 0 .15rem; }
+.lesson-octal-hex .oh-gbit {
+  width: clamp(1.8rem, 1.2rem + 1.6vw, 2.6rem); height: clamp(2.4rem, 1.6rem + 2vw, 3.3rem); display: grid; place-items: center;
+  border-radius: .5rem; font: 900 clamp(1.4rem, 1rem + 1.2vw, 2rem)/1 var(--font-digits); background: var(--c-binary); color: #fff;
+}
+.lesson-octal-hex .oh-group .digit-tile.tile-md { --tile: clamp(3rem, 2rem + 2.5vw, 4.2rem); }
+.lesson-octal-hex .oh-groups.is-split { gap: clamp(.8rem, 3vw, 2rem); }
+.lesson-octal-hex .oh-groups.is-split .oh-group { padding: .3rem .4rem; background: color-mix(in srgb, var(--c-hex) 14%, transparent); outline: 3px dashed var(--c-hex); }
+.lesson-octal-hex .oh-answer { font: 900 clamp(2.4rem, 1.6rem + 2.5vw, 3.8rem)/1 var(--font-digits); display: flex; align-items: baseline; gap: .2em; border-radius: var(--radius); padding: 0 .3em; }
+.lesson-octal-hex .oh-answer-hex { color: var(--c-hex); }
+.lesson-octal-hex .oh-answer-dec { color: var(--c-base10); }
+
+/* 3.4 colors: the mixer */
+.lesson-octal-hex .oh-mixer { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-6, 2.5rem); align-items: center; justify-content: center; width: 100%; }
+.lesson-octal-hex .oh-swatch-wrap { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+.lesson-octal-hex .oh-swatch {
+  width: clamp(8rem, 18vw, 12rem); aspect-ratio: 1; border-radius: var(--radius-lg); border: 5px solid var(--ink);
+  box-shadow: var(--shadow); transition: background-color .1s;
+}
+.lesson-octal-hex .oh-code { display: flex; font: 900 clamp(1.8rem, 1.2rem + 2vw, 2.8rem)/1 var(--font-digits); letter-spacing: .04em; border-radius: var(--radius); padding: .1em .2em; }
+.lesson-octal-hex .oh-hash { color: var(--ink-soft); }
+.lesson-octal-hex .oh-pair { padding: 0 .08em; border-bottom: 5px solid transparent; border-radius: .2rem; display: inline-block; }
+.lesson-octal-hex .oh-pair.is-marked.oh-pair-red { border-color: #e53935; }
+.lesson-octal-hex .oh-pair.is-marked.oh-pair-green { border-color: #2fb344; }
+.lesson-octal-hex .oh-pair.is-marked.oh-pair-blue { border-color: #1e6fe0; }
+.lesson-octal-hex .oh-code-labels { display: flex; font-weight: 800; font-size: .9rem; line-height: 1; margin-top: -.3rem; }
+.lesson-octal-hex .oh-hash-space { width: .7em; }
+.lesson-octal-hex .oh-pair-label { width: 3.4rem; text-align: center; }
+.lesson-octal-hex .oh-pair-label.oh-pair-red { color: #e53935; }
+.lesson-octal-hex .oh-pair-label.oh-pair-green { color: #23883a; }
+.lesson-octal-hex .oh-pair-label.oh-pair-blue { color: #1e6fe0; }
+.lesson-octal-hex .oh-color-name { font-size: var(--fs-lead); font-weight: 900; min-height: 1.4em; }
+.lesson-octal-hex .oh-channels { flex: 1 1 22rem; min-width: 0; max-width: 34rem; display: flex; flex-direction: column; gap: var(--sp-3); }
+.lesson-octal-hex .oh-ch { display: flex; align-items: center; gap: var(--sp-2); border-radius: var(--radius); padding: .2rem .3rem; }
+.lesson-octal-hex .oh-ch-name { font-weight: 900; flex: none; width: 4.2rem; }
+.lesson-octal-hex .oh-ch-red .oh-ch-name { color: #e53935; }
+.lesson-octal-hex .oh-ch-green .oh-ch-name { color: #23883a; }
+.lesson-octal-hex .oh-ch-blue .oh-ch-name { color: #1e6fe0; }
+.lesson-octal-hex .oh-ch-vals { display: flex; flex-direction: column; align-items: flex-end; min-width: 3.2rem; line-height: 1.05; }
+.lesson-octal-hex .oh-ch-hex { font: 900 1.6rem var(--font-digits); }
+.lesson-octal-hex .oh-ch-dec { font: 800 .95rem var(--font-digits); color: var(--ink-soft); }
+.lesson-octal-hex .oh-range {
+  -webkit-appearance: none; appearance: none; flex: 1 1 8rem; min-width: 6rem; height: 2.2rem; margin: 0; border-radius: 1.1rem;
+  border: 3px solid var(--ink); background: linear-gradient(to right, #000, var(--ch)); cursor: pointer;
+}
+.lesson-octal-hex .oh-range:disabled { cursor: default; opacity: 1; }
+.lesson-octal-hex .oh-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 2.6rem; height: 2.6rem; border-radius: 50%;
+  background: #fff; border: 5px solid var(--ink); box-shadow: var(--shadow-sm);
+}
+.lesson-octal-hex .oh-range::-moz-range-thumb {
+  width: 2.6rem; height: 2.6rem; border-radius: 50%; box-sizing: border-box;
+  background: #fff; border: 5px solid var(--ink); box-shadow: var(--shadow-sm);
+}
+.lesson-octal-hex .oh-range::-moz-range-track { background: transparent; }
+.lesson-octal-hex .oh-range:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+.lesson-octal-hex .oh-nudge { width: var(--tap); height: var(--tap); padding: 0; display: inline-grid; place-items: center; border-radius: 50%; flex: none; }
+.lesson-octal-hex .oh-nudge svg { width: 1.4rem; height: 1.4rem; }
+
+/* 3.5 you try it */
+.lesson-octal-hex .oh-tabs { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
+.lesson-octal-hex .oh-tab { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-weight: 800; }
+.lesson-octal-hex .oh-tab[aria-pressed="true"] { background: var(--theme-color); color: #fff; border-color: var(--theme-color); }
+.lesson-octal-hex .oh-tab-dots { display: inline-flex; gap: 2px; }
+.lesson-octal-hex .oh-tab-dots i { width: .7rem; height: .7rem; border-radius: 50%; border: 2px solid currentColor; background: #e53935; }
+.lesson-octal-hex .oh-tab-dots i:nth-child(2) { background: #2fb344; }
+.lesson-octal-hex .oh-tab-dots i:nth-child(3) { background: #1e6fe0; }
+.lesson-octal-hex .oh-tab-glyph { font: 900 1.1rem var(--font-digits); }
+.lesson-octal-hex .oh-tab-panel { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.lesson-octal-hex .oh-tab-panel[hidden] { display: none; }
+.lesson-octal-hex .oh-card {
+  position: relative; display: flex; align-items: center; gap: var(--sp-3) var(--sp-4); flex-wrap: wrap; justify-content: center;
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-lg); background: var(--surface);
+  border: 4px solid var(--theme-color); box-shadow: var(--shadow); max-width: 100%;
+}
+.lesson-octal-hex .oh-card.is-won { border-color: #ffc400; background: #fff6d6; }
+.lesson-octal-hex .oh-prompt { margin: 0; font-size: var(--fs-h2); font-weight: 900; text-align: center; }
+.lesson-octal-hex .oh-stars { display: inline-flex; align-items: center; gap: var(--sp-1); font: 900 1.5rem var(--font-digits); }
+.lesson-octal-hex .oh-star-icon { width: 2rem; height: 2rem; color: #f5b400; }
+.lesson-octal-hex .oh-card-buttons { display: inline-flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: center; }
+.lesson-octal-hex .oh-hint, .lesson-octal-hex .oh-skip, .lesson-octal-hex .oh-pick { min-height: var(--tap); display: inline-flex; align-items: center; gap: var(--sp-1); }
+.lesson-octal-hex .oh-hint[hidden], .lesson-octal-hex .oh-pick[hidden] { display: none; }
+.lesson-octal-hex .oh-hint svg, .lesson-octal-hex .oh-pick svg { width: 1.3rem; height: 1.3rem; }
+.lesson-octal-hex .oh-hint:disabled { opacity: .4; cursor: default; }
+.lesson-octal-hex .oh-burst-anchor { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.lesson-octal-hex .oh-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 4; }
+.lesson-octal-hex .oh-burst-star {
+  position: absolute; width: 3rem; height: 3rem; max-width: none; left: -1.5rem; top: -1.5rem;
+  animation: oh-burst 1.4s ease-out forwards;
+}
+@keyframes oh-burst {
+  0% { transform: rotate(var(--a)) translateY(0) scale(.3); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-8rem) scale(1.1) rotate(180deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-octal-hex .oh-burst-star { animation: none; transform: translateY(-4rem) scale(1.3); }
+}
+.lesson-octal-hex .oh-count-tip { margin: 0; font-size: var(--fs-lead); font-weight: 700; text-align: center; max-width: 40rem; }
+.lesson-octal-hex .oh-odos { display: flex; flex-wrap: wrap; gap: var(--sp-4) var(--sp-5); justify-content: center; align-items: flex-end; }
+.lesson-octal-hex .oh-odo { display: flex; flex-direction: column; align-items: center; gap: var(--sp-1); padding: var(--sp-2) var(--sp-3); border-radius: var(--radius-lg); }
+.lesson-octal-hex .oh-odo .odometer { --odo: clamp(3rem, 2rem + 2.6vw, 4.5rem); }
+.lesson-octal-hex .oh-count-buttons { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
+.lesson-octal-hex .oh-count-btn { min-width: 5rem; min-height: calc(var(--tap) + .5rem); font: 900 1.6rem var(--font-digits); }
+.lesson-octal-hex .oh-count-btn.is-up:not(:disabled) { background: var(--theme-color); border-color: var(--theme-color); color: #fff; }
+.lesson-octal-hex .oh-count-btn:disabled { opacity: .35; cursor: default; }
+.lesson-octal-hex .oh-count-status { margin: 0; font-weight: 700; color: var(--ink-soft); }
+
+@media (max-width: 560px) {
+  .lesson-octal-hex .oh-scene { gap: var(--sp-3); }
+  .lesson-octal-hex .oh-critter-wrap { flex-basis: 11rem; max-width: 60vw; }
+  .lesson-octal-hex .oh-strips { align-items: center; }
+  .lesson-octal-hex .oh-strip-row { flex-direction: column; gap: .15rem; }
+  .lesson-octal-hex .oh-strip-name { min-width: 0; font-size: .9rem; text-align: center; }
+  .lesson-octal-hex .oh-strip-tiles { justify-content: center; gap: .2rem; }
+  .lesson-octal-hex .oh-strip-tiles .digit-tile.tile-sm { --tile: 1.75rem; border-width: 2px; }
+  .lesson-octal-hex .oh-group-bits { gap: .15rem; padding: 0; }
+  .lesson-octal-hex .oh-gbit { width: 1.3rem; height: 1.9rem; font-size: 1.1rem; border-radius: .35rem; }
+  .lesson-octal-hex .oh-groups.is-split { gap: .5rem; }
+  .lesson-octal-hex .oh-groups.is-split .oh-group { padding: .25rem .2rem; }
+  .lesson-octal-hex .oh-hex-cell { min-height: 3.6rem; }
+  .lesson-octal-hex .oh-tag { font-size: .8rem; }
+  .lesson-octal-hex .oh-bit { width: 1.5rem; height: 2rem; font-size: 1.2rem; }
+  .lesson-octal-hex .oh-equals { font-size: 1.6rem; }
+  .lesson-octal-hex .oh-pair-col { gap: var(--sp-2); }
+  .lesson-octal-hex .oh-prompt { font-size: var(--fs-lead); }
+  .lesson-octal-hex .oh-pair-label { width: 2.6rem; }
+  .lesson-octal-hex .oh-mixer { gap: var(--sp-3); }
+  .lesson-octal-hex .oh-swatch { width: 7rem; }
+  .lesson-octal-hex .oh-ch { gap: .35rem; padding: .2rem 0; }
+  .lesson-octal-hex .oh-ch-name { width: 3.1rem; font-size: .95rem; }
+  .lesson-octal-hex .oh-nudge { width: 2.5rem; height: 2.5rem; }
+  .lesson-octal-hex .oh-nudge svg { width: 1.1rem; height: 1.1rem; }
+  .lesson-octal-hex .oh-range { min-width: 3rem; height: 1.9rem; }
+  .lesson-octal-hex .oh-range::-webkit-slider-thumb { width: 2.2rem; height: 2.2rem; border-width: 4px; }
+  .lesson-octal-hex .oh-range::-moz-range-thumb { width: 2.2rem; height: 2.2rem; border-width: 4px; }
+  .lesson-octal-hex .oh-ch-vals { min-width: 2.4rem; }
+  .lesson-octal-hex .oh-ch-hex { font-size: 1.3rem; }
+  .lesson-octal-hex .oh-count-btn { min-width: 4.2rem; font-size: 1.3rem; }
+}

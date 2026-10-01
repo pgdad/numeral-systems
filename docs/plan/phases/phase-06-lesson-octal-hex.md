@@ -26,10 +26,10 @@ A narrated lesson plus two interactives: an oct/hex counter and a hex color mixe
 6. Tests: the color-match tolerance function, nibble regrouping, and the registration checks.
 
 ## Acceptance criteria
-- [ ] A–F values are taught with clear visuals. Rollover F→10 is animated.
-- [ ] The color mixer works and is accessible (sliders have labels, values are announced).
-- [ ] Autoplay runs start to finish. Deep links work.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] A–F values are taught with clear visuals. Rollover F→10 is animated.
+- [x] The color mixer works and is accessible (sliders have labels, values are announced).
+- [x] Autoplay runs start to finish. Deep links work.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 `index.html#/lesson/octal-hex`

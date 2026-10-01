@@ -126,3 +126,14 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
 - The D5 middle-finger policy applies to challenges too: no challenge target is 4 or 128, and an age of 4 or 128 becomes "next birthday" (+1).
 - A lesson may put a short narrated scene after its interactive scene (binary's "Did you know?"). The player stops at the interactive
   scene; "I'm done!" continues to it.
+
+## D17. Octal/hex characters and color codes (Phase 06)
+- Octal is "an alien with eight fingers" (purple, two hands × four fingers) and hex is "a creature with sixteen fingers" (orange,
+  four hands × four fingers). One hex digit is shown as **one four-fingered hand** whose fingers are worth 8 4 2 1 (left to right),
+  the same reading order as D5. The D5 middle-finger rule is about human hands only. Cartoon four-fingered hands may pass through or show any value.
+- Hex letters are narrated as bare letters ("F F", "three F F"), which matches `digitsets` `speak`. Narrated rollovers say
+  "one-zero" and then what it means ("that means eight", "means sixteen").
+- Color codes are `#RRGGBB` in upper case. Channel −/+ buttons step by 0x11 (00, 11 … FF). A color challenge is met within RGB
+  distance 64 of its target, or by a rule (purple: red and blue ≥ 96, |red − blue| ≤ 80, green ≤ 80). Sliders are native
+  `<input type="range">` with a `<label>` and `aria-valuetext` like "255, hex F F".
+

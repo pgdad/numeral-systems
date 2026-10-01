@@ -31,7 +31,7 @@ const shotsDir = process.env.SMOKE_SCREENSHOTS;
 const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
 const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0',
-  '#/lesson/binary/3/2', '#/lesson/binary/5/0'];
+  '#/lesson/binary/3/2', '#/lesson/binary/5/0', '#/lesson/octal-hex/2/4', '#/lesson/octal-hex/4/0'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -366,6 +366,31 @@ async function lessonScenarios(browser, failures) {
         return svg && /3 fingers up: right index, right ring, right pinky$/.test(svg.getAttribute('aria-label'));
       }, null, { timeout: 5000 }).catch(() => null);
       if (!eleven) failures.push(`${label}: deep link #/lesson/binary/4/1 does not show eleven on the fingers`);
+    }
+    if (id === 'octal-hex') {
+      // Challenge 1 is "yellow": push the green slider (keyboard End) to FF.
+      await page.focus('.oh-try .oh-ch-green .oh-range');
+      await page.keyboard.press('End');
+      const yellow = await page.waitForFunction(() => document.querySelector('.oh-star-count').textContent === '1' &&
+        document.querySelector('.oh-try .oh-mixer').dataset.code === '#FFFF00', null, { timeout: 3000 }).catch(() => null);
+      if (!yellow) failures.push(`${label}: FF FF 00 did not complete the "yellow" challenge`);
+      const vt = await page.getAttribute('.oh-try .oh-ch-green .oh-range', 'aria-valuetext');
+      if (vt !== '255, hex F F') failures.push(`${label}: green slider announces "${vt}"`);
+      // Counter: sixteen +1 presses roll hex over from F to 10.
+      await page.click('.oh-tab:nth-child(2)');
+      for (let i = 0; i < 16; i++) await page.click('.oh-count-btn[data-delta="1"]');
+      const rolled = await page.waitForFunction(() => {
+        const o = [...document.querySelectorAll('.oh-odos .odometer')].map((x) => x.getAttribute('aria-label'));
+        return o.join('|') === 'Odometer showing sixteen|Odometer showing two-zero|Odometer showing one zero';
+      }, null, { timeout: 3000 }).catch(() => null);
+      if (!rolled) failures.push(`${label}: the counter did not show 16 = octal 20 = hex 10`);
+      // A deep link rebuilds the regrouped 11 1111 1111 -> 3 F F.
+      await page.evaluate(() => { location.hash = '#/lesson/octal-hex/2/4'; });
+      const grouped = await page.waitForFunction(() => {
+        const g = document.querySelector('.oh-friends .oh-groups.is-split');
+        return g && g.getAttribute('aria-label') === 'Binary 11 1111 1111';
+      }, null, { timeout: 5000 }).catch(() => null);
+      if (!grouped) failures.push(`${label}: deep link #/lesson/octal-hex/2/4 does not show the nibble groups`);
     }
     console.log(`smoke: ${label} autoplay OK (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
     await context.close();
