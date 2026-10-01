@@ -51,7 +51,7 @@ a.lesson-card:active { transform: translateY(1px); }
   color: var(--card-color); letter-spacing: .02em;
   min-height: 1em;
 }
-.card-glyph-icon .icon-art { width: 1em; height: 1em; display: block; }
+.card-glyph-icon svg { width: 1em; height: 1em; display: block; }
 .card-glyph-dots { display: inline-flex; gap: .2em; align-items: center; }
 .card-glyph-dots .dot { width: .6em; height: .6em; border-radius: 50%; display: inline-block; }
 .dot-red { background: var(--c-red); }
@@ -247,6 +247,8 @@ a.lesson-card:active { transform: translateY(1px); }
 .hand-finger.is-down .hand-nail { opacity: 0; }
 .hand-hit { fill: transparent; }
 .hands.is-interactive .hand-finger { cursor: pointer; }
+/* A folded finger hides behind the palm: let taps on the knuckle edge of the palm reach the finger's hit area. */
+.hands.is-interactive .hand-palm, .hands.is-interactive .hand-crease { pointer-events: none; }
 .hands.is-interactive .hand-finger:hover .hand-skin { stroke: var(--theme-color, var(--focus)); stroke-width: 6; }
 .hand-finger:focus { outline: none; }
 .hand-finger:focus-visible .hand-hit { stroke: var(--focus); stroke-width: 4; stroke-dasharray: 6 4; }

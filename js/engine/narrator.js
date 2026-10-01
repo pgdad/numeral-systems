@@ -1,5 +1,7 @@
 // Narrator: speaks a step's text and shows it as captions (DECISIONS D3).
-//   speak(id, text, {rate, signal}) -> Promise (resolves when done; rejects AbortError if aborted)
+//   speak(id, text, {rate, signal, onSentence}) -> Promise (resolves when done; rejects AbortError if aborted)
+//   onSentence(i) is called as sentence i starts (and for any skipped ones at the end), so
+//   animations can follow the words (the player exposes it to steps as ctx.cue(i)).
 // Order of preference:
 //   1. a recorded file listed in NS.audioManifest[id] whose hash matches the text,
 //   2. the browser's speechSynthesis (voice on + available),
@@ -161,7 +163,7 @@
     });
   }
 
-  function speakWithSynth(text, rate, signal) {
+  function speakWithSynth(text, rate, signal, onSentence) {
     var s = synth();
     var sentences = splitSentences(text);
     // Chrome bug: speaking straight after cancel() can be dropped — cancel, then wait a tick.
@@ -174,6 +176,7 @@
       sentences.forEach(function (sentence, i) {
         chain = chain.then(function () {
           highlightSentence(i);
+          onSentence(i);
           return speakSentence(sentence, voice, rate, signal, function (charIndex) { highlightWord(i, charIndex); });
         });
       });
@@ -255,6 +258,12 @@
     options = options || {};
     var rate = options.rate || 1;
     var signal = options.signal;
+    var reached = -1;
+    function onSentence(i) {
+      if (i <= reached) return;
+      reached = i;
+      if (options.onSentence) { try { options.onSentence(i); } catch (e) { console.error(e); } }
+    }
     showCaption(text);
     var source = chooseSource(id, text, {
       manifest: NS.audioManifest, voiceOn: voiceOn, speechAvailable: isSpeechAvailable()
@@ -266,6 +275,7 @@
       sentences.forEach(function (sentence, i) {
         chain = chain.then(function () {
           highlightSentence(i);
+          onSentence(i);
           return U.sleep(estimateMs(sentence, rate), signal);
         });
       });
@@ -276,16 +286,27 @@
     if (source === 'audio') {
       var entry = NS.audioManifest[id];
       highlightSentence(0);
+      onSentence(0);
+      // A recording has no sentence events: estimate when each later sentence starts.
+      var at = 0;
+      splitSentences(text).forEach(function (sentence, i) {
+        if (i) U.sleep(at, signal).then(function () { onSentence(i); }, function () {});
+        at += estimateMs(sentence, rate) / config.timeScale;
+      });
       run = speakWithAudio(typeof entry === 'string' ? entry : entry.src, rate, signal).catch(function (e) {
         if (U.isAbortError(e)) throw e;
-        return isSpeechAvailable() && voiceOn ? speakWithSynth(text, rate, signal) : timed();
+        return isSpeechAvailable() && voiceOn ? speakWithSynth(text, rate, signal, onSentence) : timed();
       });
     } else if (source === 'speech') {
-      run = speakWithSynth(text, rate, signal);
+      run = speakWithSynth(text, rate, signal, onSentence);
     } else {
       run = timed();
     }
-    return run.then(function () { clearHighlights(); return source; });
+    return run.then(function () {
+      clearHighlights();
+      onSentence(Infinity); // release any cue still waiting
+      return source;
+    });
   }
 
   // Stop anything that is speaking right now.

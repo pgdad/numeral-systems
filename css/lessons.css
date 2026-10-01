@@ -19,3 +19,113 @@
 }
 .lesson-demo .demo-animal-icon { width: clamp(3rem, 8vw, 5rem); height: clamp(3rem, 8vw, 5rem); }
 .lesson-demo .demo-press { font-size: 1.5rem; min-height: 4rem; }
+
+/* ---------- Lesson 1: Base-10 (js/lessons/01-base10.js) ---------- */
+.lesson-base10 .b10-scene { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); position: relative; }
+.lesson-base10 .b10-big {
+  font-family: var(--font-digits); font-weight: 900; font-size: var(--fs-digit-lg); line-height: 1;
+  color: var(--theme-color); font-variant-numeric: tabular-nums; min-width: 1.3em; text-align: center;
+}
+.lesson-base10 .b10-hands-wrap { flex: 1 1 24rem; max-width: 40rem; display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+
+/* 1.1 Hello, fingers */
+.lesson-base10 .b10-hello { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+.lesson-base10 .b10-group {
+  font-size: var(--fs-lead); font-weight: 800; padding: var(--sp-1) var(--sp-5);
+  border-top: 5px solid var(--theme-color); border-radius: 0 0 var(--radius) var(--radius);
+  width: 90%; text-align: center; background: color-mix(in srgb, var(--theme-color) 10%, transparent);
+}
+.lesson-base10 .b10-group strong { color: var(--theme-color); }
+
+/* 1.2 Ten digits */
+.lesson-base10 .b10-digits-top { display: flex; align-items: center; justify-content: center; gap: var(--sp-5); min-height: 9rem; }
+.lesson-base10 .b10-finger { width: 8rem; }
+.lesson-base10 .b10-bubble {
+  font-size: var(--fs-h2); padding: var(--sp-2) var(--sp-5); border-radius: var(--radius-lg);
+  background: var(--surface); border: 4px solid var(--theme-color); box-shadow: var(--shadow-sm);
+}
+.lesson-base10 .b10-bubble strong { color: var(--theme-color); }
+.lesson-base10 .b10-tiles {
+  --b10-tile: clamp(3rem, 1rem + 5.2vw, 5.5rem);
+  display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2); max-width: 100%;
+}
+.lesson-base10 .b10-tiles .digit-tile.tile-md { --tile: var(--b10-tile); }
+.lesson-base10 .b10-question {
+  display: inline-grid; place-items: center; width: var(--b10-tile); height: var(--b10-tile); border-radius: var(--radius);
+  border: 5px dashed var(--c-hex); color: var(--c-hex); background: var(--surface);
+  font: 900 calc(var(--b10-tile) * .62)/1 var(--font-digits);
+}
+.lesson-base10 .b10-word { font-size: var(--fs-h2); font-weight: 900; color: var(--theme-color); letter-spacing: .04em; }
+.lesson-base10 .b10-fly { position: absolute; z-index: 3; margin: 0; pointer-events: none; }
+
+/* 1.3 / 1.4 boards */
+.lesson-base10 .b10-board .pv-col { min-width: 7rem; }
+.lesson-base10 .b10-bundle .pv-units { min-height: 7rem; max-width: 12rem; gap: .35rem; }
+.lesson-base10 .b10-bundle .pv-stick { width: 1rem; height: 4.5rem; }
+.lesson-base10 .b10-bundle .pv-bundle, .lesson-base10 .b10-bundle .pv-crate { width: 3.4rem; height: 3.4rem; }
+.lesson-base10 .b10-bundle .pv-crate { width: 4.5rem; height: 4.5rem; }
+.lesson-base10 .b10-big-number { display: flex; gap: .05em; }
+.lesson-base10 .b10-big-digit { display: inline-block; transition: color .3s; }
+.lesson-base10 .b10-big-digit.is-sent { color: color-mix(in srgb, var(--theme-color) 55%, var(--surface)); }
+.lesson-base10 .b10-big-digit.is-zero { color: var(--c-hex); }
+
+/* 1.5 You try it */
+.lesson-base10 .b10-card {
+  position: relative; display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; justify-content: center;
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--radius-lg); background: var(--surface);
+  border: 4px solid var(--theme-color); box-shadow: var(--shadow); max-width: 100%;
+}
+.lesson-base10 .b10-card.is-won { border-color: #ffc400; background: #fff6d6; }
+.lesson-base10 .b10-prompt { margin: 0; font-size: var(--fs-h2); font-weight: 900; text-align: center; }
+.lesson-base10 .b10-stars { display: inline-flex; align-items: center; gap: var(--sp-1); font: 900 1.5rem var(--font-digits); }
+.lesson-base10 .b10-star-icon { width: 2rem; height: 2rem; color: #f5b400; }
+.lesson-base10 .b10-skip { min-height: var(--tap); }
+.lesson-base10 .b10-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.lesson-base10 .b10-burst-star {
+  position: absolute; width: 3rem; height: 3rem; max-width: none; left: -1.5rem; top: -1.5rem;
+  animation: b10-burst 1.4s ease-out forwards;
+}
+@keyframes b10-burst {
+  0% { transform: rotate(var(--a)) translateY(0) scale(.3); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-9rem) scale(1.1) rotate(180deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-base10 .b10-burst-star { animation: none; transform: translateY(-4rem) scale(1.3); }
+}
+.lesson-base10 .b10-tabs { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
+.lesson-base10 .b10-tab { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-weight: 800; }
+.lesson-base10 .b10-tab svg { width: 1.6rem; height: 1.6rem; }
+.lesson-base10 .b10-tab[aria-pressed="true"] { background: var(--theme-color); color: #fff; border-color: var(--theme-color); }
+.lesson-base10 .b10-panel { width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--sp-5); }
+.lesson-base10 .b10-panel[hidden] { display: none; }
+.lesson-base10 .b10-panel-board { flex-direction: column; gap: var(--sp-3); }
+.lesson-base10 .b10-try-number { font-size: var(--fs-digit-md); }
+.lesson-base10 .b10-steppers { display: flex; gap: var(--sp-2); }
+.lesson-base10 .b10-step {
+  width: var(--tap); height: var(--tap); padding: 0; display: inline-grid; place-items: center;
+  border-radius: 50%; font-size: 1.6rem;
+}
+.lesson-base10 .b10-step svg { width: 1.6rem; height: 1.6rem; }
+.lesson-base10 .b10-step-plus:not(:disabled) { background: var(--theme-color); color: #fff; border-color: var(--theme-color); }
+.lesson-base10 .b10-step:disabled { opacity: .35; cursor: default; }
+.lesson-base10 .b10-try-board .pv-units { min-height: 3rem; }
+
+@media (max-width: 560px) {
+  .lesson-base10 .b10-scene { gap: var(--sp-3); }
+  .lesson-base10 .b10-question { border-width: 3px; }
+  .lesson-base10 .b10-tiles .digit-tile.tile-md { border-width: 3px; }
+  .lesson-base10 .b10-digits-top { min-height: 6rem; gap: var(--sp-3); }
+  .lesson-base10 .b10-finger { width: 5rem; }
+  .lesson-base10 .b10-board .pv-col { min-width: 0; }
+  .lesson-base10 .b10-board .pv-grid { gap: .2rem; }
+  .lesson-base10 .b10-board .pv-arrow-line { width: 1.2rem; }
+  .lesson-base10 .b10-board .pv-arrow-text { font-size: .8rem; padding: 0 .2rem; }
+  .lesson-base10 .b10-bundle .digit-tile.tile-lg { --tile: 4.5rem; }
+  .lesson-base10 .b10-tab { font-size: 1rem; padding-inline: var(--sp-3); }
+  .lesson-base10 .b10-bundle .pv-units { max-width: 6rem; min-height: 4rem; gap: .2rem; }
+  .lesson-base10 .b10-bundle .pv-stick { width: .7rem; height: 3rem; }
+  .lesson-base10 .b10-bundle .pv-bundle { width: 2.6rem; height: 2.6rem; }
+  .lesson-base10 .b10-bundle .pv-crate { width: 3.2rem; height: 3.2rem; }
+  .lesson-base10 .b10-prompt { font-size: var(--fs-lead); }
+}

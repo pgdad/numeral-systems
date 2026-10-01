@@ -30,7 +30,7 @@ const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',').map((s) =
 const shotsDir = process.env.SMOKE_SCREENSHOTS;
 const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
-const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery'];
+const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -88,6 +88,8 @@ async function run(browserName) {
     await playerScenarios(browser, failures);
     // Component gallery (Phase 03).
     await galleryScenario(browser, failures);
+    // Every real lesson plays in autoplay to its "You try it!" scene (Phase 04+).
+    await lessonScenarios(browser, failures);
   } finally {
     await browser.close();
   }
@@ -306,6 +308,50 @@ async function galleryScenario(browser, failures) {
   }
   console.log('smoke: gallery scenarios done');
 }
+// Autoplay every visible lesson (fake speech) up to its first interactive scene, or to the end.
+// Checks: no errors, every narrated sentence spoken in order. Lesson-specific checks follow.
+async function lessonScenarios(browser, failures) {
+  const probe = await browser.newPage();
+  await probe.goto(INDEX + '#/');
+  const ids = await probe.evaluate(() => NumSys.lessons.list().map((l) => l.id));
+  await probe.close();
+  for (const id of ids) {
+    const label = `lesson/${id}`;
+    const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH);
+    await page.goto(INDEX + '#/lesson/' + id);
+    await page.click('button[aria-label="Autoplay"]');
+    await page.click('.btn-start');
+    const t0 = Date.now();
+    const reached = await page.waitForFunction(() => {
+      const p = document.querySelector('.player');
+      const end = document.querySelector('.player-overlay-end:not([hidden])');
+      return end || (p.classList.contains('is-interactive') && p.dataset.mode === 'waiting');
+    }, null, { timeout: 180000, polling: 250 }).catch(() => null);
+    if (!reached) { failures.push(`${label}: autoplay did not reach the end or an interactive scene`); await context.close(); continue; }
+    const res = await page.evaluate((lessonId) => {
+      const lesson = NumSys.lessons.get(lessonId);
+      const pos = location.hash.split('/').slice(3).map(Number);
+      const expected = [];
+      lesson.scenes.forEach((sc, si) => sc.steps.forEach((st, ti) => {
+        if (si < pos[0] || (si === pos[0] && ti <= pos[1]) || !pos.length) expected.push(...NumSys.narrator.splitSentences(st.say));
+      }));
+      return { expected, spoken: window.__spoken };
+    }, id);
+    if (JSON.stringify(res.spoken) !== JSON.stringify(res.expected)) {
+      failures.push(`${label}: spoken sentences differ from the lesson text`);
+    }
+    if (id === 'base10') {
+      // Challenge 1 is "seven fingers": tap seven fingers and expect a star.
+      const fingers = await page.$$('.b10-panel-fingers .hand-finger');
+      for (let i = 0; i < 7; i++) await fingers[i].click();
+      const stars = await page.waitForFunction(() => document.querySelector('.b10-star-count').textContent === '1', null, { timeout: 3000 }).catch(() => null);
+      if (!stars) failures.push(`${label}: seven fingers did not complete the first challenge`);
+    }
+    console.log(`smoke: ${label} autoplay OK (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+    await context.close();
+  }
+}
+
 function NumSysOrder() {
   return ['left pinky', 'left ring', 'left middle', 'left index', 'left thumb',
     'right thumb', 'right index', 'right middle', 'right ring', 'right pinky'].join(',');

@@ -26,11 +26,12 @@ into tens → place value (237 = 200+30+7) → ×10 per place. It ends with an i
    checker logic is unit-tested.
 
 ## Acceptance criteria
-- [ ] Plays start to finish in autoplay with voice and no errors. Total length is 3–5 min at 1×.
-- [ ] Every step works with Prev/Next and deep links (spot-check 5 random steps).
-- [ ] The interactive scene works with mouse, touch (DevTools device mode) and keyboard.
-- [ ] The home menu shows the lesson card with its icon.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] Plays start to finish in autoplay with voice and no errors. Total length is 3–5 min at 1×.
+  (Fake-speech autoplay in Chromium + Firefox with no errors. Captions-only timing reaches "You try it!" in about 2.4 min, and the challenges add 1–2 min. Real voices still need a human listen.)
+- [x] Every step works with Prev/Next and deep links. All 13 in-scene deep links were compared with the played state, and they match in Chromium + Firefox, including with reduced motion.
+- [x] The interactive scene works with mouse, touch (Playwright `hasTouch` at 400px) and keyboard (Tab + Enter/Space).
+- [x] The home menu shows the lesson card with its icon.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 `index.html` → "Base‑10" card, or `index.html#/lesson/base10`.

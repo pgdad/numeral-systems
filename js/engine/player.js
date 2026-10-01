@@ -119,11 +119,40 @@
     if (captions) captions.hidden = true;
 
     // ---------------------------------------------------------------- running steps
-    function makeCtx(scene, state, instant, signal) {
+    // Sentence cues: ctx.cue(i) resolves when the narrator starts sentence i of the step's `say`
+    // (immediately in instant mode, and for every index once the narration ends).
+    function makeCues(signal) {
+      var reached = -1, waiting = [];
+      return {
+        reach: function (i) {
+          if (i <= reached) return;
+          reached = i;
+          waiting = waiting.filter(function (w) { if (w.i <= reached) { w.resolve(); return false; } return true; });
+        },
+        wait: function (i) {
+          if (signal.aborted) return Promise.reject(U.abortError());
+          if (i <= reached) return Promise.resolve();
+          return new Promise(function (resolve, reject) {
+            var w = { i: i, resolve: resolve };
+            waiting.push(w);
+            signal.addEventListener('abort', function () {
+              waiting = waiting.filter(function (x) { return x !== w; });
+              reject(U.abortError());
+            }, { once: true });
+          });
+        }
+      };
+    }
+
+    function makeCtx(scene, state, instant, signal, cues) {
       var ctx = {
         lesson: lesson, scene: scene, stage: stageEl, state: state,
         instant: !!instant, speed: settings.speed, reducedMotion: reducedMotion,
         signal: signal, abortSignal: signal, anim: NS.anim, player: api
+      };
+      ctx.cue = function (i) {
+        if (ctx.instant || !cues) return signal.aborted ? Promise.reject(U.abortError()) : Promise.resolve();
+        return cues.wait(i);
       };
       ctx.wait = function (ms) { return NS.anim.wait(ms, ctx); };
       ctx.sound = function (name) { return (ctx.instant || signal.aborted) ? 0 : NS.sound.play(name); };
@@ -191,11 +220,13 @@
       return Promise.resolve(needsRebuild ? rebuild(target.scene, target.step, signal) : null).then(function () {
         if (myGen !== gen) return;
         live.completedThrough = -2; // dirty until this step finishes
-        var ctx = makeCtx(scene, live.state, false, signal);
+        var cues = makeCues(signal);
+        var ctx = makeCtx(scene, live.state, false, signal, cues);
         var id = NS.lessons.stepId(lesson.id, scene.id, target.step);
         if (captions) captions.hidden = false;
         return Promise.all([
-          NS.narrator.speak(id, step.say, { rate: settings.speed, signal: signal }),
+          NS.narrator.speak(id, step.say, { rate: settings.speed, signal: signal, onSentence: cues.reach })
+            .then(null, function (e) { cues.reach(Infinity); throw e; }),
           step.do ? step.do(ctx) : null
         ]).then(function () {
           if (myGen !== gen) return;
@@ -409,12 +440,14 @@
 
     // ---------------------------------------------------------------- keyboard & visibility
     on(document, 'keydown', function (e) {
-      if (destroyed || e.altKey || e.ctrlKey || e.metaKey) return;
+      // defaultPrevented: a lesson control (e.g. a clickable finger) already handled the key.
+      if (destroyed || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
       var t = e.target;
       var tag = t && t.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
       if (e.key === ' ' || e.key === 'Spacebar') {
-        if (tag === 'BUTTON' || tag === 'A') return; // let the focused control handle it
+        // let the focused control handle it
+        if (tag === 'BUTTON' || tag === 'A' || (t && t.getAttribute && t.getAttribute('role') === 'button')) return;
         e.preventDefault();
         togglePlay();
       } else if (e.key === 'ArrowRight') {

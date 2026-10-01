@@ -79,7 +79,8 @@ NumSys.lessons.register({
 - `do(ctx)` returns a Promise. The player waits for **both** the narration and the
   animation to finish before it auto-advances (in Movie mode or with autoplay on).
 - `ctx` gives: `ctx.stage`, `ctx.state`, `ctx.wait(ms)`, `ctx.speed` (playback
-  rate), `ctx.reducedMotion`, `ctx.sound(name)` (sound effects), and `ctx.abortSignal`.
+  rate), `ctx.reducedMotion`, `ctx.sound(name)` (sound effects), `ctx.cue(i)` (resolves when sentence i of
+  `say` starts; see DECISIONS D15), and `ctx.abortSignal`.
   Animations must stop cleanly when the user skips.
 - The player must be able to **jump to any step** by re-running `setup` and then
   replaying the earlier steps' `do` with animations disabled (`ctx.instant = true`).

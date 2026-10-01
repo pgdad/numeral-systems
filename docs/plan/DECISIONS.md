@@ -107,3 +107,13 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   to choose. New icons are data in `icons.js`: original drawings, thick `#2b2d42` outlines, flat fills, 100×100 viewBox.
 - Hands never stack on narrow screens. They scale as one row, so the binary reading order is kept (D5).
 
+
+## D15. Narration-synced animation and interactive scenes (Phase 04)
+- `ctx.cue(i)` resolves when sentence *i* (0-based, split by `NS.narrator.splitSentences`) of the step's `say` starts.
+  It resolves immediately in instant mode, and for every *i* once the narration ends, so it never hangs. It rejects on abort.
+  Animations that "show what's said while it's said" await cues. Counting is written one number per sentence ("One. Two. Three.").
+- Interactive scenes own an `AbortController` created in `setup` and aborted in `teardown`. All their timers use it.
+  Live narration (reading the child's number, praise, the next prompt) goes through `NS.narrator.speak(id, text, {signal})`,
+  so captions show too. It is skipped while the player is still speaking the step (`ctx.player.getMode() === 'playing'`).
+- Lesson controls that handle Enter/Space call `preventDefault()`. The player ignores keys that are already handled.
+- Pure lesson logic that needs tests (challenge checkers etc.) is exposed on the lesson definition as `helpers`.

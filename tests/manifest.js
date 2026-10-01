@@ -32,6 +32,7 @@
       'js/components/hands.js',
       'js/components/gallery.js',
       'js/lessons/00-demo.js',
+      'js/lessons/01-base10.js',
       'js/app.js'
     ],
     specs: [
@@ -45,7 +46,8 @@
       'tests/specs/player-state.spec.js',
       'tests/specs/narrator.spec.js',
       'tests/specs/components.spec.js',
-      'tests/specs/hands.spec.js'
+      'tests/specs/hands.spec.js',
+      'tests/specs/lesson-base10.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);

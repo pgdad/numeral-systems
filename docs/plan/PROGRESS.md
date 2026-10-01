@@ -10,7 +10,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 01 | Numeral & addition engine | done | 2026-10-01 | 67 tests (Node + Chromium + Firefox) |
 | 02 | Scene player & narration | done | 2026-10-01 | 84 tests + 5 player smoke scenarios (Chromium + Firefox) |
 | 03 | Visual components | done | 2026-10-01 | 110 tests + gallery smoke (Chromium + Firefox) |
-| 04 | Lesson: Base‑10 & fingers | todo | | |
+| 04 | Lesson: Base‑10 & fingers | done | 2026-10-01 | 119 tests + lesson autoplay smoke (Chromium + Firefox) |
 | 05 | Lesson: Binary on two hands | todo | | |
 | 06 | Lesson: Octal & Hex | todo | | |
 | 07 | Lesson: Silly systems | todo | | |
@@ -20,7 +20,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 04 (Base‑10 & fingers). Phases 04–09 can run in any order.
+**Next phase:** 05 (Binary on two hands). Phases 05–09 can run in any order.
 
 ---
 
@@ -160,3 +160,46 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 - For lesson phases: open `index.html#/gallery` to try every piece. Build scenes from these components in `setup`,
   and call their methods with `ctx` in `do`. Don't stop on 4 or 128 alone (D5).
 - How to see it: open `index.html#/gallery`.
+
+### Phase 04 — Lesson: Base‑10 & fingers — 2026-10-01 — done
+- Built: `js/lessons/01-base10.js` (id `base10`, order 10, 5 scenes, 18 steps) and its styles in `css/lessons.css`
+  (all scoped under `.lesson-base10`; each scene's root is `.b10-scene`).
+  - 1.1 hello: the hands pop and wave, then count from a fist to ten in sync with "One. Two. …", with a big number and "a group of ten".
+  - 1.2 digits: tiles 0–9 slide in and light up as each is read. A finger flies into the "1" tile, then "digit = finger". Ends on the "?" tile.
+  - 1.3 bundle: ten sticks are tied into a bundle, then 1 | 0 is written. Counting 11–15 adds a stick each time. Ten bundles make a
+    crate and the Hundreds column appears.
+  - 1.4 meaning: the digits of 237 fly into the columns, then 200 + 30 + 7. **Added step:** 305, "a zero keeps every digit in its
+    place". This is a key place-value point the script lacked. Then the ×10 arrows, and "ten ones make a ten…".
+  - 1.5 try (interactive): a challenge card with a star count and Skip, two tabs (Fingers / Big numbers), clickable hands with a
+    big number, and a 3-place board with −/+ under each digit (0–999, no carrying). Eight challenges rotate in a loop, and a challenge
+    that is already met is skipped. A met challenge plays tada, a star burst and spoken praise, then the next one appears after 2.2s.
+    Changes are spoken ("seven fingers.", "Forty-two.") after a 450ms debounce, but never over the step's own narration.
+- Engine additions (DECISIONS D15):
+  - **sentence cues**: `ctx.cue(i)` resolves when the narrator starts sentence i of the step's `say`. It resolves at once
+    in instant mode, and for every i once narration ends. `narrator.speak` takes `onSentence`. Recorded audio estimates the cue times.
+    Write counting lines as one number per sentence ("One. Two.") and `await ctx.cue(k)` before each animation.
+  - The player's Space/arrow shortcuts now ignore keys a lesson control already handled (`defaultPrevented`) and Space
+    on `role="button"` elements. Before this fix, Space on a focused finger skipped to the end of the lesson.
+  - `hands.js`/CSS: in interactive mode the palm lets clicks through. A folded finger hides behind the palm, so a tap on
+    the knuckle edge now reaches it. Before this, Firefox could not click folded fingers.
+  - Home card icons: `.card-glyph-icon svg` sizes UI icons too (`glyph: 'icon:hands'`).
+- Tests: `tests/specs/lesson-base10.spec.js`. It covers registration, more than 10 steps, non-empty `say`, numbers spelled
+  in words, sentence-per-number counting, narration estimate 100–300s, challenge text, `isMet` and `nextChallenge`. The pure challenge
+  helpers are on `lesson.helpers`. `tools/smoke.js` gained `lessonScenarios`: every visible lesson autoplays with fake
+  speech to its first interactive scene (or the end), and spoken sentences must equal the lesson text. For base10 it also
+  taps seven fingers and expects a star. Base10 deep links are in `EXTRA_ROUTES`.
+- Verified: a scratchpad Playwright script played every step and compared the DOM state after each step with the deep link to
+  the next one. There were 0 mismatches in Chromium, Firefox and reduced motion. The interactive scene passed with mouse, touch at
+  400px and keyboard. Screenshots were checked at 400 and 1280px.
+- Known issues / needs a human:
+  - Listen to the real voice on Windows/Mac. The counting lines are separate utterances, so check the pauses sound natural.
+  - Safari is untested.
+  - The scene title "What does 237 mean?" stays up during the 305 step (intended).
+- For Phases 05–09: copy this file's patterns.
+  - Build components in `setup` and hide with `opacity 0`.
+  - Use `ctx.cue(i)` for word-synced animation, and `fly()` (clone + arc) to move a thing into a component.
+  - For interactive scenes, own an AbortController in `setup` and abort it in `teardown`. Use `NS.narrator.speak(...)` for live
+    lines only when `setupCtx.player.getMode() !== 'playing'`.
+  - Put pure checker logic on `lesson.helpers` for tests.
+  - The new `lessonScenarios` smoke covers each new lesson automatically. Remember the D5 rule: don't stop on 4 or 128 alone.
+- How to see it: open `index.html` and click the "Base‑10" card, or go to `index.html#/lesson/base10`.
