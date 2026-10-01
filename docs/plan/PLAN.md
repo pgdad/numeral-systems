@@ -109,7 +109,7 @@ index.html                 app entry (also works from file://)
 css/base.css  css/components.css  css/lessons.css
 js/core/namespace.js  util.js  numeral.js  digitsets.js  addition.js  router.js  lessons.js
 js/engine/anim.js  sound.js  narrator.js  player.js  audio-manifest.js
-js/components/hands.js  place-value.js  digit-tile.js  odometer.js  column-add.js  symbols.js  icons.js
+js/components/icons.js  symbols.js  digit-tile.js  readout.js  odometer.js  place-value.js  column-add.js  hands.js  gallery.js
 js/lessons/01-base10.js  02-binary.js  03-octal-hex.js  04-silly.js  05-addition.js  06-playground.js
 js/app.js
 assets/svg/  assets/audio/

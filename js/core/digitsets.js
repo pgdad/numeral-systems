@@ -146,6 +146,24 @@
     return values.map(function (v) { return s.digits[v].speak; }).join(join);
   }
 
+  function pluralize(words) {
+    if (/x$/.test(words)) return words + 'es';      // six -> sixes
+    if (/y$/.test(words)) return words.slice(0, -1) + 'ies'; // (not needed for powers, kept safe)
+    return words + 's';                                // ten -> tens, twenty-five -> twenty-fives
+  }
+
+  // Name of a place (column) for labels: placeName(0, 10) -> "Ones", placeName(2, 10) -> "Hundreds",
+  // placeName(3, 2) -> "Eights", placeName(2, 5) -> "Twenty-fives". {plural: false} -> "Hundred".
+  // {style: 'number'} -> "100s" (compact labels for big places).
+  function placeName(power, base, opts) {
+    opts = opts || {};
+    var value = Math.pow(base, power);
+    if (opts.style === 'number') return value.toLocaleString('en-US') + (opts.plural === false ? '' : 's');
+    var words = power === 0 ? 'one' : numberToWords(value).replace(/^one (hundred|thousand)$/, '$1');
+    if (opts.plural !== false) words = pluralize(words);
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  }
+
   BUILT_INS.forEach(register);
 
   NS.digitsets = {
@@ -158,6 +176,7 @@
     speak: speak,
     digitName: digitName,
     numberToWords: numberToWords,
+    placeName: placeName,
     BUILT_IN_IDS: BUILT_INS.map(function (b) { return b.id; })
   };
 })(typeof window !== 'undefined' ? (window.NumSys = window.NumSys || {})

@@ -95,3 +95,15 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
 - Interactive scenes (`interactive: true`) wire their own event handlers in `setup`. The player never
   auto-advances past them.
 - Narration ids are `<lessonId>.<sceneId>.<stepIndex>`. Renaming a scene id orphans its recorded audio (Phase 10).
+
+## D14. Visual component contract (Phase 03)
+- Each component is `NS.<name>.create(opts)` and returns an object whose `.el` the caller inserts (scenes do this in `setup`).
+  Components never touch the DOM at load time, and their files are in `tests/manifest.js`.
+- Every animating method takes a `ctx` (`{instant, speed, reducedMotion, signal, sound?}`), returns a Promise, and reaches the
+  **same end state** with `ctx.instant` (D13). Sound effects go through `ctx.sound(name)` when it is present.
+- The digit set a component shows is `.digitSet`, and `.value` is its current number. `set(n, ctx)` changes the number.
+- Places are powers (0 = ones) in every component API, as in D12. Place labels come from `NS.digitsets.placeName`.
+- Icons: `NS.icons.render(name, {size, title, kind, color})`. Art wins name clashes ('star'); pass `kind: 'shape'` or `'ui'`
+  to choose. New icons are data in `icons.js`: original drawings, thick `#2b2d42` outlines, flat fills, 100×100 viewBox.
+- Hands never stack on narrow screens. They scale as one row, so the binary reading order is kept (D5).
+

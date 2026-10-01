@@ -30,7 +30,7 @@ const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',').map((s) =
 const shotsDir = process.env.SMOKE_SCREENSHOTS;
 const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
-const EXTRA_ROUTES = ['#/lesson/demo/1/2'];
+const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -86,6 +86,8 @@ async function run(browserName) {
     else console.log(`smoke[${browserName}]: tests/browser.html ${summary.trim()}`);
     // Player scenarios against the demo lesson (Phase 02).
     await playerScenarios(browser, failures);
+    // Component gallery (Phase 03).
+    await galleryScenario(browser, failures);
   } finally {
     await browser.close();
   }
@@ -262,6 +264,51 @@ async function playerScenarios(browser, failures) {
     await context.close();
   }
   console.log('smoke: player scenarios done');
+}
+
+// Press every gallery button in normal, instant and reduced-motion modes; spot-check the hands.
+async function galleryScenario(browser, failures) {
+  const label = 'gallery';
+  for (const mode of ['normal', 'instant', 'reduced']) {
+    const { context, page } = await newPlayerPage(browser, failures, `${label}/${mode}`, null,
+      mode === 'reduced' ? { reducedMotion: 'reduce' } : undefined);
+    await page.goto(INDEX + '#/gallery');
+    const ready = await page.waitForSelector('.gallery', { timeout: 5000 }).catch(() => null);
+    if (!ready) { failures.push(`${label}: gallery did not render`); await context.close(); return; }
+    if (mode === 'instant') await page.click('.gallery-toggle input >> nth=0');
+    const count = await page.$$eval('.gallery-section button.btn', (b) => b.length);
+    for (let i = 0; i < count; i++) {
+      await page.click(`.gallery-section button.btn >> nth=${i}`, { force: true });
+      await page.waitForTimeout(mode === 'normal' ? 60 : 10);
+    }
+    await page.waitForTimeout(mode === 'normal' ? 2500 : 300);
+    if (mode === 'instant') {
+      const res = await page.evaluate(async () => {
+        const order = NumSys.hands.displayOrder('both').map((p) => p.hand + ' ' + p.finger);
+        const out = {};
+        for (const n of [1, 5, 11, 512, 1023]) {
+          const h = NumSys.hands.create({ bits: 0 });
+          document.body.appendChild(h.el);
+          await h.setBits(n, { instant: true });
+          out[n] = [...h.el.querySelectorAll('.hand-finger')].length === 10 &&
+            order.filter((name, i) => !h.fingerAt(i).outer.classList.contains('is-down')).join(',');
+          h.destroy();
+        }
+        return out;
+      });
+      const want = { 1: 'right pinky', 5: 'right middle,right pinky', 11: 'right index,right ring,right pinky',
+        512: 'left pinky', 1023: NumSysOrder() };
+      for (const n of Object.keys(want)) {
+        if (res[n] !== want[n]) failures.push(`${label}: setBits(${n}) shows "${res[n]}", expected "${want[n]}"`);
+      }
+    }
+    await context.close();
+  }
+  console.log('smoke: gallery scenarios done');
+}
+function NumSysOrder() {
+  return ['left pinky', 'left ring', 'left middle', 'left index', 'left thumb',
+    'right thumb', 'right index', 'right middle', 'right ring', 'right pinky'].join(',');
 }
 
 (async () => {

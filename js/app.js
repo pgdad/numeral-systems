@@ -2,6 +2,7 @@
 // Later phases plug in through optional namespaces:
 //   NS.player.mount(stage, lesson, {scene, step}) -> {destroy()}   (Phase 02)
 //   NS.playground.mount(stage) -> {destroy()}                        (Phase 09)
+//   NS.gallery.mount(stage) -> {destroy()}                           (Phase 03, #/gallery)
 (function (NS) {
   'use strict';
 
@@ -21,7 +22,7 @@
       blurb: 'Numbers made of cats, dogs and frogs, and numbers made of colors.', ageHint: '5+' },
     { id: 'addition', order: 50, theme: 'addition', glyph: '+', title: 'Adding in Every System',
       blurb: 'Carrying in tens, in binary, in hex, and with jumping animals.', ageHint: '7+' },
-    { id: 'playground', order: 60, theme: 'playground', glyph: '★', title: 'Playground',
+    { id: 'playground', order: 60, theme: 'playground', glyph: 'icon:star', title: 'Playground',
       blurb: 'Convert numbers, invent your own number system, and take a quiz.', ageHint: 'all', route: 'playground' }
   ];
 
@@ -38,6 +39,9 @@
     if (kind === 'dots') {
       return U.el('span', { class: 'card-glyph card-glyph-dots', 'aria-hidden': 'true' },
         U.el('i', { class: 'dot dot-red' }), U.el('i', { class: 'dot dot-yellow' }), U.el('i', { class: 'dot dot-green' }));
+    }
+    if (kind.indexOf('icon:') === 0 && NS.icons) {
+      return U.el('span', { class: 'card-glyph card-glyph-icon', 'aria-hidden': 'true' }, NS.icons.render(kind.slice(5)));
     }
     return U.el('span', { class: 'card-glyph', 'aria-hidden': 'true', text: kind });
   }
@@ -132,6 +136,12 @@
     else notReady(S.playground, S.playgroundSoon);
   }
 
+  function renderGallery() {
+    document.title = 'Component gallery · ' + S.appTitle;
+    if (NS.gallery) currentView = NS.gallery.mount(stage);
+    else notReady('Component gallery', 'The gallery is not available.');
+  }
+
   function renderAbout() {
     document.title = S.about + ' · ' + S.appTitle;
     stage.appendChild(U.el('section', { class: 'about prose' },
@@ -160,6 +170,7 @@
       case 'lesson': renderLesson(route.params); break;
       case 'playground': renderPlayground(); break;
       case 'about': renderAbout(); break;
+      case 'gallery': renderGallery(); break;
       default: renderHome();
     }
 

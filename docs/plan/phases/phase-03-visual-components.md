@@ -50,12 +50,13 @@ and its animations. The lesson phases can then just put the pieces together.
 9. Replace any emoji placeholders from earlier phases with icons.
 
 ## Acceptance criteria
-- [ ] Hands: `setBits(0..1023)` shows correct fingers for spot checks 1, 5, 11, 512, 1023. The
+- [x] Hands: `setBits(0..1023)` shows correct fingers for spot checks 1, 5, 11, 512, 1023. The
       finger-state logic is unit-tested (pure function `bitsToFingers(n)` → 10 booleans).
-- [ ] Every component works from the gallery, in instant mode and with reduced motion.
-- [ ] Hands, tiles and column-add look good at 400px and 1920px wide.
-- [ ] Icons are original SVG in-repo (no external assets, no emoji).
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] Every component works from the gallery, in instant mode and with reduced motion.
+      *(tools/smoke.js presses every gallery button in normal, instant and reduced-motion modes in Chromium and Firefox.)*
+- [x] Hands, tiles and column-add look good at 400px and 1920px wide.
+- [x] Icons are original SVG in-repo (no external assets, no emoji).
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 Open `index.html#/gallery`.

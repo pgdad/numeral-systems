@@ -22,6 +22,15 @@
       'js/engine/narrator.js',
       'js/engine/player-state.js',
       'js/engine/player.js',
+      'js/components/icons.js',
+      'js/components/symbols.js',
+      'js/components/digit-tile.js',
+      'js/components/readout.js',
+      'js/components/odometer.js',
+      'js/components/place-value.js',
+      'js/components/column-add.js',
+      'js/components/hands.js',
+      'js/components/gallery.js',
       'js/lessons/00-demo.js',
       'js/app.js'
     ],
@@ -34,7 +43,9 @@
       'tests/specs/digitsets.spec.js',
       'tests/specs/addition.spec.js',
       'tests/specs/player-state.spec.js',
-      'tests/specs/narrator.spec.js'
+      'tests/specs/narrator.spec.js',
+      'tests/specs/components.spec.js',
+      'tests/specs/hands.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);

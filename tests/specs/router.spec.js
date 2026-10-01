@@ -22,6 +22,7 @@ describe('router.parse', function () {
   it('parses playground and about, ignoring trailing slashes and query strings', function () {
     expect(parse('#/playground/').name).toBe('playground');
     expect(parse('#/about?x=1').name).toBe('about');
+    expect(parse('#/gallery').name).toBe('gallery');
   });
 
   it('redirects unknown routes home', function () {

@@ -71,7 +71,8 @@
         setup: function (stage) {
           var number = U.el('div', { class: 'demo-number', text: '0' });
           var animals = ANIMALS.map(function (a) {
-            return U.el('span', { class: 'demo-animal', text: a.name, style: { opacity: '0' } });
+            return U.el('span', { class: 'demo-animal', style: { opacity: '0' } },
+              NS.icons.render(a.name.toLowerCase(), { class: 'demo-animal-icon' }), U.el('span', { text: a.name }));
           });
           stage.appendChild(U.el('div', { class: 'demo-counting' }, number, U.el('div', { class: 'demo-animals' }, animals)));
           return { number: number, animals: animals };

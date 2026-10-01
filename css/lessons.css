@@ -13,7 +13,9 @@
 }
 .lesson-demo .demo-animals { display: flex; flex-wrap: wrap; gap: var(--sp-3); justify-content: center; }
 .lesson-demo .demo-animal {
-  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius-pill);
-  background: var(--bg-accent); font-weight: 800; font-size: 1.4rem;
+  display: inline-flex; flex-direction: column; align-items: center; gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--radius);
+  background: var(--bg-accent); font-weight: 800; font-size: 1.2rem;
 }
+.lesson-demo .demo-animal-icon { width: clamp(3rem, 8vw, 5rem); height: clamp(3rem, 8vw, 5rem); }
 .lesson-demo .demo-press { font-size: 1.5rem; min-height: 4rem; }

@@ -5,6 +5,7 @@
 //   #/lesson/:id/:scene/:step   deep link (0-based scene and step indexes)
 //   #/playground                playground
 //   #/about                     about page
+//   #/gallery                   component gallery (hidden from the menu, for building lessons and QA)
 // Anything else redirects home. parse() is pure so it can be unit-tested in Node.
 (function (NS) {
   'use strict';
@@ -14,7 +15,8 @@
     { name: 'lesson', pattern: ['lesson', ':id'] },
     { name: 'lesson', pattern: ['lesson', ':id', '#scene', '#step'] },
     { name: 'playground', pattern: ['playground'] },
-    { name: 'about', pattern: ['about'] }
+    { name: 'about', pattern: ['about'] },
+    { name: 'gallery', pattern: ['gallery'] }
   ];
 
   function splitHash(hash) {

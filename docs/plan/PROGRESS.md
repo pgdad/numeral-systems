@@ -9,7 +9,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 00 | Foundation & app shell | done | 2026-10-01 | 24 tests; smoke OK in Chromium + Firefox |
 | 01 | Numeral & addition engine | done | 2026-10-01 | 67 tests (Node + Chromium + Firefox) |
 | 02 | Scene player & narration | done | 2026-10-01 | 84 tests + 5 player smoke scenarios (Chromium + Firefox) |
-| 03 | Visual components | todo | | |
+| 03 | Visual components | done | 2026-10-01 | 110 tests + gallery smoke (Chromium + Firefox) |
 | 04 | Lesson: Base‑10 & fingers | todo | | |
 | 05 | Lesson: Binary on two hands | todo | | |
 | 06 | Lesson: Octal & Hex | todo | | |
@@ -20,7 +20,7 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 03 (Visual components). Then 04–09 in any order.
+**Next phase:** 04 (Base‑10 & fingers). Phases 04–09 can run in any order.
 
 ---
 
@@ -122,3 +122,41 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   instant, abort and reduced motion work automatically. `ctx.sound(name)` is silent in instant mode. Read state
   from `ctx.state` (whatever `setup` returned). To smoke-test a new route, add it to `EXTRA_ROUTES` in `tools/smoke.js`.
 - How to see it: open `index.html#/lesson/demo` and press Start. (The demo is hidden from the home menu.)
+
+### Phase 03 — Visual components — 2026-10-01 — done
+- Built (all in `js/components/`, loaded in this order): `icons.js` (16 original animals/objects, 6 shapes, UI icons;
+  icons are data so Node can load them), `symbols.js` (draws any digit of any set as SVG), `digit-tile.js`,
+  `readout.js`, `odometer.js`, `place-value.js`, `column-add.js`, `hands.js`, and `gallery.js` (the `#/gallery` view).
+  Also `NS.digitsets.placeName(power, base)` ("Ones", "Tens", "Twenty-fives"; `{style:'number'}` gives "512s").
+- Component API conventions are in DECISIONS D14: `create(opts)` returns an object with `.el`; every animation
+  method takes a `ctx` and ends in the same state when `ctx.instant` is set. The digit set is `.digitSet`
+  (not `.set`, because `set(n)` is the "change the number" method).
+- Hands: `NS.hands.create({hands:'both'|'left'|'right', bits|fingers, labels, skin})` with `setBits`, `setFingers`
+  (base 10, raising fingers left to right), `setFinger(hand, finger, up)`, `setStates`, `labels(on, values)`,
+  `onToggle(cb)` (returns `off()`), `wave`, `glow`, `getBits`, `getFingers`. Pure helpers: `bitsToFingers`, `fingersToBits`,
+  `countToFingers`, `fingerValues`, `displayOrder`, `fingerIndex`. Five skin tones are saved in `localStorage`
+  (`numsys.hands.skin`). `NS.hands.skinPicker()` gives a swatch row for the Phase 11 settings panel.
+  Narrow-screen decision: the hands never stack; the SVG scales and keeps both hands in one row, so the fingers
+  always read as a binary number from left to right. Single-hand mode: the rightmost finger is worth 1.
+- Odometer: `set`, `step(±1)`, `runTo(n, ctx, {msPerStep, accelerate, onStep})`, `highlightPlace`, `markPlace`,
+  `labels('names'|'numbers'|false)`. It wraps around like a real odometer.
+- Place value: `set`, `expand`/`collapse` (200 + 30 + 7 = 237), `highlightPlace`, `markPlace`, `showUnits`,
+  `setUnits(power, k)`, `regroup(power)` (ten sticks squeeze into a bundle that moves into the tens; other bases use dots
+  in rings), and ×base arrows.
+- Column add: `next`, `playStep(step)`, `playAll`, `ask(step, ctx, {onWrong, onRight})` (choice buttons; resolves on
+  the right answer), `reset`, `focusColumn`. Pure `NS.columnAdd.layout(a, b, base)`. Pair it with
+  `NS.addition.explainStep` for the narration (the gallery shows how).
+- Readout: `create({systems, value})`, `set(n)`.
+- Replaced placeholders: the Playground card's ★ text is now the star icon (`glyph: 'icon:<name>'` works for any
+  card), and the demo lesson's animals are icons. The player keeps its own `ICONS` paths; `NS.icons` reuses them for UI icons.
+- Tests: `tests/specs/hands.spec.js` (D5 spot checks 1/5/11/512/1023, round trip 0..1023, DOM behavior) and
+  `tests/specs/components.spec.js` (icons, place names, layout, DOM behavior). DOM tests run only in `tests/browser.html`.
+  `tools/smoke.js` now has a gallery scenario: it presses every button in three modes and checks the hands in the DOM.
+- Verified visually in Chromium and Firefox at 400/1280/1920px (hands, tiles, odometers, place value, addition, icons),
+  including mid-animation frames (finger squash-and-stretch, odometer roll, carry hop).
+- Known issues: none found. Safari is untested. The finger and badge animations use CSS `transform-box: fill-box`,
+  which Safari 11+ supports. A full 10-finger `setBits` change moves the fingers one after another, about 70ms apart,
+  right to left. Lessons that count fast should use `ctx.speed`, or just rely on fewer fingers changing per step.
+- For lesson phases: open `index.html#/gallery` to try every piece. Build scenes from these components in `setup`,
+  and call their methods with `ctx` in `do`. Don't stop on 4 or 128 alone (D5).
+- How to see it: open `index.html#/gallery`.
