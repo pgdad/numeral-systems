@@ -61,6 +61,10 @@ All planning state lives in this repo. Nothing relies on session memory.
 - `node tools/smoke.js`: headless-browser smoke test. It needs Playwright, which is optional:
   set `PLAYWRIGHT_MODULE=/path/to/node_modules/playwright` if it isn't installed globally. Add
   `SMOKE_SCREENSHOTS=<dir>` for screenshots at 400/1024/1920px. Add new routes to `EXTRA_ROUTES` in it.
+- `tools/build-dist.sh [--verify]`: builds `dist/` and `numeral-systems-<version>.zip` (runs `check.sh` first; `--verify`
+  smoke-tests the build over http under `/numbers/` with the CSP, and the unzipped copy over `file://`). Deploying,
+  hosting and releases: `deploy/README.md`. Never commit credentials (the lint scans for them).
+- `node tools/serve.js [--root dist --prefix /numbers/]`: a local server with the headers and CSP from `deploy/headers.md`.
 - To view the app, open `index.html` in a browser. Or run
   `python3 -m http.server 8000` and visit http://localhost:8000.
 - `tests/browser.html`: runs the same unit tests in a browser.

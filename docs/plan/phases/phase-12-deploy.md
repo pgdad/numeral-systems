@@ -43,9 +43,9 @@ Documented, scripted deploys exist for AWS S3 + CloudFront and Akamai, plus note
    steps in `deploy/README.md`: bump the version → check → build → deploy → tag.
 
 ## Acceptance criteria
-- [ ] `tools/build-dist.sh` produces `dist/` and a zip. The zip runs by double-click.
-- [ ] `dist/` works from a sub-path over http, with no 404s in the network log.
-- [ ] `deploy/s3-cloudfront.sh --dry-run` prints the intended commands without credentials.
-- [ ] `deploy/akamai.md` and `deploy/headers.md` are complete. The CSP was tested against the app (no CSP errors).
-- [ ] No secrets are in the repo.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] `tools/build-dist.sh` produces `dist/` and a zip. The zip runs by double-click.
+- [x] `dist/` works from a sub-path over http, with no 404s in the network log.
+- [x] `deploy/s3-cloudfront.sh --dry-run` prints the intended commands without credentials.
+- [x] `deploy/akamai.md` and `deploy/headers.md` are complete. The CSP was tested against the app (no CSP errors).
+- [x] No secrets are in the repo.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.

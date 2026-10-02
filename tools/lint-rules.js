@@ -12,11 +12,14 @@ const problems = [];
 function rel(p) { return path.relative(ROOT, p).split(path.sep).join('/'); }
 function report(file, line, msg) { problems.push(`${file}${line ? ':' + line : ''}  ${msg}`); }
 
-function walk(dir, out) {
+// skipBuilt: leave out .git, node_modules and build output (for the whole-repo secret scan).
+function walk(dir, out, skipBuilt) {
   if (!fs.existsSync(dir)) return out;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) walk(full, out);
+    if (entry.isDirectory()) {
+      if (!(skipBuilt && /^(\.git|node_modules|dist|test-results|playwright-report)$/.test(entry.name))) walk(full, out, skipBuilt);
+    }
     else out.push(full);
   }
   return out;
@@ -61,14 +64,15 @@ for (const file of runtimeFiles) {
 const indexPath = path.join(ROOT, 'index.html');
 const indexHtml = fs.existsSync(indexPath) ? fs.readFileSync(indexPath, 'utf8') : '';
 if (!indexHtml) report('index.html', 0, 'missing');
-const scriptSrcs = [...indexHtml.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)].map((m) => m[1]);
+// dist/index.html adds ?v=<commit> to every script and stylesheet (tools/build-dist.sh); compare paths without it.
+const scriptSrcs = [...indexHtml.matchAll(/<script\b[^>]*\bsrc\s*=\s*["']([^"'?]+)(?:\?[^"']*)?["']/gi)].map((m) => m[1]);
 const seen = new Set();
 for (const src of scriptSrcs) {
   if (seen.has(src)) report('index.html', 0, `script "${src}" is included twice`);
   seen.add(src);
   if (!fs.existsSync(path.join(ROOT, src))) report('index.html', 0, `script "${src}" does not exist`);
 }
-const linkHrefs = [...indexHtml.matchAll(/<link\b[^>]*\bhref\s*=\s*["']([^"'#]+)["']/gi)].map((m) => m[1]);
+const linkHrefs = [...indexHtml.matchAll(/<link\b[^>]*\bhref\s*=\s*["']([^"'#?]+)(?:\?[^"']*)?["']/gi)].map((m) => m[1]);
 for (const href of linkHrefs) {
   if (!fs.existsSync(path.join(ROOT, href))) report('index.html', 0, `linked file "${href}" does not exist`);
 }
@@ -135,9 +139,27 @@ if (fs.existsSync(exportTool)) {
   if (res.status !== 0) report('docs/narration.md', 0, (res.stderr || res.stdout || 'narration export failed').trim());
 }
 
+// No secrets anywhere in the repo (Phase 12): deploy scripts read credentials from the environment or the
+// standard CLI profiles (~/.aws, ~/.edgerc), never from files in here.
+const SECRET_RULES = [
+  { re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/, msg: 'looks like an AWS access key id' },
+  { re: /aws_secret_access_key\s*[=:]\s*["']?[A-Za-z0-9/+]{40}/i, msg: 'looks like an AWS secret key' },
+  { re: /-----BEGIN [A-Z ]*PRIVATE KEY-----/, msg: 'private key' },
+  { re: /\b(?:client_secret|access_token|client_token)\s*=\s*[A-Za-z0-9+/=_-]{20,}/, msg: 'looks like an Akamai .edgerc credential' }
+];
+let secretFiles = 0;
+for (const file of walk(ROOT, [], true)) {
+  if (!/\.(js|json|sh|md|html|css|txt|ya?ml|env|cfg|ini|edgerc)$|(^|[\/])\.[a-z]+rc$/i.test(file)) continue;
+  secretFiles++;
+  fs.readFileSync(file, 'utf8').split('\n').forEach((ln, i) => {
+    for (const rule of SECRET_RULES) if (rule.re.test(ln)) report(rel(file), i + 1, 'Possible secret: ' + rule.msg + '. Never commit credentials.');
+  });
+}
+
 if (problems.length) {
   console.error(`lint-rules: ${problems.length} problem(s):`);
   problems.forEach((p) => console.error('  ' + p));
   process.exit(1);
 }
-console.log(`lint-rules: OK (${runtimeFiles.length} runtime files, ${scriptSrcs.length} scripts, ${audioCount} recorded lines)`);
+console.log(`lint-rules: OK (${runtimeFiles.length} runtime files, ${scriptSrcs.length} scripts, ${audioCount} recorded lines, ` +
+  `${secretFiles} files scanned for secrets)`);

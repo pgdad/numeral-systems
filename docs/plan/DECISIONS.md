@@ -241,3 +241,25 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   light and dark (run from a scratchpad; axe is not a repo dependency). `tools/smoke.js` checks every control has a name, every focus stop
   shows a ring (SVG fingers draw a dashed stroke), and runs every lesson keyboard-only.
 - The player sets `data-ready="<scene>/<step>"` on `.player` when a deep-linked picture has finished building (tests wait for it).
+
+## D23. Packaging, caching, CSP and releases (Phase 12)
+- **`tools/build-dist.sh`** is the only way to make a release: it runs `tools/check.sh`, copies the runtime files (`index.html`, `css/`,
+  `js/`, `assets/` minus dotfiles and `assets/audio/README.md`) to `dist/`, adds `?v=<git short sha>` (plus `-dirty` for an unclean tree) to
+  every script and stylesheet **in `dist/index.html` only**, writes `dist/version.txt` and `dist/HOW-TO-OPEN.txt`, lints the build
+  (`node tools/lint-rules.js dist`), and zips `numeral-systems-<version>.zip` (one top folder). `--verify` serves `dist/` under `/numbers/`
+  with the production headers and runs the full smoke test, then runs it again on the unzipped copy over `file://`. A new runtime file type or
+  folder must be added to the copy list there.
+- **Version**: `NS.version` in `js/core/namespace.js` (semver, shown on About). Releases: bump → check → commit → build → deploy → tag
+  `vX.Y.Z` (`deploy/README.md` "Releasing").
+- **Cache policy** (`deploy/headers.md`): `index.html` and other top-level files `no-cache`; `js/*` and `css/*` a year `immutable` (safe
+  only because of `?v=`, so **the CDN cache key must include the query string**); `assets/*` a day. Uploads put `index.html` last.
+- **CSP**: `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self'; media-src 'self' blob:;
+  connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`. It is defined once in
+  `tools/serve.js` and repeated verbatim in `deploy/headers.md` (`tests/deploy.test.js` checks they match). Code must keep working under it:
+  no inline `<script>`, no `on*=` attributes, no `eval`/`new Function`, no network requests, media only from files or `blob:`. Prefer
+  `element.style` / `U.el(..., {style: {...}})` over `style="..."` strings (the app currently passes even `style-src 'self'`).
+- **The smoke test fails on CSP violations and on http responses >= 400** on every page (`watchEveryContext` in `tools/smoke.js`), and
+  `SMOKE_INDEX=<url>` points it at another copy (it then skips `tests/browser.html`, which isn't shipped).
+- **No credentials in the repo**: deploy scripts read them from the CLIs' own stores (`~/.aws`, `~/.ssh`, `~/.edgerc`) or the environment;
+  `tools/lint-rules.js` scans every text file for AWS keys, private keys and `.edgerc`-style secrets. Every deploy script has `--dry-run`, which
+  needs no CLI or credentials (tested in `tests/deploy.test.js`).

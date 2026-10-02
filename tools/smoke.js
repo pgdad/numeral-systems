@@ -8,6 +8,9 @@
 //   PLAYWRIGHT_MODULE=/path/to/node_modules/playwright node tools/smoke.js
 //   SMOKE_BROWSERS=chromium,firefox node tools/smoke.js
 //   SMOKE_SCREENSHOTS=/some/dir node tools/smoke.js   # save screenshots per route/width
+//   SMOKE_INDEX=http://localhost:8000/numbers/index.html node tools/smoke.js
+//                                             # test another copy (a built dist/, over http); skips tests/browser.html
+// Every page also fails on Content-Security-Policy violations and on http responses of 400 or more.
 'use strict';
 
 const path = require('path');
@@ -24,8 +27,8 @@ try {
 }
 
 const ROOT = path.resolve(__dirname, '..');
-const INDEX = pathToFileURL(path.join(ROOT, 'index.html')).href;
-const TESTS = pathToFileURL(path.join(ROOT, 'tests', 'browser.html')).href;
+const INDEX = process.env.SMOKE_INDEX || pathToFileURL(path.join(ROOT, 'index.html')).href;
+const TESTS = process.env.SMOKE_INDEX ? null : pathToFileURL(path.join(ROOT, 'tests', 'browser.html')).href;
 const browsers = (process.env.SMOKE_BROWSERS || 'chromium').split(',').map((s) => s.trim()).filter(Boolean);
 const shotsDir = process.env.SMOKE_SCREENSHOTS;
 const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
@@ -38,6 +41,7 @@ const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '
 async function run(browserName) {
   const browser = await pw[browserName].launch();
   const failures = [];
+  watchEveryContext(browser, failures);
   try {
     for (const width of WIDTHS) {
       const page = await browser.newPage({ viewport: { width, height: 900 } });
@@ -78,15 +82,17 @@ async function run(browserName) {
       await page.close();
     }
 
-    // In-browser unit tests.
-    const tpage = await browser.newPage();
-    tpage.on('pageerror', (err) => failures.push(`tests pageerror: ${err.message}`));
-    await tpage.goto(TESTS);
-    await tpage.waitForFunction(() => /PASS|FAIL/.test(document.title), null, { timeout: 15000 });
-    const title = await tpage.title();
-    const summary = await tpage.textContent('#summary');
-    if (!/PASS/.test(title)) failures.push(`tests/browser.html: ${summary}`);
-    else console.log(`smoke[${browserName}]: tests/browser.html ${summary.trim()}`);
+    // In-browser unit tests (not shipped in dist/, so only for the source tree).
+    if (TESTS) {
+      const tpage = await browser.newPage();
+      tpage.on('pageerror', (err) => failures.push(`tests pageerror: ${err.message}`));
+      await tpage.goto(TESTS);
+      await tpage.waitForFunction(() => /PASS|FAIL/.test(document.title), null, { timeout: 15000 });
+      const title = await tpage.title();
+      const summary = await tpage.textContent('#summary');
+      if (!/PASS/.test(title)) failures.push(`tests/browser.html: ${summary}`);
+      else console.log(`smoke[${browserName}]: tests/browser.html ${summary.trim()}`);
+    }
     // Player scenarios against the demo lesson (Phase 02).
     await playerScenarios(browser, failures);
     // Component gallery (Phase 03).
@@ -107,6 +113,39 @@ async function run(browserName) {
     await browser.close();
   }
   return failures;
+}
+
+// Phase 12: on every page of every context, fail on CSP violations (reported by the page itself, so it works the
+// same in every browser) and on http responses >= 400 (a missing file under a CDN sub-path).
+const CSP_SPY = `
+  document.addEventListener('securitypolicyviolation', (e) => {
+    console.error('CSP violation: ' + e.violatedDirective + ' blocked ' + (e.blockedURI || 'inline') +
+      (e.sourceFile ? ' (' + e.sourceFile.split('/').pop() + ':' + e.lineNumber + ')' : ''));
+  });
+`;
+function watchEveryContext(browser, failures) {
+  const seen = new WeakSet();
+  const watch = async (context) => {
+    if (seen.has(context)) return context;
+    seen.add(context);
+    await context.addInitScript(CSP_SPY);
+    const onPage = (page) => {
+      page.on('console', (msg) => { if (/^CSP violation/.test(msg.text())) failures.push(msg.text()); });
+      page.on('response', (r) => { if (r.status() >= 400) failures.push(`http ${r.status()}: ${r.url()}`); });
+    };
+    context.pages().forEach(onPage);
+    context.on('page', onPage);
+    return context;
+  };
+  const newContext = browser.newContext.bind(browser);
+  browser.newContext = async (opts) => watch(await newContext(opts));
+  browser.newPage = async (opts) => {
+    const context = await browser.newContext(opts);
+    const page = await context.newPage();
+    const close = page.close.bind(page);
+    page.close = async (o) => { await close(o); await context.close(); };
+    return page;
+  };
 }
 
 // A fake speechSynthesis that records what is spoken and "speaks" each sentence in 30ms.

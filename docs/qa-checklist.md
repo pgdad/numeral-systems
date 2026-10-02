@@ -18,6 +18,9 @@ driver this phase (repeatable, see PROGRESS.md), **M** = needs a person.
 | Served over http (`python3 -m http.server`) | M | – | – | | | | |
 | Works offline (no network requests at all) | A | ✓ | ✓ | | | | |
 | Bad URL (`#/nonsense`) goes home | A | ✓ | ✓ | | | | |
+| Built `dist/` over http under a sub-path (`/numbers/`) with the CSP: no 404s, no CSP errors (`tools/build-dist.sh --verify`) | A | ✓ | ✓ | | | | |
+| The release zip, unzipped, runs by double-click (`file://`) | A | ✓ | ✓ | | | | |
+| On a real CDN (CloudFront / Akamai): headers, compression, invalidation | M | – | – | | | | |
 
 ## 2. Lessons (each of the six)
 

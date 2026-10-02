@@ -18,8 +18,10 @@ colors, and resetting the ✓ marks that finished lessons get on the home screen
 with a grandchild. `docs/qa-checklist.md` lists what has been tested where.
 
 It's just files: double-click `index.html` and it runs on PC or Mac with no
-install and no internet. To publish it, copy the folder to any static host or CDN
-(S3 + CloudFront, Akamai, Netlify, GitHub Pages). See `deploy/`.
+install and no internet. `tools/build-dist.sh` makes a clean `dist/` folder and an offline zip
+(`numeral-systems-<version>.zip`: unzip, double-click `index.html`). To publish it, copy `dist/` to any static host or
+CDN. `deploy/README.md` covers S3 + CloudFront and Akamai (with scripts), plus GitHub Pages, Netlify, Cloudflare
+Pages, Azure and plain web servers, as well as headers, caching and releasing.
 
 ## Building it (one phase per Claude session)
 

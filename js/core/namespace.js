@@ -3,7 +3,7 @@
 // Load order is defined by the <script> tags in index.html (and tests/manifest.js).
 (function (NS) {
   'use strict';
-  NS.version = '0.1.0';
+  NS.version = '1.0.0'; // semver; bump it for every release (deploy/README.md "Releasing")
   NS.debug = false;
 })(typeof window !== 'undefined' ? (window.NumSys = window.NumSys || {})
                                  : (globalThis.NumSys = globalThis.NumSys || {}));

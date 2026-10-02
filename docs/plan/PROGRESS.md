@@ -18,9 +18,9 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 09 | Playground & games | done | 2026-10-02 | 173 tests + playground make/convert/quiz smoke, storage on and blocked (Chromium + Firefox) |
 | 10 | Movie mode & recorded audio | done | 2026-10-02 | 190 tests + movie/recorder smoke; full movie, piper audio + stale fallback verified (Chromium + Firefox) |
 | 11 | Polish, a11y, QA | done | 2026-10-02 | 199 tests + all-steps/keyboard/robustness/settings smoke; axe AA clean light+dark (Chromium + Firefox) |
-| 12 | Packaging & CDN deploy | todo | | |
+| 12 | Packaging & CDN deploy | done | 2026-10-02 | 208 tests; dist/ smoke over http under /numbers/ with CSP + unzipped over file:// (Chromium + Firefox) |
 
-**Next phase:** 12 (Packaging & CDN deploy).
+**Next phase:** none. All planned phases are done. Remaining work is the human QA list in `docs/qa-checklist.md`; releases follow `deploy/README.md` "Releasing".
 
 ---
 
@@ -548,3 +548,55 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   origin, so a CDN copy starts fresh. IndexedDB is used only by `#/record`.
 - How to see it: open `index.html`. The gear (Settings) is top right; finish any lesson to see its ✓ on the home screen; About has the
   grown-up tips. Pick "Dark" in Settings for dark mode.
+
+### Phase 12 — Packaging & CDN deployment — 2026-10-02 — done
+- Built:
+  - **`tools/build-dist.sh [--verify]`**:
+    - runs `check.sh` and copies the runtime files to `dist/`;
+    - adds `?v=<short sha>` to scripts and stylesheets in `dist/index.html` only;
+    - writes `version.txt` and `HOW-TO-OPEN.txt`, lints the build, and zips `numeral-systems-<version>.zip` (one top folder, about 196 KB);
+    - `--verify` serves `dist/` at `http://127.0.0.1:8765/numbers/` with the production headers and CSP, runs the full smoke test against it,
+      then unzips the zip and runs the full smoke test again over `file://`.
+  - **`tools/serve.js`**: a zero-dependency static server with a sub-path prefix and the MIME types, cache headers, security headers and CSP
+    from `deploy/headers.md`. It refuses dotfiles and path traversal.
+  - **`deploy/`**:
+    - `README.md`: build, offline install on PC/Mac with desktop shortcuts, the AWS one-time setup (private bucket + OAC, a cache policy that
+      keys on `v`, a response headers policy, and a CloudFront Function for `index.html` under a sub-folder), other hosts (GitHub Pages,
+      Netlify/Cloudflare Pages `_headers`, Azure SWA, nginx/Apache/Caddy), local sub-path testing, and the release steps;
+    - `headers.md`: cache policy, MIME types, compression, and a tested CSP;
+    - `s3-cloudfront.sh`: four upload passes with per-type cache-control, `index.html` last, and the invalidation; `--dry-run` and `--full`;
+    - `akamai.md`: NetStorage, Property Manager rules and Fast Purge;
+    - `akamai-netstorage.sh`: rsync upload with `index.html` last, plus `akamai purge invalidate`; `--dry-run` and `--full`.
+  - **Version 1.0.0** (`NS.version`, shown at the bottom of About).
+  - **Smoke test**: `SMOKE_INDEX=<url>` tests another copy. Every page now fails on CSP violations (a `securitypolicyviolation` listener)
+    and on http responses >= 400.
+  - **Lint**: tolerates `?v=` (so it can lint `dist/`), and scans every text file for AWS keys, private keys and `.edgerc` secrets.
+- Key files: `tools/build-dist.sh`, `tools/serve.js`, `deploy/*`, `tests/deploy.test.js`, `tools/smoke.js` (`watchEveryContext`),
+  `tools/lint-rules.js`.
+- Tests: `tests/deploy.test.js` (9 tests):
+  - the version is semver and shown on About;
+  - `headers.md` and `serve.js` agree on the CSP and headers;
+  - the CSP has no outside origins or eval;
+  - cache policy and MIME types;
+  - the server under a sub-path: redirects, 404s outside the prefix and for dotfiles and traversal;
+  - both deploy scripts' `--dry-run` output, run with a PATH that has no aws/akamai/rsync and no credentials;
+  - the refusals.
+- Verified (Chromium + Firefox, Playwright from the scratchpad):
+  - the full smoke over http from `/numbers/` with the CSP: no 404s, no CSP violations;
+  - the same with the strict `style-src 'self'` (no `unsafe-inline`): also clean;
+  - the full smoke on the unzipped zip over `file://`;
+  - negative checks that a missing file (404) and an injected inline style (CSP) are reported in both browsers;
+  - `tools/check.sh`;
+  - the secret scan catches a planted AWS key id.
+- Deviations: the zip goes in the repo root (gitignored as `numeral-systems-*.zip`), not inside `dist/`, so `dist/` uploads as-is. The
+  optional `deploy/cloudformation.yaml` was not written; the console steps are in `deploy/README.md`. `js/components/gallery.js`
+  (`#/gallery`) stays in `dist/` (small; removing it would mean editing the script list). No LICENSE file exists, so none is shipped.
+- Known issues / not verifiable here: no `aws` or `akamai` CLI or accounts in this environment. The real uploads, the CloudFront Function and
+  the Property Manager rules are documented from the services' standard setup but untested against live accounts; run the scripts with
+  `--dry-run` first. The ssh/rsync details for NetStorage (upload domain, `sshacs` account) should be checked against your account's
+  connection page.
+- For later work: any new runtime folder or file type must be added to the copy list in `tools/build-dist.sh` (and a MIME type to
+  `tools/serve.js` and `headers.md`). Keep the code CSP-clean (D23). Bump `NS.version` for each release.
+- How to see it: `tools/build-dist.sh` (or `SKIP_CHECK=1 tools/build-dist.sh` for a quick one), then unzip `numeral-systems-1.0.0.zip` and
+  double-click `index.html`; or `node tools/serve.js --root dist --prefix /numbers/` and open http://localhost:8000/numbers/. About shows
+  "Version 1.0.0". `BUCKET=x PREFIX=numbers deploy/s3-cloudfront.sh --dry-run` shows the deploy commands.

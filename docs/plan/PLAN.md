@@ -118,11 +118,12 @@ js/recorder.js             "Record the narration" page (#/record)
 js/settings.js             the Settings panel (gear in the header): voice, speed, sounds, captions, hands, theme, progress
 js/app.js
 assets/svg/  assets/audio/    (audio: optional <id>.mp3 narration files + cue sheets)
-tests/manifest.js  harness.js  load-app.js  specs.test.js  tools.test.js  specs/*.spec.js  browser.html
+tests/manifest.js  harness.js  load-app.js  specs.test.js  tools.test.js  deploy.test.js  specs/*.spec.js  browser.html
 tools/check.sh  tools/lint-rules.js  tools/smoke.js  tools/narration-export.js  tools/narration.json
-tools/build-audio-manifest.js  tools/generate-audio.sh  tools/build-dist.sh
+tools/build-audio-manifest.js  tools/generate-audio.sh  tools/build-dist.sh  tools/serve.js
 docs/narration.md  docs/recording-your-voice.md  docs/making-a-video.md  docs/qa-checklist.md
-deploy/README.md  deploy/s3-cloudfront.sh  deploy/akamai.md  deploy/headers.md
+deploy/README.md  deploy/s3-cloudfront.sh  deploy/akamai.md  deploy/akamai-netstorage.sh  deploy/headers.md
+dist/  numeral-systems-<version>.zip   (build output of tools/build-dist.sh; gitignored)
 docs/plan/...              (this plan)
 ```
 
