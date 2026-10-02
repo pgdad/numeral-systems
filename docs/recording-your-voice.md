@@ -26,9 +26,12 @@ plus an entry in the manifest.
    `python3 -m http.server 8000` and open `http://localhost:8000/#/record`.
 3. Pick a lesson. For each line: press **Record** (or the **R** key), read the line, and press **Stop**. Press
    **Play** (or **P**) to listen, and record it again if you like. **Next →** (or the → key) moves on.
-4. Recordings only live in the page. Before you close it, press **Save recorded lines** (one file per line, for
+4. The page keeps your recordings in the browser (IndexedDB), so you can leave and come back later. Where the
+   browser doesn't allow that (some private windows), they only last while the page is open and it says so. The
+   lessons can only use **files**, so when you're done press **Save recorded lines** (one file per line, for
    example `binary.switches.0.webm`; let the browser save several files) and **Save the cue sheet**
-   (`narration-cues-<date>.json`, which says which text each file was recorded from).
+   (`narration-cues-<date>.json`, which says which text each file was recorded from). **Forget all recordings**
+   (press it twice) empties the browser's copy.
 5. Copy the sound files **and** the cue sheet into the app's `assets/audio/` folder.
 6. In the app folder run:
 

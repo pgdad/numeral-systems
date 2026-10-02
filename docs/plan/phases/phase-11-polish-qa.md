@@ -34,8 +34,8 @@ all screen sizes, and from both `file://` and http.
    and credits.
 
 ## Acceptance criteria
-- [ ] All known issues from handoff notes are resolved or explicitly deferred with a reason.
-- [ ] A keyboard-only run through every lesson succeeds.
-- [ ] The smoke test passes (or the manual checklist is complete where Playwright isn't available).
-- [ ] `docs/qa-checklist.md` is filled in.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] All known issues from handoff notes are resolved or explicitly deferred with a reason.
+- [x] A keyboard-only run through every lesson succeeds.
+- [x] The smoke test passes (or the manual checklist is complete where Playwright isn't available).
+- [x] `docs/qa-checklist.md` is filled in.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.

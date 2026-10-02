@@ -211,3 +211,33 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   (the whole narration is ~3–5 MB at 48 kbps mono).
 - **No video files in git** (D4). `docs/making-a-video.md` covers OS screen recorders. Movie mode has an optional "Record a video of it" button
   (`getDisplayMedia` + `MediaRecorder` → `counting-movie.webm` download) when the browser supports it.
+
+## D22. Polish: settings, progress, captions layout, colors and accessibility (Phase 11)
+- **Settings** live in `js/settings.js` (the gear button in the header, a native `<dialog>` with a fallback). Choices are saved at once via
+  `NS.util.storage`: `numsys.theme` (`light` default | `dark` | `auto` = follow the computer), `numsys.captions.size` (`s|m|l`, applied as
+  `html[data-captions]`), `numsys.player.speed` (shared with the player's speed button), plus the existing voice on/off, voice name, sound
+  effects and hand skin tone keys. Every change fires a window event **`numsys:settings`** `{detail: {key}}`; any view with its own quick
+  buttons (player, movie, playground) listens and redraws. New views with voice/sound buttons must do the same.
+- **Progress**: `js/core/progress.js` (`NS.progress.isDone/markDone/doneIds/reset/onChange`, key `numsys.progress` = `{id: date}`).
+  The player marks a visible lesson done when its end card shows; the playground marks `playground` done when a quiz is finished. Home cards
+  show "✓ Done!" and a "You finished N of 6" line. Reset is in Settings (two presses).
+- **Captions never hide the buttons** (fixes the overlap noted since Phase 05):
+  - the part dots live inside the control bar (one row from 73.75em wide; above the buttons when narrower);
+  - from 35em wide, the control bar is `position: sticky` just above the captions bar, using `--cap-h` (the captions' height, kept up to
+    date by a ResizeObserver in `app.js`);
+  - in interactive scenes the narrator hides the captions 3.5 s after a line ends (`NS.narrator.setCaptionAutoHide(ms)`; the player sets it per
+    scene), so they don't cover try-it controls; live lines show them again;
+  - each step scrolls the picture just clear of the captions and sticky bar (`keepInView`, never above the picture's top).
+- **`narrator.stop()` ends the whole current line**, with or without a signal: every `speak()` runs under its own AbortController, so the
+  promise rejects with AbortError. Callers must `.catch()` (all do). A hidden tab stops all speech (`app.js`), and the player/movie pause.
+- **Colors**: system colors are AA-contrast tokens. Light: `--c-base10 #2a65cc`, `--c-binary #17804a`, `--c-octal #7b4fd6`,
+  `--c-hex #b85600`, `--c-animals #8c5730`, `--c-addition #c42a5f`, `--c-playground #087a7a`, text on them `--on-theme #fff`. Dark mode
+  (`html[data-theme="dark"]`) swaps in lighter versions with `--on-theme #10121f`. **Never write `color: #fff` on a system-colored fill**:
+  use `var(--on-theme)`. Panels that stay dark in both themes (captions, odometer frames, the traffic light) use `--chrome`/`--chrome-ink`.
+  Warnings use `--warn`; color-mixer channel names `--ch-red/green/blue`. The color *digits* (`--c-red/yellow/green`) are unchanged: their
+  shapes and printed names carry the meaning (checked with protanopia/deuteranopia simulation).
+- **Media queries are in em** (35em = 560px at default text size), so readers who raise the browser's text size get the narrow layouts.
+- **Accessibility checks** (Phase 11 baseline): axe-core WCAG 2.1 AA reports no violations on every view and the last step of every scene, in
+  light and dark (run from a scratchpad; axe is not a repo dependency). `tools/smoke.js` checks every control has a name, every focus stop
+  shows a ring (SVG fingers draw a dashed stroke), and runs every lesson keyboard-only.
+- The player sets `data-ready="<scene>/<step>"` on `.player` when a deep-linked picture has finished building (tests wait for it).

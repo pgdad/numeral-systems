@@ -13,6 +13,10 @@ A browser app with animated, narrated lessons about how we write numbers:
 explains how to turn it into a video file). The lessons can talk in a recorded voice, even your own
 (`docs/recording-your-voice.md`); otherwise they use the browser's voice.
 
+The **Settings** gear (top right) has the voice, its speed, sound effects, caption size, hand color, light or dark
+colors, and resetting the ✓ marks that finished lessons get on the home screen. The About page has tips for using it
+with a grandchild. `docs/qa-checklist.md` lists what has been tested where.
+
 It's just files: double-click `index.html` and it runs on PC or Mac with no
 install and no internet. To publish it, copy the folder to any static host or CDN
 (S3 + CloudFront, Akamai, Netlify, GitHub Pages). See `deploy/`.

@@ -12,6 +12,7 @@
       'js/core/strings.js',
       'js/core/util.js',
       'js/core/lessons.js',
+      'js/core/progress.js',
       'js/core/router.js',
       'js/core/numeral.js',
       'js/core/digitsets.js',
@@ -41,6 +42,7 @@
       'js/playground.js',
       'js/movie.js',
       'js/recorder.js',
+      'js/settings.js',
       'js/app.js'
     ],
     specs: [
@@ -61,7 +63,8 @@
       'tests/specs/lesson-silly.spec.js',
       'tests/specs/lesson-addition.spec.js',
       'tests/specs/playground.spec.js',
-      'tests/specs/movie.spec.js'
+      'tests/specs/movie.spec.js',
+      'tests/specs/polish.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);

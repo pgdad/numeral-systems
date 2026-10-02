@@ -5,6 +5,8 @@
 //   NS.gallery.mount(stage) -> {destroy()}                           (Phase 03, #/gallery)
 //   NS.movie.mount(stage, {id}) -> {destroy()}                        (Phase 10, #/movie[/:id])
 //   NS.recorder.mount(stage) -> {destroy()}                           (Phase 10, #/record)
+//   NS.settings.apply()/open(opener)                                   (Phase 11, the header gear)
+//   NS.progress.isDone(id)                                             (Phase 11, ✓ on finished lessons)
 (function (NS) {
   'use strict';
 
@@ -65,6 +67,7 @@
         theme: (real && real.theme) || p.theme,
         glyph: (real && real.glyph) || p.glyph,
         ready: !!real || (p.route === 'playground' && !!(NS.playground && NS.playground.mount)),
+        done: !!(NS.progress && NS.progress.isDone(p.id)),
         href: p.route ? NS.router.href(p.route) : NS.router.href('lesson', { id: p.id })
       };
     });
@@ -72,7 +75,8 @@
     Object.keys(byId).forEach(function (id) {
       var l = byId[id];
       entries.push({ id: id, order: l.order, title: l.title, blurb: l.blurb || '', ageHint: l.ageHint,
-        theme: l.theme || 'base10', glyph: l.glyph || '#', ready: true, href: NS.router.href('lesson', { id: id }) });
+        theme: l.theme || 'base10', glyph: l.glyph || '#', ready: true, done: !!(NS.progress && NS.progress.isDone(id)),
+        href: NS.router.href('lesson', { id: id }) });
     });
     return entries.sort(function (a, b) { return a.order - b.order; });
   }
@@ -80,6 +84,9 @@
   function lessonCard(entry, index) {
     var inner = [
       U.el('span', { class: 'card-number', 'aria-hidden': 'true', text: String(index + 1) }),
+      entry.done && entry.ready
+        ? U.el('span', { class: 'card-done' }, NS.icons ? NS.icons.render('check', { kind: 'ui' }) : '✓', U.el('span', { text: S.finished }))
+        : null,
       glyph(entry.glyph),
       U.el('span', { class: 'card-title', text: entry.title }),
       U.el('span', { class: 'card-blurb', text: entry.blurb }),
@@ -88,7 +95,8 @@
         entry.ready ? U.el('span', { class: 'card-go', text: S.startLesson + ' →' })
                     : U.el('span', { class: 'badge badge-soon', text: S.comingSoon }))
     ];
-    var attrs = { class: ['lesson-card', 'theme-' + entry.theme, entry.ready ? '' : 'is-soon'], dataset: { lesson: entry.id } };
+    var attrs = { class: ['lesson-card', 'theme-' + entry.theme, entry.ready ? '' : 'is-soon', entry.done && entry.ready ? 'is-done' : ''],
+      dataset: { lesson: entry.id } };
     if (entry.ready) {
       attrs.href = entry.href;
       return U.el('a', attrs, inner);
@@ -100,6 +108,8 @@
   function renderHome() {
     document.title = S.appTitle;
     var entries = homeEntries();
+    var ready = entries.filter(function (e) { return e.ready; });
+    var done = ready.filter(function (e) { return e.done; }).length;
     var watch = NS.movie && NS.movie.mount && NS.player
       ? U.el('a', { class: 'btn-watch', href: NS.router.href('movie') },
           U.el('span', { class: 'btn-watch-play', 'aria-hidden': 'true' }, NS.player.icon('play')),
@@ -111,6 +121,7 @@
       U.el('div', { class: 'hero' },
         U.el('h1', { class: 'view-heading', tabindex: '-1', text: S.homeHeading }),
         U.el('p', { class: 'lead', text: S.homeIntro }),
+        done ? U.el('p', { class: 'home-progress', text: done === ready.length ? S.allFinished : S.finishedCount(done, ready.length) }) : null,
         watch),
       U.el('nav', { class: 'lesson-grid', 'aria-label': 'Lessons' }, entries.map(lessonCard))
     ));
@@ -167,16 +178,39 @@
   function renderAbout() {
     document.title = S.about + ' · ' + S.appTitle;
     var lessons = NS.lessons.list();
+    var entries = homeEntries().filter(function (e) { return e.ready; });
+    function lessonLink(e) { return U.el('a', { href: e.href }, e.title); }
+    function key(k) { return U.el('kbd', { text: k }); }
     stage.appendChild(U.el('section', { class: 'about prose' },
       U.el('h1', { class: 'view-heading', tabindex: '-1', text: 'About ' + S.appTitle }),
       U.el('p', { text: 'A set of animated, talking lessons about how we write numbers: counting in tens on our ' +
         'fingers, counting to 1023 in binary on two hands, octal and hexadecimal, silly number systems made of ' +
         'animals and colors, and adding in all of them.' }),
-      U.el('h2', { text: 'For the grown-up' }),
-      U.el('ul', {},
-        U.el('li', { text: 'Sit together and go through one lesson at a time, in order from the home screen.' }),
-        U.el('li', { text: 'Each lesson talks and shows captions. Pause any time to ask "what comes next?"' }),
-        U.el('li', { text: 'Finish with the "You try it!" part, and let the child drive the mouse.' })),
+
+      U.el('h2', { text: 'For the grown-up: using it together' }),
+      U.el('ul', { class: 'about-tips' },
+        U.el('li', {}, U.el('strong', { text: 'Sit together. ' }),
+          'The lessons work best with a grown-up beside the child. Each one takes 5 to 10 minutes.'),
+        U.el('li', {}, U.el('strong', { text: 'One lesson at a time. ' }),
+          'Stop when it stops being fun. The home screen puts a ✓ on every lesson you finish, so you can pick up next time.'),
+        U.el('li', {}, U.el('strong', { text: 'Pause and ask. ' }),
+          'Press pause (or the space bar) and ask "what comes next?" before the lesson shows it. Guessing is the fun part.'),
+        U.el('li', {}, U.el('strong', { text: 'Use real fingers. ' }),
+          'Hold your hands up and count along. In binary, a finger up is 1 and a finger down is 0.'),
+        U.el('li', {}, U.el('strong', { text: 'Let the child drive "You try it!" ' }),
+          'Those parts wait for the child. Press "I\'m done!" when you\'re ready to move on.'),
+        U.el('li', {}, U.el('strong', { text: 'Make it comfortable. ' }),
+          'The gear button (Settings) at the top lets you slow the voice down, make the captions bigger, choose a voice, ' +
+          'change the hand color, turn sound effects off, or switch to dark colors.')),
+
+      U.el('h2', { text: 'Suggested order and ages' }),
+      U.el('ol', { class: 'about-order' }, entries.map(function (e) {
+        return U.el('li', {}, lessonLink(e), e.ageHint && e.ageHint !== 'all' ? ' (ages ' + e.ageHint + ')' : ' (any age)');
+      })),
+      U.el('p', { text: 'Younger children (5 and 6) enjoy Base‑10, Silly Number Systems and the Playground converter. ' +
+        'From about 7, try Binary and Adding. Octal and Hexadecimal suits 8 and up. Any lesson can be watched again: ' +
+        'children often like the second time best.' }),
+
       U.el('h2', { text: 'Watch it like a video' }),
       U.el('p', {}, 'The ', U.el('a', { href: NS.router.href('movie') }, 'movie'),
         ' plays every lesson hands-free, one after another, with chapter cards in between. Or watch one lesson: ',
@@ -186,8 +220,27 @@
       U.el('p', {}, 'Would you like the lessons to talk in your own voice? ',
         U.el('a', { class: 'about-record', href: '#/record' }, 'Record the narration'),
         ' line by line, then follow the steps on that page.'),
+
+      U.el('h2', { text: 'Keyboard' }),
+      U.el('ul', {},
+        U.el('li', {}, key('Space'), ' play or pause'),
+        U.el('li', {}, key('→'), ' next step, ', key('←'), ' previous step (in the movie: next and previous chapter)'),
+        U.el('li', {}, key('Tab'), ' moves between buttons; ', key('Enter'), ' or ', key('Space'), ' presses one (fingers too)'),
+        U.el('li', {}, key('F'), ' full screen in the movie; ', key('Esc'), ' leaves full screen or closes Settings')),
+
+      U.el('h2', { text: 'Privacy' }),
+      U.el('p', { text: 'Nothing leaves this computer. There are no accounts, ads or tracking. Finished lessons, settings and ' +
+        'home-made number systems are kept only in this browser.' }),
+
       U.el('h2', { text: 'Works anywhere' }),
       U.el('p', { text: 'This app is just files. It runs offline by opening index.html, and can be copied to any web host or CDN.' }),
+
+      U.el('h2', { text: 'Credits' }),
+      U.el('ul', {},
+        U.el('li', { text: 'Lessons, pictures and code: made for this app. Every drawing (hands, animals, aliens) is drawn in code.' }),
+        U.el('li', { text: 'Sound effects are made on the spot by the browser; there are no sound files.' }),
+        U.el('li', { text: 'The voice is your browser\'s own speech, or recordings you add yourself.' }),
+        U.el('li', { text: 'No outside libraries, fonts or services. Built with help from Claude, an AI assistant by Anthropic.' })),
       U.el('p', { class: 'muted', text: 'Version ' + NS.version })
     ));
   }
@@ -224,10 +277,35 @@
   }
   render.count = 0;
 
+  function setupSettingsButton() {
+    var btn = document.querySelector('[data-settings]');
+    if (!btn || !NS.settings) return;
+    if (NS.icons) btn.appendChild(NS.icons.render('gear', { kind: 'ui' }));
+    btn.appendChild(U.el('span', { class: 'settings-btn-label', text: S.settings }));
+    btn.hidden = false;
+    btn.addEventListener('click', function () { NS.settings.open(btn); });
+  }
+
   function boot() {
     stage = document.getElementById('stage');
     if (!stage) return;
     if (U.prefersReducedMotion()) document.documentElement.classList.add('reduced-motion');
+    if (NS.settings) NS.settings.apply();
+    setupSettingsButton();
+    // --cap-h = the captions bar's height (0 when hidden), so sticky controls can sit just above it (D22).
+    var cap = document.getElementById('captions');
+    if (cap && window.ResizeObserver) {
+      new window.ResizeObserver(function () {
+        document.documentElement.style.setProperty('--cap-h', (cap.hidden ? 0 : cap.offsetHeight) + 'px');
+      }).observe(cap);
+    }
+    // Never keep talking in a hidden tab (the player and movie also pause themselves).
+    document.addEventListener('visibilitychange', function () { if (document.hidden && NS.narrator) NS.narrator.stop(); });
+    // A finished lesson changes the home screen's ✓ marks.
+    if (NS.progress) NS.progress.onChange(function () {
+      var r = NS.router.current();
+      if (r && r.name === 'home' && stage.querySelector('.home')) { U.clear(stage); renderHome(); }
+    });
     NS.router.onChange(render);
     NS.router.start();
   }

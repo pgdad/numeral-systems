@@ -270,8 +270,12 @@
     plus: 'M10.5 4h3v6.5H20v3h-6.5V20h-3v-6.5H4v-3h6.5z',
     minus: 'M4 10.5h16v3H4z',
     dice: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 2v14h14V5zm3 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm8 8a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm-4-4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z',
-    swap: 'M7 7h11l-3-3 1.4-1.4L21.8 8l-5.4 5.4L15 12l3-3H7zm10 10H6l3 3-1.4 1.4L2.2 16l5.4-5.4L9 12l-3 3h11z'
+    swap: 'M7 7h11l-3-3 1.4-1.4L21.8 8l-5.4 5.4L15 12l3-3H7zm10 10H6l3 3-1.4 1.4L2.2 16l5.4-5.4L9 12l-3 3h11z',
+    gear: 'M10.3 2h3.4l.5 2.7c.6.2 1.2.5 1.7.9l2.6-.9 1.7 2.9-2.1 1.8a7 7 0 0 1 0 2l2.1 1.8-1.7 2.9-2.6-.9c-.5.4-1.1.7-1.7.9l-.5 2.7h-3.4l-.5-2.7a7 7 0 0 1-1.7-.9l-2.6.9-1.7-2.9 2.1-1.8a7 7 0 0 1 0-2L3.6 7.6l1.7-2.9 2.6.9c.5-.4 1.1-.7 1.7-.9zM12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z',
+    moon: 'M14.5 3a9 9 0 1 0 6.5 13.7A7.5 7.5 0 0 1 14.5 3z',
+    close: 'M6.4 4.6 12 10.2l5.6-5.6 1.8 1.8-5.6 5.6 5.6 5.6-1.8 1.8-5.6-5.6-5.6 5.6-1.8-1.8 5.6-5.6-5.6-5.6z'
   });
+  var UI_EVENODD = { gear: true }; // icons with a hole
 
   function build(U, spec) {
     var tag = spec[0], attrs = spec[1], kids = spec[2];
@@ -309,7 +313,7 @@
       nodes = SHAPES[name](opts.color || SHAPE_DEFAULT_COLOR[name]);
     } else if (UI[name]) {
       root = svgRoot(U, name, '0 0 24 24', opts, 'icon');
-      nodes = [['path', { d: UI[name], fill: 'currentColor' }]];
+      nodes = [['path', UI_EVENODD[name] ? { d: UI[name], fill: 'currentColor', 'fill-rule': 'evenodd' } : { d: UI[name], fill: 'currentColor' }]];
     } else {
       throw new Error('Unknown icon: ' + name);
     }

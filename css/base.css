@@ -4,15 +4,22 @@
    ========================================================================== */
 
 :root {
-  /* Number-system colors (one per system, used across lessons) */
-  --c-base10: #2f6fde;      /* blue */
-  --c-binary: #1f9d55;      /* green */
+  /* Number-system colors (one per system, used across lessons). Phase 11: deep enough for AA contrast
+     (≥ 4.5:1) as text on white and with white text on top (--on-theme); dark mode swaps in lighter ones. */
+  --c-base10: #2a65cc;      /* blue */
+  --c-binary: #17804a;      /* green */
   --c-octal: #7b4fd6;       /* purple */
-  --c-hex: #f07b16;         /* orange */
-  --c-animals: #9a6235;     /* brown */
+  --c-hex: #b85600;         /* orange */
+  --c-animals: #8c5730;     /* brown */
   --c-colors: linear-gradient(90deg, #e53935, #fbc02d, #43a047, #1e88e5, #8e24aa);
-  --c-addition: #d6336c;    /* pink */
-  --c-playground: #0b8f8f;  /* teal */
+  --c-colors-text: #2e7d32; /* text/accents for the color system (the green digit itself stays --c-green) */
+  --c-addition: #c42a5f;    /* pink */
+  --c-playground: #087a7a;  /* teal */
+  --on-theme: #ffffff;      /* text on a system-colored fill */
+  --warn: #a3470b;          /* friendly warnings ("2 isn't a digit in binary") */
+  --ch-red: #c62828;        /* color-mixer channel names (text) */
+  --ch-green: #1f7a33;
+  --ch-blue: #1e63c9;
 
   /* Color-digit palette (DECISIONS D6) */
   --c-red: #e53935;
@@ -28,6 +35,8 @@
   --ink-soft: #565b78;
   --line: #e4ddd0;
   --focus: #1a73e8;
+  --chrome: #23263a;        /* dark panels that stay dark in both themes (captions, odometer frames) */
+  --chrome-ink: #ffffff;
   --shadow: 0 6px 0 rgba(35, 38, 58, .12), 0 12px 24px rgba(35, 38, 58, .08);
   --shadow-sm: 0 3px 0 rgba(35, 38, 58, .12);
 
@@ -65,6 +74,21 @@
   --line: #3a3e5e;
   --shadow: 0 6px 0 rgba(0, 0, 0, .35), 0 12px 24px rgba(0, 0, 0, .3);
   --shadow-sm: 0 3px 0 rgba(0, 0, 0, .35);
+  --chrome: #0c0e1a;
+  --focus: #7fb2ff;
+  --c-base10: #79a6ff;
+  --c-binary: #3fcf84;
+  --c-octal: #b49bff;
+  --c-hex: #ff9d4d;
+  --c-animals: #d9a273;
+  --c-colors-text: #6fd174;
+  --c-addition: #ff7aa8;
+  --c-playground: #3fcfcf;
+  --on-theme: #10121f;
+  --warn: #ffb27a;
+  --ch-red: #ff7b74;
+  --ch-green: #6fd174;
+  --ch-blue: #79a6ff;
   color-scheme: dark;
 }
 
@@ -147,7 +171,7 @@ button { font: inherit; color: inherit; }
   margin: 0 auto; width: min(100%, var(--content-max));
   padding: var(--sp-4) var(--sp-5);
   padding-bottom: max(var(--sp-4), env(safe-area-inset-bottom));
-  background: var(--ink); color: var(--surface);
+  background: var(--chrome); color: var(--chrome-ink);
   font-size: var(--fs-lead); font-weight: 600; text-align: center;
   border-radius: var(--radius) var(--radius) 0 0;
 }
@@ -176,7 +200,7 @@ button { font: inherit; color: inherit; }
 }
 .btn:hover { transform: translateY(-2px); }
 .btn:active { transform: translateY(2px); box-shadow: none; }
-.btn-primary { background: var(--c-base10); border-color: var(--c-base10); color: #fff; }
+.btn-primary { background: var(--c-base10); border-color: var(--c-base10); color: var(--on-theme); }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; transform: none; }
 
 .badge {
@@ -184,6 +208,9 @@ button { font: inherit; color: inherit; }
   border-radius: var(--radius-pill); background: var(--surface-2); color: var(--ink-soft);
   font-size: .85rem; font-weight: 700;
 }
+
+/* Media queries use em (1em = the browser's default text size, 16px unless the reader changed it), so a
+   reader who sets 200% text gets the narrow layouts instead of overflowing wide ones (Phase 11). */
 
 /* ---------- Motion ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -195,7 +222,7 @@ button { font: inherit; color: inherit; }
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 30em) {
   :root { --fs-base: 1.125rem; --fs-lead: 1.2rem; }
   .brand-name { font-size: 1.15rem; }
   .app-nav a { padding: 0 var(--sp-3); }

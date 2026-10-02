@@ -74,6 +74,41 @@
     return '';
   }
 
+  // Takes are also kept in IndexedDB (Phase 11), so leaving the page or a crash doesn't lose them.
+  // Every call resolves (never rejects); without IndexedDB (some file:// setups, private windows) the
+  // store reports ok:false and recordings live in memory only, as before.
+  var DB_NAME = 'numsys-recorder', DB_STORE = 'takes';
+  function takeStore() {
+    var dbp = new Promise(function (resolve) {
+      try {
+        var req = window.indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = function () { req.result.createObjectStore(DB_STORE, { keyPath: 'id' }); };
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = req.onblocked = function () { resolve(null); };
+      } catch (e) { resolve(null); }
+    });
+    function run(mode, fn) {
+      return dbp.then(function (db) {
+        if (!db) return null;
+        return new Promise(function (resolve) {
+          try {
+            var tx = db.transaction(DB_STORE, mode);
+            var out = fn(tx.objectStore(DB_STORE));
+            tx.oncomplete = function () { resolve(out && 'result' in out ? out.result : true); };
+            tx.onerror = tx.onabort = function () { resolve(null); };
+          } catch (e) { resolve(null); }
+        });
+      });
+    }
+    return {
+      ready: dbp.then(function (db) { return !!db; }),
+      all: function () { return run('readonly', function (s) { return s.getAll(); }).then(function (r) { return r || []; }); },
+      put: function (rec) { return run('readwrite', function (s) { s.put(rec); }); },
+      clear: function () { return run('readwrite', function (s) { s.clear(); }); },
+      close: function () { dbp.then(function (db) { if (db) db.close(); }); }
+    };
+  }
+
   function mount(stage) {
     var ctrl = new AbortController();
     var signal = ctrl.signal;
@@ -85,6 +120,12 @@
     var rec = null;          // {recorder, id, started}
     var audio = null;
     var tick = null;
+    var store = window.indexedDB ? takeStore() : null;
+    var kept = false; // true once IndexedDB works: no need to warn before leaving
+    function persist(id) {
+      var t = takes[id];
+      if (store && t) store.put({ id: id, blob: t.blob, ext: t.ext, ms: t.ms, text: t.text, saved: t.saved });
+    }
 
     function on(target, type, fn) { target.addEventListener(type, fn, { signal: signal }); }
 
@@ -107,6 +148,8 @@
     var listEl = U.el('ol', { class: 'rec-list' });
     var saveAllBtn = U.el('button', { type: 'button', class: 'btn btn-primary rec-save-all', onClick: function () { saveAll(); } }, 'Save recorded lines');
     var cuesBtn = U.el('button', { type: 'button', class: 'btn rec-save-cues', onClick: function () { saveCues(); } }, 'Save the cue sheet');
+    var clearBtn = U.el('button', { type: 'button', class: 'btn rec-clear', onClick: function () { clearAll(); } }, 'Forget all recordings');
+    var keepNote = U.el('p', { class: 'rec-warning rec-keep', text: 'Recordings are only kept while this page is open. Save them before you leave!' });
 
     var panel = U.el('div', { class: 'rec-panel' },
       U.el('div', { class: 'rec-panel-top' }, where, idText),
@@ -126,11 +169,11 @@
           U.el('code', { text: 'node tools/build-audio-manifest.js' }), '. Details: ', U.el('code', { text: 'docs/recording-your-voice.md' }), '.')),
       supported ? null : U.el('p', { class: 'rec-warning', role: 'alert', text: 'This browser cannot record here. Try Chrome, Edge or Firefox, ' +
         'and if it still does not work, open the app from a small local web server (see docs/recording-your-voice.md).' }),
-      U.el('p', { class: 'rec-warning rec-keep', text: 'Recordings are only kept while this page is open. Save them before you leave!' }),
+      keepNote,
       U.el('div', { class: 'rec-pick' }, U.el('label', { for: 'rec-group', text: 'Lesson: ' }), select, counter),
       panel,
       listEl,
-      U.el('div', { class: 'rec-save' }, saveAllBtn, cuesBtn,
+      U.el('div', { class: 'rec-save' }, saveAllBtn, cuesBtn, clearBtn,
         U.el('p', { class: 'muted', text: 'The browser may ask once whether this page may save several files. Say yes.' }))));
 
     if (!supported) { recBtn.disabled = true; }
@@ -158,6 +201,8 @@
       counter.textContent = done + ' of ' + group.lines.length + ' recorded' + (total > done ? ' (' + total + ' in all)' : '');
       saveAllBtn.disabled = !total;
       cuesBtn.disabled = !total;
+      clearBtn.disabled = !total || !!rec;
+      if (!clearArmed) clearBtn.textContent = 'Forget all recordings';
       renderList();
     }
 
@@ -217,6 +262,7 @@
           if (old) URL.revokeObjectURL(old.url);
           var blob = new Blob(chunks, { type: type });
           takes[line.id] = { blob: blob, url: URL.createObjectURL(blob), ext: extFor(type), ms: ms, text: line.text, saved: false };
+          persist(line.id);
           status('Recorded. Press Play to listen, or Next for the next line.');
           render();
           if (!nextBtn.disabled) nextBtn.focus({ preventScroll: true });
@@ -279,6 +325,7 @@
         var id = ids[i++];
         download(takes[id].url, id + '.' + takes[id].ext);
         takes[id].saved = true;
+        persist(id);
         U.sleep(350, signal).then(nextFile, function () {});
       })();
     }
@@ -291,6 +338,27 @@
       download(url, 'narration-cues-' + new Date().toISOString().slice(0, 19).replace(/[^0-9]/g, '') + '.json');
       setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
       status('Cue sheet saved. Put it in assets/audio/ next to the sound files.');
+    }
+
+    // Two presses: the first arms the button for 5 seconds.
+    var clearArmed = false, clearTimer = null;
+    function clearAll() {
+      if (!clearArmed) {
+        clearArmed = true;
+        clearBtn.textContent = 'Yes, forget them all';
+        clearBtn.classList.add('btn-danger');
+        clearTimer = setTimeout(function () { clearArmed = false; clearBtn.classList.remove('btn-danger'); render(); }, 5000);
+        return;
+      }
+      clearTimeout(clearTimer);
+      clearArmed = false;
+      clearBtn.classList.remove('btn-danger');
+      stopPlayback();
+      Object.keys(takes).forEach(function (id) { URL.revokeObjectURL(takes[id].url); });
+      takes = {};
+      if (store) store.clear();
+      status('All recordings were forgotten.');
+      render();
     }
 
     // ---- events
@@ -306,10 +374,29 @@
     });
     on(window, 'beforeunload', function (e) {
       var unsaved = Object.keys(takes).some(function (id) { return !takes[id].saved; });
-      if (unsaved) { e.preventDefault(); e.returnValue = ''; }
+      if (unsaved && !kept) { e.preventDefault(); e.returnValue = ''; }
     });
 
     render();
+
+    if (store) {
+      store.ready.then(function (ok) {
+        if (!ok || signal.aborted) return;
+        kept = true;
+        keepNote.textContent = 'Recordings are kept in this browser, even if you leave the page. They still need to be ' +
+          'saved as files before the lessons can use them.';
+        keepNote.classList.add('is-kept');
+        return store.all().then(function (rows) {
+          if (signal.aborted) return;
+          rows.forEach(function (r) {
+            if (takes[r.id] || !r.blob) return; // a take made while loading wins
+            takes[r.id] = { blob: r.blob, url: URL.createObjectURL(r.blob), ext: r.ext, ms: r.ms, text: r.text, saved: !!r.saved };
+          });
+          if (rows.length) status(rows.length + ' recording' + (rows.length === 1 ? ' was' : 's were') + ' kept from last time.');
+          render();
+        });
+      });
+    }
 
     return {
       destroy: function () {
@@ -319,6 +406,8 @@
         stopPlayback();
         if (stream) stream.getTracks().forEach(function (t) { t.stop(); });
         Object.keys(takes).forEach(function (id) { URL.revokeObjectURL(takes[id].url); });
+        clearTimeout(clearTimer);
+        if (store) store.close();
       }
     };
   }

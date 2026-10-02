@@ -96,7 +96,7 @@
 .lesson-base10 .b10-tabs { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .lesson-base10 .b10-tab { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-weight: 800; }
 .lesson-base10 .b10-tab svg { width: 1.6rem; height: 1.6rem; }
-.lesson-base10 .b10-tab[aria-pressed="true"] { background: var(--theme-color); color: #fff; border-color: var(--theme-color); }
+.lesson-base10 .b10-tab[aria-pressed="true"] { background: var(--theme-color); color: var(--on-theme); border-color: var(--theme-color); }
 .lesson-base10 .b10-panel { width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--sp-5); }
 .lesson-base10 .b10-panel[hidden] { display: none; }
 .lesson-base10 .b10-panel-board { flex-direction: column; gap: var(--sp-3); }
@@ -107,11 +107,11 @@
   border-radius: 50%; font-size: 1.6rem;
 }
 .lesson-base10 .b10-step svg { width: 1.6rem; height: 1.6rem; }
-.lesson-base10 .b10-step-plus:not(:disabled) { background: var(--theme-color); color: #fff; border-color: var(--theme-color); }
+.lesson-base10 .b10-step-plus:not(:disabled) { background: var(--theme-color); color: var(--on-theme); border-color: var(--theme-color); }
 .lesson-base10 .b10-step:disabled { opacity: .35; cursor: default; }
 .lesson-base10 .b10-try-board .pv-units { min-height: 3rem; }
 
-@media (max-width: 560px) {
+@media (max-width: 35em) {
   .lesson-base10 .b10-scene { gap: var(--sp-3); }
   .lesson-base10 .b10-question { border-width: 3px; }
   .lesson-base10 .b10-tiles .digit-tile.tile-md { border-width: 3px; }
@@ -150,7 +150,7 @@
   width: 1.9rem; height: 2.4rem; display: grid; place-items: center; border-radius: .5rem;
   font: 900 1.6rem/1 var(--font-digits); color: var(--ink); background: color-mix(in srgb, var(--theme-color) 14%, var(--surface));
 }
-.lesson-binary .bin-bit.is-one { background: var(--theme-color); color: #fff; }
+.lesson-binary .bin-bit.is-one { background: var(--theme-color); color: var(--on-theme); }
 .lesson-binary .bin-bit.is-lead { color: color-mix(in srgb, var(--ink) 30%, transparent); background: transparent; }
 
 /* 2.1 switches */
@@ -211,7 +211,7 @@
 .lesson-binary .bin-two-eq { color: var(--theme-color); }
 .lesson-binary .bin-fly {
   position: absolute; z-index: 3; pointer-events: none; padding: .1rem .5rem; border-radius: 1rem;
-  font: 900 1.3rem/1.2 var(--font-digits); background: var(--theme-color); color: #fff; box-shadow: var(--shadow-sm);
+  font: 900 1.3rem/1.2 var(--font-digits); background: var(--theme-color); color: var(--on-theme); box-shadow: var(--shadow-sm);
 }
 
 /* stars burst (1023, a solved challenge) */
@@ -273,9 +273,9 @@
   width: 2.2rem; height: 2.6rem; display: grid; place-items: center; border-radius: .5rem;
   font: 900 1.5rem var(--font-digits); background: var(--bg-accent); color: var(--ink-soft);
 }
-.lesson-binary .bin-switch.is-one { background: var(--theme-color); color: #fff; }
+.lesson-binary .bin-switch.is-one { background: var(--theme-color); color: var(--on-theme); }
 
-@media (max-width: 560px) {
+@media (max-width: 35em) {
   .lesson-binary .bin-scene { gap: var(--sp-3); }
   .lesson-binary .bin-bit { width: 1.35rem; height: 1.9rem; font-size: 1.15rem; border-radius: .35rem; }
   .lesson-binary .bin-strip { height: 2rem; }
@@ -327,7 +327,7 @@
   position: absolute; top: 0; transform: translateX(-50%); width: 1.9rem; height: 2.4rem; display: grid; place-items: center;
   border-radius: .5rem; font: 900 1.6rem/1 var(--font-digits); background: color-mix(in srgb, var(--c-binary) 14%, var(--surface));
 }
-.lesson-octal-hex .oh-bit.is-one { background: var(--c-binary); color: #fff; }
+.lesson-octal-hex .oh-bit.is-one { background: var(--c-binary); color: var(--on-theme); }
 
 /* 3.1 any base */
 .lesson-octal-hex .oh-any-right { flex: 1 1 22rem; max-width: 36rem; display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
@@ -379,7 +379,7 @@
 .lesson-octal-hex .oh-group-bits { display: flex; gap: .3rem; padding: 0 .15rem; }
 .lesson-octal-hex .oh-gbit {
   width: clamp(1.8rem, 1.2rem + 1.6vw, 2.6rem); height: clamp(2.4rem, 1.6rem + 2vw, 3.3rem); display: grid; place-items: center;
-  border-radius: .5rem; font: 900 clamp(1.4rem, 1rem + 1.2vw, 2rem)/1 var(--font-digits); background: var(--c-binary); color: #fff;
+  border-radius: .5rem; font: 900 clamp(1.4rem, 1rem + 1.2vw, 2rem)/1 var(--font-digits); background: var(--c-binary); color: var(--on-theme);
 }
 .lesson-octal-hex .oh-group .digit-tile.tile-md { --tile: clamp(3rem, 2rem + 2.5vw, 4.2rem); }
 .lesson-octal-hex .oh-groups.is-split { gap: clamp(.8rem, 3vw, 2rem); }
@@ -404,16 +404,16 @@
 .lesson-octal-hex .oh-code-labels { display: flex; font-weight: 800; font-size: .9rem; line-height: 1; margin-top: -.3rem; }
 .lesson-octal-hex .oh-hash-space { width: .7em; }
 .lesson-octal-hex .oh-pair-label { width: 3.4rem; text-align: center; }
-.lesson-octal-hex .oh-pair-label.oh-pair-red { color: #e53935; }
-.lesson-octal-hex .oh-pair-label.oh-pair-green { color: #23883a; }
-.lesson-octal-hex .oh-pair-label.oh-pair-blue { color: #1e6fe0; }
+.lesson-octal-hex .oh-pair-label.oh-pair-red { color: var(--ch-red); }
+.lesson-octal-hex .oh-pair-label.oh-pair-green { color: var(--ch-green); }
+.lesson-octal-hex .oh-pair-label.oh-pair-blue { color: var(--ch-blue); }
 .lesson-octal-hex .oh-color-name { font-size: var(--fs-lead); font-weight: 900; min-height: 1.4em; }
 .lesson-octal-hex .oh-channels { flex: 1 1 22rem; min-width: 0; max-width: 34rem; display: flex; flex-direction: column; gap: var(--sp-3); }
 .lesson-octal-hex .oh-ch { display: flex; align-items: center; gap: var(--sp-2); border-radius: var(--radius); padding: .2rem .3rem; }
 .lesson-octal-hex .oh-ch-name { font-weight: 900; flex: none; width: 4.2rem; }
-.lesson-octal-hex .oh-ch-red .oh-ch-name { color: #e53935; }
-.lesson-octal-hex .oh-ch-green .oh-ch-name { color: #23883a; }
-.lesson-octal-hex .oh-ch-blue .oh-ch-name { color: #1e6fe0; }
+.lesson-octal-hex .oh-ch-red .oh-ch-name { color: var(--ch-red); }
+.lesson-octal-hex .oh-ch-green .oh-ch-name { color: var(--ch-green); }
+.lesson-octal-hex .oh-ch-blue .oh-ch-name { color: var(--ch-blue); }
 .lesson-octal-hex .oh-ch-vals { display: flex; flex-direction: column; align-items: flex-end; min-width: 3.2rem; line-height: 1.05; }
 .lesson-octal-hex .oh-ch-hex { font: 900 1.6rem var(--font-digits); }
 .lesson-octal-hex .oh-ch-dec { font: 800 .95rem var(--font-digits); color: var(--ink-soft); }
@@ -438,7 +438,7 @@
 /* 3.5 you try it */
 .lesson-octal-hex .oh-tabs { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .lesson-octal-hex .oh-tab { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-weight: 800; }
-.lesson-octal-hex .oh-tab[aria-pressed="true"] { background: var(--theme-color); color: #fff; border-color: var(--theme-color); }
+.lesson-octal-hex .oh-tab[aria-pressed="true"] { background: var(--theme-color); color: var(--on-theme); border-color: var(--theme-color); }
 .lesson-octal-hex .oh-tab-dots { display: inline-flex; gap: 2px; }
 .lesson-octal-hex .oh-tab-dots i { width: .7rem; height: .7rem; border-radius: 50%; border: 2px solid currentColor; background: #e53935; }
 .lesson-octal-hex .oh-tab-dots i:nth-child(2) { background: #2fb344; }
@@ -480,11 +480,11 @@
 .lesson-octal-hex .oh-odo .odometer { --odo: clamp(3rem, 2rem + 2.6vw, 4.5rem); }
 .lesson-octal-hex .oh-count-buttons { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .lesson-octal-hex .oh-count-btn { min-width: 5rem; min-height: calc(var(--tap) + .5rem); font: 900 1.6rem var(--font-digits); }
-.lesson-octal-hex .oh-count-btn.is-up:not(:disabled) { background: var(--theme-color); border-color: var(--theme-color); color: #fff; }
+.lesson-octal-hex .oh-count-btn.is-up:not(:disabled) { background: var(--theme-color); border-color: var(--theme-color); color: var(--on-theme); }
 .lesson-octal-hex .oh-count-btn:disabled { opacity: .35; cursor: default; }
 .lesson-octal-hex .oh-count-status { margin: 0; font-weight: 700; color: var(--ink-soft); }
 
-@media (max-width: 560px) {
+@media (max-width: 35em) {
   .lesson-octal-hex .oh-scene { gap: var(--sp-3); }
   .lesson-octal-hex .oh-critter-wrap { flex-basis: 11rem; max-width: 60vw; }
   .lesson-octal-hex .oh-strips { align-items: center; }
@@ -550,7 +550,7 @@
 /* 4.3 traffic light */
 .lesson-silly .sl-light {
   display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4) var(--sp-3); border-radius: 2.5rem;
-  background: var(--ink); box-shadow: var(--shadow);
+  background: var(--chrome); box-shadow: var(--shadow);
 }
 .lesson-silly .sl-lamp {
   display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2);
@@ -603,7 +603,7 @@
 .lesson-silly .sl-tabs { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .lesson-silly .sl-tab { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-weight: 800; }
 .lesson-silly .sl-tab-icon { width: 2rem; height: 2rem; }
-.lesson-silly .sl-tab[aria-pressed="true"] { background: var(--c-animals); color: #fff; border-color: var(--c-animals); }
+.lesson-silly .sl-tab[aria-pressed="true"] { background: var(--c-animals); color: var(--on-theme); border-color: var(--c-animals); }
 .lesson-silly .sl-tab-panel { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
 .lesson-silly .sl-tab-panel[hidden] { display: none; }
 .lesson-silly .sl-tip { margin: 0; font-size: var(--fs-lead); font-weight: 700; text-align: center; max-width: 42rem; }
@@ -620,7 +620,7 @@
 .lesson-silly .sl-counter .sl-dec { font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.4rem); }
 .lesson-silly .sl-step { width: calc(var(--tap) + .4rem); height: calc(var(--tap) + .4rem); padding: 0; display: inline-grid; place-items: center; border-radius: 50%; flex: none; }
 .lesson-silly .sl-step svg { width: 1.5rem; height: 1.5rem; }
-.lesson-silly .sl-step.is-up:not(:disabled) { background: var(--c-animals); border-color: var(--c-animals); color: #fff; }
+.lesson-silly .sl-step.is-up:not(:disabled) { background: var(--c-animals); border-color: var(--c-animals); color: var(--on-theme); }
 .lesson-silly .sl-step:disabled { opacity: .35; cursor: default; }
 .lesson-silly .sl-read { margin: 0; font-weight: 800; color: var(--ink-soft); }
 .lesson-silly .sl-wheel-form { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
@@ -645,7 +645,7 @@
 .lesson-silly .sl-quiz-number .sl-named-label { font-size: 1.1rem; }
 .lesson-silly .sl-choices { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
 .lesson-silly .sl-choice { min-width: 5rem; min-height: calc(var(--tap) + .6rem); font: 900 2rem var(--font-digits); }
-.lesson-silly .sl-choice.is-right { background: var(--c-binary); border-color: var(--c-binary); color: #fff; }
+.lesson-silly .sl-choice.is-right { background: var(--c-binary); border-color: var(--c-binary); color: var(--on-theme); }
 .lesson-silly .sl-choice.is-wrong { opacity: .4; text-decoration: line-through; }
 .lesson-silly .sl-feedback { margin: 0; min-height: 1.4em; font-weight: 800; text-align: center; }
 .lesson-silly .sl-skip { min-height: var(--tap); }
@@ -664,7 +664,7 @@
   .lesson-silly .sl-burst-star { animation: none; transform: translateY(-4rem) scale(1.3); }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 43.75em) {
   /* The wheel becomes a list: the number first, then its costumes in a grid. */
   .lesson-silly .sl-wheel { aspect-ratio: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
   .lesson-silly .sl-center { position: relative; left: auto; top: auto; translate: none; grid-column: 1 / -1; justify-self: center; width: 8rem; }
@@ -673,7 +673,7 @@
   .lesson-silly .sl-wheel.is-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lesson-silly .sl-spot-4, .lesson-silly .sl-spot-5 { grid-column: 1 / -1; }
 }
-@media (max-width: 560px) {
+@media (max-width: 35em) {
   .lesson-silly .sl-scene { gap: var(--sp-3); }
   .lesson-silly .sl-cells { gap: .4rem; }
   .lesson-silly .sl-cells .digit-tile.tile-lg { --tile: 3.6rem; }
@@ -739,15 +739,15 @@
 .lesson-addition .ad-sys { display: inline-flex; flex-direction: column; align-items: center; gap: .15rem; min-height: var(--tap); padding: .35rem .8rem; font-weight: 800; }
 .lesson-addition .ad-sys-sample { display: inline-flex; gap: 1px; height: 1.7rem; color: var(--theme-color); }
 .lesson-addition .ad-sys-sample .symbol { width: 1.7rem; height: 1.7rem; }
-.lesson-addition .ad-sys[aria-pressed="true"] { background: var(--theme-color); border-color: var(--theme-color); color: #fff; }
+.lesson-addition .ad-sys[aria-pressed="true"] { background: var(--theme-color); border-color: var(--theme-color); color: var(--on-theme); }
 .lesson-addition .ad-sys.theme-colors[aria-pressed="true"] { background: #fff6d6; color: var(--ink); border-color: #f5c400; }
-.lesson-addition .ad-sys[aria-pressed="true"] .ad-sys-sample { color: #fff; }
+.lesson-addition .ad-sys[aria-pressed="true"] .ad-sys-sample { color: var(--on-theme); }
 .lesson-addition .ad-sys[aria-pressed="true"] .symbol-icon, .lesson-addition .ad-sys[aria-pressed="true"] .symbol-color { background: #fff; border-radius: 6px; }
 .lesson-addition .ad-options { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; justify-content: center; }
 .lesson-addition .ad-opt-group { display: flex; gap: var(--sp-1); align-items: center; }
 .lesson-addition .ad-opt-label { font-weight: 800; margin-right: .2rem; }
 .lesson-addition .ad-opt { min-height: var(--tap); min-width: var(--tap); padding: 0 .8rem; font-weight: 800; }
-.lesson-addition .ad-opt[aria-pressed="true"] { background: var(--c-addition); border-color: var(--c-addition); color: #fff; }
+.lesson-addition .ad-opt[aria-pressed="true"] { background: var(--c-addition); border-color: var(--c-addition); color: var(--on-theme); }
 .lesson-addition .ad-new { display: inline-flex; align-items: center; gap: var(--sp-1); min-height: var(--tap); font-weight: 800; }
 .lesson-addition .ad-new svg { width: 1.4rem; height: 1.4rem; }
 .lesson-addition .ad-card {
@@ -794,7 +794,7 @@
   .lesson-addition .ad-burst-star { animation: none; transform: translateY(-4rem) scale(1.3); }
   .lesson-addition .ad-rules, .lesson-addition .ad-rule, .lesson-addition .ad-rule-math { transition: none; }
 }
-@media (max-width: 560px) {
+@media (max-width: 35em) {
   .lesson-addition .ad-scene { gap: var(--sp-3); }
   .lesson-addition .ad-example .column-add, .lesson-addition .ad-holder .column-add { --ca: 3rem; }
   .lesson-addition .ad-example .column-add.ca-kind-icon, .lesson-addition .ad-example .column-add.ca-kind-color,

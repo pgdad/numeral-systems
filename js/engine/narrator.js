@@ -26,6 +26,9 @@
   var preferredVoiceName = U.storage.get('narrator.voiceName', null);
   var captionEl = null;
   var currentAudio = null;
+  var captionHideMs = null; // setCaptionAutoHide(ms): hide the captions this long after speech ends
+  var captionTimer = null;
+  var speakCount = 0;
 
   // ---------- pure helpers (unit-tested) ----------------------------------------------
 
@@ -207,7 +210,17 @@
 
   // ---------- captions -------------------------------------------------------------
 
-  function setCaptionElement(el) { captionEl = el; }
+  function setCaptionElement(el) {
+    captionEl = el;
+    clearTimeout(captionTimer);
+  }
+
+  // Interactive parts set this so the captions bar doesn't sit on top of the buttons after a line
+  // has been read (Phase 11, D22). null = keep showing the last line.
+  function setCaptionAutoHide(ms) {
+    captionHideMs = ms || null;
+    clearTimeout(captionTimer);
+  }
 
   function showCaption(text) {
     if (!captionEl) return;
@@ -254,11 +267,25 @@
 
   // ---------- main API ---------------------------------------------------------------
 
+  // Every speak() runs under its own AbortController, linked to options.signal, so stop() ends the whole
+  // line (all its sentences, or a recording) even for callers that passed no signal (Phase 11).
+  var active = [];
+
   function speak(id, text, options) {
     options = options || {};
     var rate = options.rate || 1;
-    var signal = options.signal;
+    var inner = new AbortController();
+    var signal = inner.signal;
+    var outer = options.signal;
+    if (outer) {
+      if (outer.aborted) inner.abort();
+      else outer.addEventListener('abort', function () { inner.abort(); }, { once: true });
+    }
+    active.push(inner);
+    function done() { active = active.filter(function (c) { return c !== inner; }); }
     var reached = -1;
+    var mine = ++speakCount;
+    clearTimeout(captionTimer);
     function onSentence(i) {
       if (i <= reached) return;
       reached = i;
@@ -302,15 +329,23 @@
     } else {
       run = timed();
     }
-    return run.then(function () {
+    return run.then(function (v) { done(); return v; }, function (e) { done(); throw e; }).then(function () {
       clearHighlights();
       onSentence(Infinity); // release any cue still waiting
+      if (captionHideMs && captionEl) {
+        var el = captionEl;
+        clearTimeout(captionTimer);
+        captionTimer = setTimeout(function () { if (mine === speakCount && el === captionEl) el.hidden = true; }, captionHideMs);
+      }
       return source;
     });
   }
 
   // Stop anything that is speaking right now.
   function stop() {
+    var running = active;
+    active = [];
+    running.forEach(function (c) { c.abort(); });
     var s = synth();
     if (s) s.cancel();
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
@@ -345,6 +380,7 @@
     listVoices: listVoices,
     setVoiceName: setVoiceName,
     setCaptionElement: setCaptionElement,
+    setCaptionAutoHide: setCaptionAutoHide,
     showCaption: showCaption,
     // pure helpers, exported for tests and tools
     splitSentences: splitSentences,

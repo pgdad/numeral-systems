@@ -573,6 +573,7 @@
       else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
       else if (e.key === 'Escape' && isFullscreen() && !document.fullscreenElement) { exitFullscreen(); }
     });
+    on(window, 'numsys:settings', function () { updateBar(); });
     on(document, 'visibilitychange', function () {
       if (document.hidden && mode === 'playing' && player && !recorder) { mode = 'paused'; player.pause(); updateBar(); }
     });

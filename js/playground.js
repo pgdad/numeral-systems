@@ -564,6 +564,8 @@
       voiceBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
     }
     drawVoice();
+    // The settings panel can turn the voice on or off too.
+    window.addEventListener('numsys:settings', drawVoice);
 
     var tabButtons = {}, panels = {}, built = {};
     var tabList = U.el('div', { class: 'pg-tabs', role: 'tablist', 'aria-label': 'Playground' });
@@ -1292,6 +1294,7 @@
 
       function finish() {
         fresh();
+        if (NS.progress) NS.progress.markDone('playground'); // a finished quiz puts the ✓ on the Playground card
         var best = noteScore(quiz.level, quiz.stars);
         var total = quiz.questions.length;
         var msg = 'You got ' + quiz.stars + (quiz.stars === 1 ? ' star' : ' stars') + ' out of ' + total + '!';
@@ -1332,6 +1335,7 @@
     return {
       destroy: function () {
         ac.abort();
+        window.removeEventListener('numsys:settings', drawVoice);
         if (speech) speech.abort();
         clearTimeout(capTimer);
         NS.narrator.stop();

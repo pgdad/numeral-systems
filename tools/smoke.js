@@ -98,6 +98,11 @@ async function run(browserName) {
     await playgroundScenario(browser, failures, true);
     // Movie mode and the narration recorder (Phase 10).
     await movieScenario(browser, failures);
+    // Phase 11: every step of every lesson, keyboard-only lessons, robustness, settings and progress.
+    await allStepsScenario(browser, failures);
+    await keyboardScenario(browser, failures);
+    await robustnessScenario(browser, failures);
+    await settingsScenario(browser, failures);
   } finally {
     await browser.close();
   }
@@ -118,7 +123,7 @@ const FAKE_SPEECH = `
         this._q = this._q.filter((x) => x !== item);
         if (u.onboundary) u.onboundary({ name: 'word', charIndex: 0, charLength: 1 });
         if (u.onend) u.onend({});
-      }, 30);
+      }, window.__speechMs || 30);
       this._q.push(item);
     },
     cancel() {
@@ -546,6 +551,8 @@ async function playgroundScenario(browser, failures, blocked) {
     const end = await page.waitForSelector('.pg-final', { timeout: 3000 }).catch(() => null);
     if (!end) failures.push(`${label}: the quiz did not end after ten questions`);
     else if (!/^You got \d+ stars? out of 10!$/.test(await page.textContent('.pg-final'))) failures.push(`${label}: quiz ended with "${await page.textContent('.pg-final')}"`);
+    // Phase 11: a finished quiz puts the ✓ on the Playground card (only remembered when storage works).
+    if (end && !blocked && !(await page.evaluate(() => NumSys.progress.isDone('playground')))) failures.push(`${label}: finishing the quiz did not mark the playground done`);
   } catch (e) {
     failures.push(`${label}: ${e.message.split('\n')[0]}`);
   }
@@ -628,6 +635,355 @@ async function movieScenario(browser, failures) {
     failures.push(`${label}: ${e.message.split('\n')[0]}`);
   }
   console.log(`smoke: ${label} done (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+  await context.close();
+}
+
+// Visible controls in #stage (and the settings dialog) with no accessible name.
+const UNNAMED = `(() => {
+  const sel = 'button, a[href], input, select, textarea, [role="button"], [tabindex]:not([tabindex="-1"])';
+  return [...document.querySelectorAll('#stage ' + sel.split(', ').join(', #stage ') + ', dialog ' + sel.split(', ').join(', dialog '))]
+    .filter((el) => el.getClientRects().length && !el.closest('[aria-hidden="true"]') && el.type !== 'hidden')
+    .filter((el) => {
+      const by = el.getAttribute('aria-labelledby');
+      const n = el.getAttribute('aria-label') || (by && document.getElementById(by) && document.getElementById(by).textContent) ||
+        el.textContent.trim() || el.title || el.placeholder ||
+        (el.id && document.querySelector('label[for="' + el.id + '"]') && document.querySelector('label[for="' + el.id + '"]').textContent) ||
+        (el.closest('label') && el.closest('label').textContent);
+      return !(n && n.trim());
+    }).map((el) => el.outerHTML.slice(0, 90));
+})()`;
+
+// Phase 11: deep-link every step of every lesson (setup + instant replay of the steps before it), in
+// captions-only mode. Fails on console errors, an empty picture, or an unnamed control.
+async function allStepsScenario(browser, failures) {
+  const label = 'all-steps';
+  const { context, page } = await newPlayerPage(browser, failures, label, NO_SPEECH);
+  const t0 = Date.now();
+  await page.goto(INDEX + '#/');
+  const lessons = await page.evaluate(() => NumSys.lessons.list({ includeHidden: true })
+    .map((l) => ({ id: l.id, scenes: l.scenes.map((s) => ({ id: s.id, steps: s.steps.length })) })));
+  let count = 0;
+  for (const l of lessons) {
+    for (let si = 0; si < l.scenes.length; si++) {
+      for (let k = 0; k < l.scenes[si].steps; k++) {
+        const hash = `#/lesson/${l.id}/${si}/${k}`;
+        await page.evaluate((h) => { location.hash = h; }, hash);
+        const ok = await page.waitForFunction((want) => {
+          const p = document.querySelector('.player');
+          const st = document.querySelector('.player-stage');
+          return p && p.dataset.ready === want.pos && st.classList.contains('scene-' + want.scene) && st.children.length > 0;
+        }, { pos: si + '/' + k, scene: l.scenes[si].id }, { timeout: 8000 }).catch(() => null);
+        if (!ok) failures.push(`${label}: ${hash} did not show its scene`);
+        count++;
+      }
+      await page.waitForTimeout(250); // let the last step's instant replay settle
+      const unnamed = await page.evaluate(UNNAMED);
+      if (unnamed.length) failures.push(`${label}: #/lesson/${l.id}/${si}: controls without a name: ${unnamed.join(' | ')}`);
+    }
+  }
+  console.log(`smoke: ${label} done (${count} steps, ${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+  await context.close();
+}
+
+// Phase 11: every lesson with the keyboard only. Tab to the lesson card, Enter, Tab to Start, Enter, → through the
+// steps, and in each "You try it!" part Tab through every control (each must show a focus outline), press one,
+// then Tab to "I'm done!". Ends on the end card, whose focused button leads on.
+async function keyboardScenario(browser, failures) {
+  const probe = await browser.newPage();
+  await probe.goto(INDEX + '#/');
+  const ids = await probe.evaluate(() => NumSys.lessons.list().map((l) => l.id));
+  await probe.close();
+  const t0 = Date.now();
+  const active = (page) => page.evaluate(() => {
+    const a = document.activeElement;
+    if (!a || a === document.body) return { tag: 'BODY' };
+    const cs = getComputedStyle(a);
+    // Hidden radio/checkbox inputs show their focus ring on the next element.
+    const shown = a.matches('input[type="radio"], input[type="checkbox"]') && a.nextElementSibling ? getComputedStyle(a.nextElementSibling) : cs;
+    // SVG controls (the fingers) draw their ring as a dashed stroke on a child shape.
+    const svgRing = a instanceof SVGElement && [...a.querySelectorAll('*')].some((c) => getComputedStyle(c).strokeDasharray !== 'none');
+    const ring = svgRing || (shown.outlineStyle !== 'none' && parseFloat(shown.outlineWidth) > 0) || /rgb/.test(shown.boxShadow) && a.matches(':focus-visible');
+    return { tag: a.tagName, cls: String(a.className && a.className.baseVal !== undefined ? a.className.baseVal : a.className),
+      label: a.getAttribute('aria-label') || a.textContent.trim().slice(0, 30), lesson: a.dataset ? a.dataset.lesson : null,
+      inStage: !!a.closest('.player-stage'), isNext: a.classList.contains('next-btn'), isStart: a.classList.contains('btn-start'),
+      ring, focusVisible: a.matches(':focus-visible'), html: a.outerHTML.slice(0, 80) };
+  });
+  for (const id of ids) {
+    const label = `keyboard/${id}`;
+    const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH);
+    await page.goto(INDEX + '#/');
+    await page.evaluate(() => { NumSys.narrator.config.timeScale = 0.05; });
+    const noRing = new Set();
+    const stats = { arrows: 0, tryParts: 0, pressed: 0, tabStops: 0 };
+    const tabTo = async (pred, max) => {
+      for (let i = 0; i < (max || 60); i++) {
+        await page.keyboard.press('Tab');
+        const a = await active(page);
+        if (a.tag !== 'BODY' && !a.ring) noRing.add(a.html);
+        stats.tabStops++;
+        if (pred(a)) return a;
+      }
+      return null;
+    };
+    // 1. home → lesson (the playground lesson has no card of its own: its intro starts from its URL)
+    if (id === 'playground') await page.evaluate(() => { location.hash = '#/lesson/playground'; });
+    else {
+      const card = await tabTo((a) => a.lesson === id, 40);
+      if (!card) { failures.push(`${label}: could not Tab to the lesson card`); await context.close(); continue; }
+      await page.keyboard.press('Enter');
+    }
+    await page.waitForSelector('.player');
+    if (!(await tabTo((a) => a.isStart, 30))) { failures.push(`${label}: could not Tab to Start`); await context.close(); continue; }
+    await page.keyboard.press('Enter');
+    // 2. through the lesson
+    let ended = false;
+    for (let guard = 0; guard < 400 && !ended; guard++) {
+      const st = await page.evaluate(() => {
+        const p = document.querySelector('.player');
+        return { mode: p.dataset.mode, interactive: p.classList.contains('is-interactive'),
+          end: !!document.querySelector('.player-overlay-end:not([hidden])'), hash: location.hash };
+      });
+      if (st.end) { ended = true; break; }
+      if (st.interactive) {
+        // Let the try-it part finish its narration first (the keyboard shortcuts would skip it).
+        await page.waitForFunction(() => document.querySelector('.player').dataset.mode === 'waiting', null, { timeout: 30000 })
+          .catch(() => failures.push(`${label}: the try-it part in ${st.hash} never became ready`));
+        // From the top of the picture, Tab through every try-it control to "I'm done!": each stop must show a focus
+        // ring; the first control is pressed with Enter and the second with Space (links are only visited).
+        let pressed = 0, stops = 0, reached = false;
+        await page.evaluate(() => { const st = document.querySelector('.player-stage'); st.setAttribute('tabindex', '-1'); st.focus(); });
+        for (let i = 0; i < 150; i++) {
+          await page.keyboard.press('Tab');
+          const a = await active(page);
+          stats.tabStops++;
+          if (a.tag !== 'BODY' && !a.ring) noRing.add(a.html);
+          if (a.isNext) { reached = true; break; }
+          if (!a.inStage) continue;
+          stops++;
+          if (pressed < 2 && a.tag !== 'A' && a.tag !== 'INPUT' && a.tag !== 'SELECT') {
+            await page.keyboard.press(pressed ? ' ' : 'Enter');
+            pressed++;
+            await page.waitForTimeout(300);
+          }
+        }
+        await page.evaluate(() => document.querySelector('.player-stage').removeAttribute('tabindex'));
+        if (!reached) { failures.push(`${label}: could not Tab to "I'm done!" in ${st.hash}`); break; }
+        if (!stops) failures.push(`${label}: no keyboard-usable control in ${st.hash}`);
+        stats.tryParts++;
+        stats.pressed += pressed;
+        stats.stageStops = (stats.stageStops || 0) + stops;
+        await page.keyboard.press('Enter'); // on "I'm done!"
+        await page.waitForTimeout(200);
+        continue;
+      }
+      // Not interactive: → skips to the next step (focus must not be in a text box).
+      await page.keyboard.press('ArrowRight');
+      stats.arrows++;
+      await page.waitForTimeout(120);
+    }
+    if (process.env.SMOKE_DEBUG) console.log(label, JSON.stringify(stats));
+    if (!ended) { failures.push(`${label}: never reached the end card`); await context.close(); continue; }
+    const a = await active(page);
+    if (!/^(A|BUTTON)$/.test(a.tag)) failures.push(`${label}: the end card did not take focus (${a.tag})`);
+    if (noRing.size) failures.push(`${label}: focus without a visible outline: ${[...noRing].slice(0, 5).join(' | ')}`);
+    const done = await page.evaluate((lid) => NumSys.progress.isDone(lid), id);
+    if (!done) failures.push(`${label}: finishing did not mark the lesson done`);
+    // The focused end-card button leads on (next lesson, or Watch again on the last one).
+    const before = await page.evaluate(() => location.hash);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(400);
+    const after = await page.evaluate(() => location.hash);
+    if (before === after && a.label !== 'Watch again') failures.push(`${label}: Enter on the end card's "${a.label}" did nothing`);
+    await context.close();
+  }
+  console.log(`smoke: keyboard lessons done (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+}
+
+// Phase 11: leaving mid-speech, hidden tab, resizing mid-animation, rapid clicks, and no listener leaks.
+const LISTENER_SPY = `
+  window.__listeners = 0; window.__intervals = 0;
+  const add = EventTarget.prototype.addEventListener, rem = EventTarget.prototype.removeEventListener;
+  const live = new WeakMap();
+  const key = (t, fn, o) => t + '|' + (typeof o === 'boolean' ? o : !!(o && o.capture));
+  EventTarget.prototype.addEventListener = function (type, fn, o) {
+    if ((this === window || this === document) && fn) {
+      let m = live.get(fn); if (!m) { m = new Set(); live.set(fn, m); }
+      const k = key(type, fn, o);
+      const target = this === window ? 'w' : 'd';
+      if (!m.has(target + k)) {
+        m.add(target + k); window.__listeners++;
+        if (o && o.signal) o.signal.addEventListener('abort', () => { if (m.delete(target + k)) window.__listeners--; });
+      }
+    }
+    return add.call(this, type, fn, o);
+  };
+  EventTarget.prototype.removeEventListener = function (type, fn, o) {
+    if ((this === window || this === document) && fn) {
+      const m = live.get(fn); const target = this === window ? 'w' : 'd';
+      if (m && m.delete(target + key(type, fn, o))) window.__listeners--;
+    }
+    return rem.call(this, type, fn, o);
+  };
+  const si = window.setInterval, ci = window.clearInterval, ids = new Set();
+  window.setInterval = function () { const id = si.apply(this, arguments); ids.add(id); window.__intervals = ids.size; return id; };
+  window.clearInterval = function (id) { ids.delete(id); window.__intervals = ids.size; return ci.call(this, id); };
+`;
+
+async function robustnessScenario(browser, failures) {
+  const t0 = Date.now();
+  const check = (label, cond, msg) => { if (!cond) failures.push(`${label}: ${msg}`); };
+  // a. Switching lessons mid-speech: the old lesson stops talking, the new one waits for Start.
+  {
+    const label = 'robust/switch';
+    const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH + 'window.__speechMs = 1500;');
+    await page.goto(INDEX + '#/lesson/binary');
+    await page.click('.btn-start');
+    await page.waitForFunction(() => window.__spoken.length >= 1);
+    await page.evaluate(() => { location.hash = '#/lesson/base10'; });
+    await page.waitForTimeout(2200);
+    const r = await page.evaluate(() => ({ spoken: window.__spoken.length, queue: window.speechSynthesis._q.length,
+      mode: document.querySelector('.player').dataset.mode, lesson: document.querySelector('.player').className,
+      captions: document.getElementById('captions').hidden }));
+    check(label, r.spoken === 1 && r.queue === 0, `speech went on after leaving (${JSON.stringify(r)})`);
+    check(label, r.mode === 'idle' && /lesson-base10/.test(r.lesson) && r.captions, `the new lesson is not waiting cleanly (${JSON.stringify(r)})`);
+    // Back/forward through history mid-speech too.
+    await page.click('.btn-start');
+    await page.waitForFunction(() => window.__spoken.length >= 2);
+    await page.goBack();
+    await page.waitForTimeout(400);
+    await page.goForward();
+    await page.waitForTimeout(400);
+    check(label, await page.evaluate(() => window.speechSynthesis._q.length <= 1), 'history navigation left several lines queued');
+    await context.close();
+  }
+  // b. A hidden tab pauses the lesson, the movie and playground speech.
+  {
+    const label = 'robust/hidden';
+    const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH + 'window.__speechMs = 1500;');
+    const hide = () => page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { get: () => true, configurable: true });
+      Object.defineProperty(document, 'visibilityState', { get: () => 'hidden', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    const show = () => page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { get: () => false, configurable: true });
+      Object.defineProperty(document, 'visibilityState', { get: () => 'visible', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await page.goto(INDEX + '#/lesson/silly');
+    await page.click('.btn-start');
+    await page.waitForFunction(() => window.__spoken.length >= 1);
+    await hide();
+    let r = await page.evaluate(() => ({ mode: document.querySelector('.player').dataset.mode, queue: window.speechSynthesis._q.length }));
+    check(label, r.mode === 'paused' && r.queue === 0, `lesson kept playing in a hidden tab (${JSON.stringify(r)})`);
+    await show();
+    await page.click('.icon-btn-main');
+    await page.waitForFunction(() => document.querySelector('.player').dataset.mode === 'playing');
+    await page.evaluate(() => { location.hash = '#/playground/converter'; });
+    await page.waitForSelector('.playground');
+    await page.click('text=Say it');
+    await page.waitForTimeout(200);
+    await hide();
+    r = await page.evaluate(() => window.speechSynthesis._q.length);
+    check(label, r === 0, 'the playground kept talking in a hidden tab');
+    await show();
+    await context.close();
+  }
+  // c. Resizing mid-animation, and rapid clicking on a real lesson.
+  {
+    const label = 'robust/resize';
+    const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH);
+    await page.goto(INDEX + '#/lesson/binary/2/4');
+    await page.click('.btn-start'); // the count from 4 to 31
+    await page.waitForTimeout(600);
+    for (const [w, h] of [[400, 800], [1920, 1080], [700, 500], [1024, 900]]) {
+      await page.setViewportSize({ width: w, height: h });
+      await page.waitForTimeout(250);
+      const wide = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      check(label, wide <= 1, `horizontal scroll of ${wide}px at ${w}px wide`);
+    }
+    await page.waitForFunction(() => document.querySelector('.player').dataset.mode === 'waiting', null, { timeout: 60000 })
+      .catch(() => failures.push(`${label}: the step never finished after resizing`));
+    for (let i = 0; i < 25; i++) await page.click(i % 3 === 2 ? 'button[aria-label="Previous step"]' : '.next-btn', { force: true });
+    for (let i = 0; i < 6; i++) await page.click('.chapter-dot >> nth=' + (i % 7), { force: true });
+    await page.waitForTimeout(1500);
+    const mode = await page.evaluate(() => document.querySelector('.player').dataset.mode);
+    check(label, ['playing', 'waiting'].includes(mode), `player stuck in "${mode}" after rapid clicks`);
+    await context.close();
+  }
+  // d. No leaked document/window listeners or intervals: go round every view twice and compare.
+  {
+    const label = 'robust/leaks';
+    const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH + LISTENER_SPY);
+    await page.goto(INDEX + '#/');
+    const ids = await page.evaluate(() => NumSys.lessons.list().map((l) => l.id));
+    const tour = ['#/about', '#/playground/converter', '#/playground/make', '#/playground/quiz', '#/movie', '#/record', '#/gallery']
+      .concat(ids.map((id) => '#/lesson/' + id), ['#/movie/playground', '#/']);
+    const counts = [];
+    for (let round = 0; round < 2; round++) {
+      for (const h of tour) {
+        await page.evaluate((x) => { location.hash = x; }, h);
+        await page.waitForTimeout(150);
+        const start = await page.$('.btn-start:visible');
+        if (start) { await start.click().catch(() => {}); await page.waitForTimeout(500); }
+        if (h === '#/') { await page.click('[data-settings]'); await page.waitForTimeout(100); await page.keyboard.press('Escape'); }
+      }
+      await page.waitForTimeout(300);
+      counts.push(await page.evaluate(() => [window.__listeners, window.__intervals]));
+    }
+    if (process.env.SMOKE_DEBUG) console.log(label, JSON.stringify(counts));
+    check(label, counts[1][0] <= counts[0][0], `document/window listeners grew from ${counts[0][0]} to ${counts[1][0]} on a second tour`);
+    check(label, counts[1][1] === 0, `${counts[1][1]} interval(s) still running on the home page`);
+    await context.close();
+  }
+  console.log(`smoke: robustness done (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+}
+
+// Phase 11: the settings panel by keyboard, its effect on an open lesson, and progress ✓ + reset.
+async function settingsScenario(browser, failures) {
+  const label = 'settings';
+  const check = (cond, msg) => { if (!cond) failures.push(`${label}: ${msg}`); };
+  const { context, page } = await newPlayerPage(browser, failures, label, NO_SPEECH);
+  await page.goto(INDEX + '#/lesson/playground/1/0');
+  // Open with the keyboard, change speed, captions, theme; Esc gives focus back.
+  await page.focus('[data-settings]');
+  await page.keyboard.press('Enter');
+  await page.waitForSelector('dialog.settings-dialog[open]');
+  const unnamed = await page.evaluate(UNNAMED);
+  check(!unnamed.length, `unnamed controls in the panel: ${unnamed.join(' | ')}`);
+  await page.check('dialog input[name^="set-speed"][value="0.75"]');
+  await page.check('dialog input[name^="set-captions"][value="l"]');
+  await page.check('dialog input[name^="set-theme"][value="dark"]');
+  let r = await page.evaluate(() => ({ speed: document.querySelector('.speed-btn').textContent, theme: document.documentElement.dataset.theme,
+    cap: document.documentElement.dataset.captions }));
+  check(r.speed === '¾×' && r.theme === 'dark' && r.cap === 'l', `settings did not apply (${JSON.stringify(r)})`);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(150);
+  r = await page.evaluate(() => ({ open: !!document.querySelector('dialog.settings-dialog'), focus: document.activeElement.matches('[data-settings]') }));
+  check(!r.open && r.focus, `Esc did not close the panel and return focus (${JSON.stringify(r)})`);
+  await page.reload();
+  await page.waitForSelector('.player');
+  r = await page.evaluate(() => ({ theme: document.documentElement.dataset.theme, speed: document.querySelector('.speed-btn').textContent }));
+  check(r.theme === 'dark' && r.speed === '¾×', `settings were not remembered (${JSON.stringify(r)})`);
+  // Finish the playground intro → ✓ on the home card; reset from Settings takes it away.
+  await page.evaluate(() => { NumSys.narrator.config.timeScale = 0.05; });
+  await page.click('.btn-start');
+  await page.waitForFunction(() => document.querySelector('.player').dataset.mode === 'waiting');
+  await page.click('.next-btn', { force: true });
+  await page.waitForSelector('.player-overlay-end:not([hidden])');
+  await page.evaluate(() => { location.hash = '#/'; });
+  await page.waitForSelector('.home');
+  check(await page.$('.lesson-card[data-lesson="playground"] .card-done'), 'no ✓ on the finished lesson');
+  check(/1 of/.test(await page.textContent('.home-progress')), 'no progress line on home');
+  await page.click('[data-settings]');
+  await page.click('dialog button:has-text("Reset progress")');
+  await page.click('dialog button:has-text("Yes, start over")');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(150);
+  check(!(await page.$('.card-done')), 'reset progress left a ✓');
+  // put the settings back for later scenarios in this context (they share nothing, but be tidy)
+  await page.evaluate(() => { NumSys.settings.set('theme', 'light'); NumSys.settings.set('captions', 'm'); NumSys.settings.set('speed', 1); });
+  console.log('smoke: settings done');
   await context.close();
 }
 

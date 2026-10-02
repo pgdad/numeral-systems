@@ -17,10 +17,10 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 08 | Lesson: Addition | done | 2026-10-02 | 164 tests + addition autoplay/solve/hint/deep-link smoke (Chromium + Firefox) |
 | 09 | Playground & games | done | 2026-10-02 | 173 tests + playground make/convert/quiz smoke, storage on and blocked (Chromium + Firefox) |
 | 10 | Movie mode & recorded audio | done | 2026-10-02 | 190 tests + movie/recorder smoke; full movie, piper audio + stale fallback verified (Chromium + Firefox) |
-| 11 | Polish, a11y, QA | todo | | |
+| 11 | Polish, a11y, QA | done | 2026-10-02 | 199 tests + all-steps/keyboard/robustness/settings smoke; axe AA clean light+dark (Chromium + Firefox) |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 11 (Polish, a11y, QA).
+**Next phase:** 12 (Packaging & CDN deploy).
 
 ---
 
@@ -497,3 +497,54 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   - The movie's captions use the global `#captions` bar like the lessons, so the captions-overlap fix applies to both.
 - How to see it: open `index.html` and press the big **Watch the movie** button (or go to `index.html#/movie`), then **Watch**.
   One lesson: `index.html#/movie/binary`. Recording: About → "Record the narration" (`#/record`). The script: `docs/narration.md`.
+
+### Phase 11 — Polish, accessibility & QA — 2026-10-02 — done
+- Built:
+  - **Settings panel** `js/settings.js` (gear button in the header, a native `<dialog>`): read out loud on/off, voice picker + "Try the
+    voice", speed (¾/1/1¼, shared with the player), sound effects, caption size (S/M/L), hand color (`NS.hands.skinPicker`), Light/Dark/
+    Same as this computer, and Reset progress (two presses). Changes apply at once, persist, and fire `numsys:settings` so the player, movie
+    and playground redraw their own quick buttons (D22).
+  - **Progress** `js/core/progress.js`: a lesson is done when its end card shows (the playground: when a quiz ends). Home cards get
+    "✓ Done!" and a "You finished N of 6" line.
+  - **Captions vs. buttons** (the issue noted in Phases 05–10): the part dots moved into the control bar (one row on wide screens), the bar is
+    sticky just above the captions from 35em wide, interactive parts hide the captions 3.5 s after a line, and each step scrolls the picture
+    clear of the captions. Checked at 1280×900, 1366×768, 1024×700 and 400×800; the movie shares it.
+  - **Dark mode and contrast**: system colors deepened to WCAG AA (hex is now a burnt orange `#b85600`, binary `#17804a`, …), with lighter
+    versions in dark mode and `--on-theme` for text on colored fills; `--chrome` for panels that stay dark. axe-core (scratchpad) reports 0
+    WCAG 2.1 AA violations on every view and the last step of every scene, in light and dark.
+  - **Accessibility**: media queries in em (200% text gets the narrow layouts), every control named, every focus stop visible, keyboard-only
+    lessons, `kbd` shortcut list on About.
+  - **Robustness**: `narrator.stop()` now ends the whole line even without a signal (a hidden tab or a new playground line used to let the
+    next sentence start); a hidden tab stops all speech; no listener/interval leaks.
+  - **Recorder** keeps takes in IndexedDB (they survive leaving the page and reloads; "Forget all recordings", two presses). Falls back to
+    memory with the old warning where IndexedDB is missing.
+  - **About page**: tips for the grown-up, suggested order with ages, keyboard shortcuts, privacy, credits.
+  - **`docs/qa-checklist.md`**: results per browser plus the list of what a person still needs to check.
+- Key files: `js/settings.js`, `js/core/progress.js`, `js/engine/player.js` (controls layout, `keepInView`, settings listener, progress,
+  `data-ready`), `js/engine/narrator.js` (`setCaptionAutoHide`, stop), `js/app.js` (gear, `--cap-h`, About, home ✓), `js/recorder.js` (IndexedDB),
+  `css/base.css` (color tokens), `css/components.css` (control bar, settings, home ✓), `tests/specs/polish.spec.js`, `tools/smoke.js`.
+- Tests: `tests/specs/polish.spec.js` (6 tests: progress store incl. blocked storage, home `done` flag, theme resolution, settings defaults,
+  the dialog in the browser (labels, saving, focus return), caption auto-hide, `stop()` ending a whole line). New smoke scenarios:
+  `allStepsScenario` (deep-links all 120 steps, fails on errors/empty pictures/unnamed controls), `keyboardScenario` (each lesson keyboard-only
+  from the home card to the end card, Tab through every try-it control with a focus-ring check, presses two of them), `robustnessScenario`
+  (leave mid-speech, Back/Forward, hidden tab in a lesson and the playground, resize 400→1920→700→1024 mid-animation with no horizontal scroll,
+  rapid clicks, listener/interval leak check over two tours), `settingsScenario` (keyboard open, speed/captions/theme apply and persist, Esc
+  returns focus, finishing a lesson → ✓, reset). The playground smoke also checks a finished quiz marks the ✓.
+- Verified with scratchpad drivers in `p11/` (Chromium and Firefox): axe light+dark; 200% browser zoom (640×450) and 200% text (Firefox default
+  font 32px): no horizontal scroll; protanopia/deuteranopia simulation of the color system, addition and binary; frame timing with the CPU
+  slowed 4× and 6×: ~60 fps, 95th percentile 16.8 ms; page weight 659 KB (161 KB gzipped); recorder persistence with a fake microphone;
+  hand color from Settings; touch at 400px.
+- Deviations: the smoke test stays `tools/smoke.js` (not `.mjs`, as since Phase 00). axe-core is not a repo dependency (scratchpad only).
+  Lesson-specific celebrations (each lesson's star burst) were reviewed for consistency, not merged into one component: they already share
+  the star count, tada, burst and spoken praise.
+- Known issues / needs a human (also in `docs/qa-checklist.md` § "Still to check by a person"):
+  - Safari (Mac, iPad), Edge/Chrome on Windows and Mac, a screen reader, a real touch screen and a slow laptop were not available here.
+  - Real voices: the voice picker list, the pauses in counting lines, hex letters, and the whole movie with speech (~15 min).
+  - The movie's "Record a video of it" still needs one try on a real Chrome/Edge.
+  - The old warm orange (`#f07b16`) for hex is now `#b85600` for contrast; if it reads too brown, a brighter orange can only be used for
+    large decorative shapes, not text.
+- For Phase 12: the runtime is `index.html`, `css/`, `js/`, `assets/` (no audio shipped). `tests/`, `tools/`, `docs/` are dev-only.
+  `js/components/gallery.js` (`#/gallery`) is a dev page but small; keep or drop it in `dist/`. Settings and progress live in localStorage per
+  origin, so a CDN copy starts fresh. IndexedDB is used only by `#/record`.
+- How to see it: open `index.html`. The gear (Settings) is top right; finish any lesson to see its ✓ on the home screen; About has the
+  grown-up tips. Pick "Dark" in Settings for dark mode.

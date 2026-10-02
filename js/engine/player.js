@@ -13,6 +13,7 @@
 
   var U = NS.util;
   var SPEEDS = [0.75, 1, 1.25];
+  var CAPTION_HIDE_MS = 3500; // interactive parts: hide the captions this long after a line ends
 
   // Inline SVG icons (24x24 viewBox). Phase 03 may move these into components/icons.js.
   var ICONS = {
@@ -107,16 +108,19 @@
       { 'aria-pressed': String(!NS.sound.isMuted()) });
     var fsBtn = iconButton('fullscreen', 'Full screen', function () { toggleFullscreen(); });
 
+    // One bar: step buttons | part dots | replay/restart and quick settings. On narrow screens it wraps
+    // into rows (CSS grid areas), so the picture, captions and buttons fit one screen more often (D22).
     var controls = U.el('div', { class: 'player-controls' },
-      U.el('div', { class: 'control-group' }, prevBtn, playBtn, nextBtn),
-      U.el('div', { class: 'control-group' }, replayBtn, restartBtn),
+      U.el('div', { class: 'control-group control-steps' }, prevBtn, playBtn, nextBtn),
+      chapters,
+      U.el('div', { class: 'control-group control-replay' }, replayBtn, restartBtn),
       U.el('div', { class: 'control-group control-settings' }, autoBtn, speedBtn, voiceBtn, soundBtn, fsBtn));
 
     var root = U.el('section', { class: ['player', 'lesson-' + lesson.id, 'theme-' + (lesson.theme || 'base10'), movie ? 'is-movie' : ''] },
       U.el('header', { class: 'player-head' },
         movie ? U.el('h2', { class: 'player-title', text: lesson.title })
               : U.el('h1', { class: 'view-heading', tabindex: '-1', text: lesson.title }), sceneTitle),
-      frame, progress, chapters, controls);
+      frame, progress, controls);
     stage.appendChild(root);
 
     var captions = document.getElementById('captions');
@@ -229,15 +233,16 @@
         var ctx = makeCtx(scene, live.state, false, signal, cues);
         var id = NS.lessons.stepId(lesson.id, scene.id, target.step);
         if (captions) captions.hidden = false;
-        return Promise.all([
-          NS.narrator.speak(id, step.say, { rate: settings.speed, signal: signal, onSentence: cues.reach })
-            .then(null, function (e) { cues.reach(Infinity); throw e; }),
-          step.do ? step.do(ctx) : null
-        ]).then(function () {
+        NS.narrator.setCaptionAutoHide(scene.interactive ? CAPTION_HIDE_MS : null);
+        var speaking = NS.narrator.speak(id, step.say, { rate: settings.speed, signal: signal, onSentence: cues.reach })
+          .then(null, function (e) { cues.reach(Infinity); throw e; });
+        keepInView(); // after speak() has filled the captions, so their real height counts
+        return Promise.all([speaking, step.do ? step.do(ctx) : null]).then(function () {
           if (myGen !== gen) return;
           live.completedThrough = target.step;
           mode = 'waiting';
           updateUI();
+          keepInView();
           if (settings.autoplay && !scene.interactive) {
             return U.sleep(700 / settings.speed, signal).then(function () {
               if (myGen === gen && mode === 'waiting') goNext();
@@ -258,10 +263,30 @@
       var ctrl = new AbortController();
       runCtrl = ctrl;
       pos = target;
+      delete root.dataset.ready;
       updateUI();
       return rebuild(target.scene, target.step, ctrl.signal).catch(function (err) {
         if (!U.isAbortError(err)) console.error(err);
-      }).then(function () { if (myGen === gen) updateUI(); });
+      }).then(function () {
+        if (myGen !== gen) return;
+        root.dataset.ready = target.scene + '/' + target.step; // the picture is ready (tests wait for this)
+        updateUI();
+      });
+    }
+
+    // Scroll just enough that the picture isn't hidden under the captions bar (or the movie's sticky bar).
+    // Only ever scrolls down to the picture, never past its top, and only while playing.
+    function keepInView() {
+      if (destroyed || !root.isConnected) return;
+      var r = frame.getBoundingClientRect();
+      var capH = captions && !captions.hidden ? captions.getBoundingClientRect().height : 0;
+      if (window.getComputedStyle(controls).position === 'sticky') capH += controls.getBoundingClientRect().height;
+      var bar = document.querySelector('.movie-bar');
+      var topLimit = (bar ? bar.getBoundingClientRect().bottom : 0) + 8;
+      var bottomLimit = window.innerHeight - capH - 8;
+      if (r.bottom <= bottomLimit) return;
+      var delta = Math.min(r.bottom - bottomLimit, r.top - topLimit);
+      if (delta > 4) window.scrollBy({ top: delta, behavior: reducedMotion ? 'auto' : 'smooth' });
     }
 
     // ---------------------------------------------------------------- actions
@@ -380,6 +405,7 @@
       mode = 'ended';
       if (movie) { updateUI(); movie.onEnd(); return; }
       if (captions) captions.hidden = true;
+      if (NS.progress && !lesson.hidden) NS.progress.markDone(lesson.id);
       NS.sound.play('tada');
       var nl = nextLesson();
       U.clear(endOverlay);
@@ -471,6 +497,16 @@
       }
     });
     if (!movie) on(document, 'fullscreenchange', syncFullscreenClass);
+    // The settings panel (js/settings.js) changed something: re-read the speed and redraw the quick buttons.
+    on(window, 'numsys:settings', function (e) {
+      var key = e.detail && e.detail.key;
+      if (key === 'speed') {
+        var sp = U.storage.get('player.speed', 1);
+        settings.speed = SPEEDS.indexOf(sp) === -1 ? 1 : sp;
+      }
+      updateUI();
+      if (key === 'voiceOn' && mode === 'playing') playStep(pos);
+    });
     on(document, 'visibilitychange', function () { if (document.hidden && mode === 'playing') pause(); });
 
     // ---------------------------------------------------------------- public API
@@ -488,6 +524,7 @@
           document.documentElement.classList.remove('is-fullscreen');
         }
         if (captions) { captions.hidden = true; U.clear(captions); }
+        NS.narrator.setCaptionAutoHide(null);
         NS.narrator.setCaptionElement(null);
       },
       // For lessons/tests/Movie mode:

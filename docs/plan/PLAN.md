@@ -108,19 +108,20 @@ animated column-addition), and `countSequence(from, to, base)` (for odometer ani
 ```
 index.html                 app entry (also works from file://)
 css/base.css  css/components.css  css/lessons.css  css/playground.css  css/movie.css
-js/core/namespace.js  util.js  numeral.js  digitsets.js  addition.js  router.js  lessons.js
+js/core/namespace.js  util.js  numeral.js  digitsets.js  addition.js  router.js  lessons.js  progress.js
 js/engine/anim.js  sound.js  narrator.js  player.js  audio-manifest.js
 js/components/icons.js  symbols.js  digit-tile.js  readout.js  odometer.js  place-value.js  column-add.js  hands.js  gallery.js
 js/lessons/01-base10.js  02-binary.js  03-octal-hex.js  04-silly.js  05-addition.js  06-playground.js
 js/playground.js           the #/playground view (converter, make your own, quiz) + its pure helpers
 js/movie.js                Movie mode (#/movie, #/movie/:id) + playlist/narration-line helpers
 js/recorder.js             "Record the narration" page (#/record)
+js/settings.js             the Settings panel (gear in the header): voice, speed, sounds, captions, hands, theme, progress
 js/app.js
 assets/svg/  assets/audio/    (audio: optional <id>.mp3 narration files + cue sheets)
 tests/manifest.js  harness.js  load-app.js  specs.test.js  tools.test.js  specs/*.spec.js  browser.html
 tools/check.sh  tools/lint-rules.js  tools/smoke.js  tools/narration-export.js  tools/narration.json
 tools/build-audio-manifest.js  tools/generate-audio.sh  tools/build-dist.sh
-docs/narration.md  docs/recording-your-voice.md  docs/making-a-video.md
+docs/narration.md  docs/recording-your-voice.md  docs/making-a-video.md  docs/qa-checklist.md
 deploy/README.md  deploy/s3-cloudfront.sh  deploy/akamai.md  deploy/headers.md
 docs/plan/...              (this plan)
 ```
