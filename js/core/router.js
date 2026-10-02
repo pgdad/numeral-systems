@@ -5,6 +5,9 @@
 //   #/lesson/:id/:scene/:step   deep link (0-based scene and step indexes)
 //   #/playground                playground
 //   #/playground/:tab           playground on a tab (converter | make | quiz)
+//   #/movie                     Movie mode: every lesson hands-free (Phase 10)
+//   #/movie/:id                 Movie mode for one lesson
+//   #/record                    record the narration in your own voice (Phase 10; linked from About)
 //   #/about                     about page
 //   #/gallery                   component gallery (hidden from the menu, for building lessons and QA)
 // Anything else redirects home. parse() is pure so it can be unit-tested in Node.
@@ -17,6 +20,9 @@
     { name: 'lesson', pattern: ['lesson', ':id', '#scene', '#step'] },
     { name: 'playground', pattern: ['playground'] },
     { name: 'playground', pattern: ['playground', ':tab'] },
+    { name: 'movie', pattern: ['movie'] },
+    { name: 'movie', pattern: ['movie', ':id'] },
+    { name: 'record', pattern: ['record'] },
     { name: 'about', pattern: ['about'] },
     { name: 'gallery', pattern: ['gallery'] }
   ];
@@ -74,6 +80,7 @@
         return h;
       }
       case 'playground': return '#/playground' + (params.tab ? '/' + encodeURIComponent(params.tab) : '');
+      case 'movie': return '#/movie' + (params.id ? '/' + encodeURIComponent(params.id) : '');
       default: return '#/' + name;
     }
   }

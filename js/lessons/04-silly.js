@@ -765,6 +765,7 @@
     order: 40,
     title: 'Silly Number Systems',
     shortTitle: 'Silly systems',
+    spokenTitle: 'Silly number systems', // Movie mode chapter card (js/movie.js)
     blurb: 'Numbers made of cats, dogs and frogs, and numbers made of colors.',
     ageHint: '5+',
     theme: 'silly',

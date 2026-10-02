@@ -3,6 +3,8 @@
 //   NS.player.mount(stage, lesson, {scene, step}) -> {destroy()}   (Phase 02)
 //   NS.playground.mount(stage, {tab}) -> {destroy()}                 (Phase 09)
 //   NS.gallery.mount(stage) -> {destroy()}                           (Phase 03, #/gallery)
+//   NS.movie.mount(stage, {id}) -> {destroy()}                        (Phase 10, #/movie[/:id])
+//   NS.recorder.mount(stage) -> {destroy()}                           (Phase 10, #/record)
 (function (NS) {
   'use strict';
 
@@ -98,10 +100,18 @@
   function renderHome() {
     document.title = S.appTitle;
     var entries = homeEntries();
+    var watch = NS.movie && NS.movie.mount && NS.player
+      ? U.el('a', { class: 'btn-watch', href: NS.router.href('movie') },
+          U.el('span', { class: 'btn-watch-play', 'aria-hidden': 'true' }, NS.player.icon('play')),
+          U.el('span', { class: 'btn-watch-text' },
+            U.el('span', { class: 'btn-watch-title', text: S.watchMovie }),
+            U.el('span', { class: 'btn-watch-sub', text: S.watchMovieSub })))
+      : null;
     stage.appendChild(U.el('section', { class: 'home' },
       U.el('div', { class: 'hero' },
         U.el('h1', { class: 'view-heading', tabindex: '-1', text: S.homeHeading }),
-        U.el('p', { class: 'lead', text: S.homeIntro })),
+        U.el('p', { class: 'lead', text: S.homeIntro }),
+        watch),
       U.el('nav', { class: 'lesson-grid', 'aria-label': 'Lessons' }, entries.map(lessonCard))
     ));
   }
@@ -142,8 +152,21 @@
     else notReady('Component gallery', 'The gallery is not available.');
   }
 
+  function renderMovie(params) {
+    document.title = S.movie + ' · ' + S.appTitle;
+    if (NS.movie && NS.movie.mount && NS.player) currentView = NS.movie.mount(stage, { id: params.id });
+    else notReady(S.movie, S.playerNotReady);
+  }
+
+  function renderRecord() {
+    document.title = S.record + ' · ' + S.appTitle;
+    if (NS.recorder && NS.recorder.mount) currentView = NS.recorder.mount(stage);
+    else notReady(S.record, 'Recording is not available.');
+  }
+
   function renderAbout() {
     document.title = S.about + ' · ' + S.appTitle;
+    var lessons = NS.lessons.list();
     stage.appendChild(U.el('section', { class: 'about prose' },
       U.el('h1', { class: 'view-heading', tabindex: '-1', text: 'About ' + S.appTitle }),
       U.el('p', { text: 'A set of animated, talking lessons about how we write numbers: counting in tens on our ' +
@@ -154,6 +177,15 @@
         U.el('li', { text: 'Sit together and go through one lesson at a time, in order from the home screen.' }),
         U.el('li', { text: 'Each lesson talks and shows captions. Pause any time to ask "what comes next?"' }),
         U.el('li', { text: 'Finish with the "You try it!" part, and let the child drive the mouse.' })),
+      U.el('h2', { text: 'Watch it like a video' }),
+      U.el('p', {}, 'The ', U.el('a', { href: NS.router.href('movie') }, 'movie'),
+        ' plays every lesson hands-free, one after another, with chapter cards in between. Or watch one lesson: ',
+        lessons.map(function (l, i) {
+          return [i ? (i === lessons.length - 1 ? ' or ' : ', ') : '', U.el('a', { href: NS.router.href('movie', { id: l.id }) }, l.shortTitle || l.title)];
+        }), '.'),
+      U.el('p', {}, 'Would you like the lessons to talk in your own voice? ',
+        U.el('a', { class: 'about-record', href: '#/record' }, 'Record the narration'),
+        ' line by line, then follow the steps on that page.'),
       U.el('h2', { text: 'Works anywhere' }),
       U.el('p', { text: 'This app is just files. It runs offline by opening index.html, and can be copied to any web host or CDN.' }),
       U.el('p', { class: 'muted', text: 'Version ' + NS.version })
@@ -171,6 +203,8 @@
       case 'playground': renderPlayground(route.params); break;
       case 'about': renderAbout(); break;
       case 'gallery': renderGallery(); break;
+      case 'movie': renderMovie(route.params); break;
+      case 'record': renderRecord(); break;
       default: renderHome();
     }
 

@@ -610,6 +610,7 @@
     order: 50,
     title: 'Adding in Every System',
     shortTitle: 'Adding',
+    spokenTitle: 'Adding in every system', // Movie mode chapter card (js/movie.js)
     blurb: 'Carrying in tens, in binary, in hex, and with jumping animals.',
     ageHint: '7+',
     theme: 'addition',

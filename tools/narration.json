@@ -1,0 +1,1262 @@
+[
+  {
+    "id": "base10.hello.0",
+    "text": "Hi! Let's count. Hold up your hands. How many fingers do you have?",
+    "hash": "37f70540",
+    "lesson": "base10",
+    "scene": "hello",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.hello.1",
+    "text": "Let's count them together. One. Two. Three. Four. Five. Six. Seven. Eight. Nine. Ten!",
+    "hash": "cdb0a7f1",
+    "lesson": "base10",
+    "scene": "hello",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.hello.2",
+    "text": "Ten fingers! That's why people count in groups of ten.",
+    "hash": "8db401f1",
+    "lesson": "base10",
+    "scene": "hello",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.digits.0",
+    "text": "We write every number with just ten little symbols. They are called digits.",
+    "hash": "247156d9",
+    "lesson": "base10",
+    "scene": "digits",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.digits.1",
+    "text": "Zero. One. Two. Three. Four. Five. Six. Seven. Eight. Nine.",
+    "hash": "54b10741",
+    "lesson": "base10",
+    "scene": "digits",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.digits.2",
+    "text": "Here is a fun fact. \"Digit\" is also a word for finger!",
+    "hash": "497dc15f",
+    "lesson": "base10",
+    "scene": "digits",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.digits.3",
+    "text": "But wait! There's no single digit for ten. What do we do?",
+    "hash": "24fc9837",
+    "lesson": "base10",
+    "scene": "digits",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.bundle.0",
+    "text": "Ten sticks are like ten fingers. When we run out of fingers, we tie the ten sticks into one bundle!",
+    "hash": "ac2c9213",
+    "lesson": "base10",
+    "scene": "bundle",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.bundle.1",
+    "text": "We write one bundle in the tens place. And zero leftover sticks in the ones place. That makes ten!",
+    "hash": "31e7adce",
+    "lesson": "base10",
+    "scene": "bundle",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.bundle.2",
+    "text": "Let's keep counting. Eleven. Twelve. Thirteen. Fourteen. Fifteen.",
+    "hash": "31940946",
+    "lesson": "base10",
+    "scene": "bundle",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.bundle.3",
+    "text": "Ten bundles make a hundred! A hundred is a bundle of bundles.",
+    "hash": "f4769b31",
+    "lesson": "base10",
+    "scene": "bundle",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.meaning.0",
+    "text": "Look at this number: two hundred thirty-seven.",
+    "hash": "2fe7f962",
+    "lesson": "base10",
+    "scene": "meaning",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.meaning.1",
+    "text": "It has two hundreds. Three tens. And seven ones.",
+    "hash": "f9b94362",
+    "lesson": "base10",
+    "scene": "meaning",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.meaning.2",
+    "text": "Two hundred, plus thirty, plus seven, makes two hundred thirty-seven.",
+    "hash": "1736517b",
+    "lesson": "base10",
+    "scene": "meaning",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.meaning.3",
+    "text": "What if a place is empty? Look at three hundred five. It has no tens, so we write a zero in the tens place. The zero keeps every digit in its own place!",
+    "hash": "2953464d",
+    "lesson": "base10",
+    "scene": "meaning",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.meaning.4",
+    "text": "Each place is worth ten times the place to its right.",
+    "hash": "ae8fbb5d",
+    "lesson": "base10",
+    "scene": "meaning",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.meaning.5",
+    "text": "Ten ones make a ten. Ten tens make a hundred.",
+    "hash": "8d19045",
+    "lesson": "base10",
+    "scene": "meaning",
+    "step": 5,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "base10.try.0",
+    "text": "Your turn! Tap the fingers to put them up or down. Then try the big number board with the plus and minus buttons. Here's your first challenge. Show me seven fingers!",
+    "hash": "e22c724e",
+    "lesson": "base10",
+    "scene": "try",
+    "step": 0,
+    "interactive": true,
+    "movie": false
+  },
+  {
+    "id": "binary.switches.0",
+    "text": "Usually we count one finger at a time. Ten fingers make ten numbers.",
+    "hash": "67cd1d5b",
+    "lesson": "binary",
+    "scene": "switches",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.switches.1",
+    "text": "But what if every finger was a switch? Up means one. Down means zero.",
+    "hash": "d4db0357",
+    "lesson": "binary",
+    "scene": "switches",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.switches.2",
+    "text": "With only two digits, zero and one, we're counting in binary. Computers count this way!",
+    "hash": "37d1a54e",
+    "lesson": "binary",
+    "scene": "switches",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.values.0",
+    "text": "Let's give each finger a number. This little finger on the right is worth one.",
+    "hash": "9dee9cc6",
+    "lesson": "binary",
+    "scene": "values",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.values.1",
+    "text": "The next finger is worth double. Two!",
+    "hash": "8ce72c90",
+    "lesson": "binary",
+    "scene": "values",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.values.2",
+    "text": "Then four. Eight. Sixteen. Each finger is worth double the one before, all the way up to five hundred twelve!",
+    "hash": "895bddb",
+    "lesson": "binary",
+    "scene": "values",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.values.3",
+    "text": "In base ten, each place is worth ten times more. In binary, each place is worth just two times more!",
+    "hash": "4de6c504",
+    "lesson": "binary",
+    "scene": "values",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.count.0",
+    "text": "Zero. All fingers down.",
+    "hash": "261e23b6",
+    "lesson": "binary",
+    "scene": "count",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.count.1",
+    "text": "One. The little finger goes up.",
+    "hash": "fd4347fe",
+    "lesson": "binary",
+    "scene": "count",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.count.2",
+    "text": "Two. Put that finger down, and the next one up. Just like carrying!",
+    "hash": "f3f0b723",
+    "lesson": "binary",
+    "scene": "count",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.count.3",
+    "text": "Three. Both fingers up. Two plus one makes three.",
+    "hash": "c9269e1e",
+    "lesson": "binary",
+    "scene": "count",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.count.4",
+    "text": "Now watch it count all by itself!",
+    "hash": "94ba111e",
+    "lesson": "binary",
+    "scene": "count",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.count.5",
+    "text": "Thirty-one! One hand can count all the way to thirty-one, not just five.",
+    "hash": "e9f9bbd3",
+    "lesson": "binary",
+    "scene": "count",
+    "step": 5,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.high.0",
+    "text": "What if all ten fingers are up?",
+    "hash": "26ee48b0",
+    "lesson": "binary",
+    "scene": "high",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.high.1",
+    "text": "Let's add them up! Five hundred twelve. Two hundred fifty-six. One hundred twenty-eight. Sixty-four. Thirty-two. Sixteen. Eight. Four. Two. And one.",
+    "hash": "194f6b45",
+    "lesson": "binary",
+    "scene": "high",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.high.2",
+    "text": "One thousand twenty-three! With ten fingers, you can count all the way to one thousand twenty-three, not just ten!",
+    "hash": "339feec8",
+    "lesson": "binary",
+    "scene": "high",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.high.3",
+    "text": "Counting zero too, that makes one thousand twenty-four different numbers. Each finger doubles how many numbers you can make. Two, times two, times two, ten times!",
+    "hash": "85949c1b",
+    "lesson": "binary",
+    "scene": "high",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.reading.0",
+    "text": "Here's a binary number. One. Zero. One. One.",
+    "hash": "8963a0ee",
+    "lesson": "binary",
+    "scene": "reading",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.reading.1",
+    "text": "Eight. Plus zero. Plus two. Plus one. That makes eleven!",
+    "hash": "70d0f4ca",
+    "lesson": "binary",
+    "scene": "reading",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.reading.2",
+    "text": "Here's another one. One. Zero. Zero. One. Zero.",
+    "hash": "21cf9666",
+    "lesson": "binary",
+    "scene": "reading",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.reading.3",
+    "text": "Fingers that are down count as zero, so we only add the fingers that are up. Sixteen. Plus two. That makes eighteen!",
+    "hash": "10c62b4f",
+    "lesson": "binary",
+    "scene": "reading",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.try.0",
+    "text": "Your turn! Tap the fingers to put them up or down. The numbers below add up what you made. If you get stuck, press Show me. Show five on your fingers!",
+    "hash": "5bda0b3a",
+    "lesson": "binary",
+    "scene": "try",
+    "step": 0,
+    "interactive": true,
+    "movie": false
+  },
+  {
+    "id": "binary.know.0",
+    "text": "Did you know? A computer chip has billions of tiny switches. Each switch is on or off, one or zero, just like your fingers!",
+    "hash": "a0872334",
+    "lesson": "binary",
+    "scene": "know",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "binary.know.1",
+    "text": "Now you can count like a computer. With ten fingers, all the way to one thousand twenty-three!",
+    "hash": "5f48f91e",
+    "lesson": "binary",
+    "scene": "know",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.any.0",
+    "text": "We've counted with ten digits, and with just two digits. But we can pick any number of digits!",
+    "hash": "604a3ff6",
+    "lesson": "octal-hex",
+    "scene": "any",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.any.1",
+    "text": "Imagine an alien with eight fingers. Four on each hand!",
+    "hash": "793e2ede",
+    "lesson": "octal-hex",
+    "scene": "any",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.any.2",
+    "text": "An eight-fingered alien would count in octal. Octal has eight digits: zero, one, two, three, four, five, six, seven.",
+    "hash": "18e85ace",
+    "lesson": "octal-hex",
+    "scene": "any",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.any.3",
+    "text": "Let's count in octal. Five. Six. Seven. And then? There's no digit eight! So we write one-zero. That means eight! One-one.",
+    "hash": "ae2e21ef",
+    "lesson": "octal-hex",
+    "scene": "any",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.any.4",
+    "text": "Each octal place is worth eight times more than the one before. Ones. Eights. Sixty-fours.",
+    "hash": "33ed25f7",
+    "lesson": "octal-hex",
+    "scene": "any",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.any.5",
+    "text": "So one-one in octal means one eight, plus one more. That makes nine!",
+    "hash": "46d8d47d",
+    "lesson": "octal-hex",
+    "scene": "any",
+    "step": 5,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.hex.0",
+    "text": "Now imagine a creature with sixteen fingers! It has four hands, with four fingers on each.",
+    "hash": "3f51a2d3",
+    "lesson": "octal-hex",
+    "scene": "hex",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.hex.1",
+    "text": "To count with sixteen fingers, we need sixteen digits. But our digits stop at nine! So we borrow some letters.",
+    "hash": "b2d54da0",
+    "lesson": "octal-hex",
+    "scene": "hex",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.hex.2",
+    "text": "A is ten. B is eleven. C is twelve. D is thirteen. E is fourteen. F is fifteen.",
+    "hash": "2966720f",
+    "lesson": "octal-hex",
+    "scene": "hex",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.hex.3",
+    "text": "Let's count in hex. E. F. And then? One-zero! In hex, one-zero means sixteen. One-one.",
+    "hash": "19785f4d",
+    "lesson": "octal-hex",
+    "scene": "hex",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.hex.4",
+    "text": "Hexadecimal is a long word, so people just say hex!",
+    "hash": "83b2a8d1",
+    "lesson": "octal-hex",
+    "scene": "hex",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.nibbles.0",
+    "text": "One hex digit fits exactly four binary digits. That's four fingers! Watch them count from zero to F.",
+    "hash": "7bfbfb97",
+    "lesson": "octal-hex",
+    "scene": "nibbles",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.nibbles.1",
+    "text": "Programmers use hex as a short way to write binary. One-one-one-one is F. One-zero-one-zero is A. So eight binary digits fit in just two hex digits!",
+    "hash": "c0a494f8",
+    "lesson": "octal-hex",
+    "scene": "nibbles",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.nibbles.2",
+    "text": "Remember all ten fingers up? In binary, that's ten ones in a row.",
+    "hash": "dfd5d417",
+    "lesson": "octal-hex",
+    "scene": "nibbles",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.nibbles.3",
+    "text": "Let's split them into groups of four, starting from the right.",
+    "hash": "3f183ef0",
+    "lesson": "octal-hex",
+    "scene": "nibbles",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.nibbles.4",
+    "text": "Each group becomes one hex digit. Three. F. F. So one thousand twenty-three is three F F in hex!",
+    "hash": "c0e5f8aa",
+    "lesson": "octal-hex",
+    "scene": "nibbles",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.colors.0",
+    "text": "Every color on a computer screen has a secret hex code!",
+    "hash": "b925761a",
+    "lesson": "octal-hex",
+    "scene": "colors",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.colors.1",
+    "text": "Two hex digits for red. Two for green. Two for blue.",
+    "hash": "652614fb",
+    "lesson": "octal-hex",
+    "scene": "colors",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.colors.2",
+    "text": "F F means as much as possible. Zero-zero means none. Now only green. Now only blue. Red and green together make yellow!",
+    "hash": "72d52cbf",
+    "lesson": "octal-hex",
+    "scene": "colors",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.colors.3",
+    "text": "Mix them to make any color you like! Orange. Pink. Sky blue.",
+    "hash": "4da9abeb",
+    "lesson": "octal-hex",
+    "scene": "colors",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "octal-hex.try.0",
+    "text": "Your turn! Move the red, green and blue sliders to mix a color. Can you make yellow? You can also press Counter, to count in decimal, octal and hex all at once.",
+    "hash": "a6cc5a4b",
+    "lesson": "octal-hex",
+    "scene": "try",
+    "step": 0,
+    "interactive": true,
+    "movie": false
+  },
+  {
+    "id": "silly.anything.0",
+    "text": "Digits are just symbols that we agree on. They could be anything. Even pictures!",
+    "hash": "add4736e",
+    "lesson": "silly",
+    "scene": "anything",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.anything.1",
+    "text": "Meet the animal numbers! Cat is zero. Dog is one. Frog is two. Pig is three. Duck is four.",
+    "hash": "83656c0d",
+    "lesson": "silly",
+    "scene": "anything",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.anything.2",
+    "text": "Five animals means we're counting in base five.",
+    "hash": "ce2a5499",
+    "lesson": "silly",
+    "scene": "anything",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.animals.0",
+    "text": "Let's count! Cat. Dog. Frog. Pig. Duck.",
+    "hash": "8a157a81",
+    "lesson": "silly",
+    "scene": "animals",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.animals.1",
+    "text": "We ran out of animals! So a Dog jumps into the next place, and the ones place starts again at Cat. Dog-Cat means five!",
+    "hash": "778933d2",
+    "lesson": "silly",
+    "scene": "animals",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.animals.2",
+    "text": "Dog-Dog is six. Dog-Frog is seven. Dog-Pig is eight. Dog-Duck is nine. And then? Frog-Cat is ten!",
+    "hash": "25c65b40",
+    "lesson": "silly",
+    "scene": "animals",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.animals.3",
+    "text": "What's Frog-Pig? Two fives. Plus three more. That makes thirteen!",
+    "hash": "d8166c0d",
+    "lesson": "silly",
+    "scene": "animals",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.colors.0",
+    "text": "Now let's count with colors! Red is zero. Yellow is one. Green is two.",
+    "hash": "70f71846",
+    "lesson": "silly",
+    "scene": "colors",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.colors.1",
+    "text": "Only three colors means base three. Let's count! Red. Yellow. Green. Yellow-red. Yellow-yellow. Yellow-green. Green-red.",
+    "hash": "75f7fc39",
+    "lesson": "silly",
+    "scene": "colors",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.colors.2",
+    "text": "Each place is worth three times more than the one before. Ones. Threes. Nines.",
+    "hash": "3cac7702",
+    "lesson": "silly",
+    "scene": "colors",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.colors.3",
+    "text": "Green-green-green is two nines, plus two threes, plus two ones. That makes twenty-six!",
+    "hash": "e69ff000",
+    "lesson": "silly",
+    "scene": "colors",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.costumes.0",
+    "text": "The number thirteen can wear lots of costumes!",
+    "hash": "239b6c46",
+    "lesson": "silly",
+    "scene": "costumes",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.costumes.1",
+    "text": "In base ten, it's one-three. In binary, one-one-zero-one. In octal, one-five. In hex, D. With animals, Frog-Pig. With colors, yellow-yellow-yellow.",
+    "hash": "8855bf24",
+    "lesson": "silly",
+    "scene": "costumes",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.costumes.2",
+    "text": "The number doesn't change. Only the way we write it! Thirteen is always thirteen.",
+    "hash": "e0300723",
+    "lesson": "silly",
+    "scene": "costumes",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "silly.try.0",
+    "text": "Your turn! Press plus and minus to count with animals and colors. Press Costumes to dress up any number. Or press Quiz: what number is Dog-Duck?",
+    "hash": "38cb8a1",
+    "lesson": "silly",
+    "scene": "try",
+    "step": 0,
+    "interactive": true,
+    "movie": false
+  },
+  {
+    "id": "addition.decimal.0",
+    "text": "Let's add forty-seven and thirty-eight. We line them up: ones under ones, and tens under tens.",
+    "hash": "96ff8616",
+    "lesson": "addition",
+    "scene": "decimal",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.decimal.1",
+    "text": "Ones first! Seven plus eight is fifteen. That's one ten and five, so write five and carry one.",
+    "hash": "3a4a7172",
+    "lesson": "addition",
+    "scene": "decimal",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.decimal.2",
+    "text": "Now the tens. One plus four plus three is eight. Write eight.",
+    "hash": "94f8732b",
+    "lesson": "addition",
+    "scene": "decimal",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.decimal.3",
+    "text": "The answer is eighty-five! Forty-seven plus thirty-eight makes eighty-five.",
+    "hash": "b5623f7e",
+    "lesson": "addition",
+    "scene": "decimal",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.0",
+    "text": "Binary adding has only four rules. Zero plus zero is zero. Zero plus one is one. One plus one is one-zero, that's two. One plus one plus one is one-one, that's three.",
+    "hash": "c5777fe2",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.1",
+    "text": "Let's add five and three. In binary, that's one-zero-one plus one-one. Here they are on our hands!",
+    "hash": "3099ec0c",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.2",
+    "text": "Ones first! One plus one is two. That's one two and zero, so write zero and carry one.",
+    "hash": "154a6e42",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.3",
+    "text": "Now the twos. One plus zero plus one is two. That's one two and zero, so write zero and carry one.",
+    "hash": "194ec3e8",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.4",
+    "text": "Now the fours. One plus one plus zero is two. That's one two and zero, so write zero and carry one.",
+    "hash": "f10ec0a",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.5",
+    "text": "Now the eights. The carried one moves into a new place all by itself. Write one.",
+    "hash": "6b74a1ed",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 5,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.binary.6",
+    "text": "The answer is one-zero-zero-zero in binary! Let's check in base ten. Five plus three is eight. Yes!",
+    "hash": "79fb2f1",
+    "lesson": "addition",
+    "scene": "binary",
+    "step": 6,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.hex.0",
+    "text": "Now hex! Let's add two A and one F.",
+    "hash": "5ee44745",
+    "lesson": "addition",
+    "scene": "hex",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.hex.1",
+    "text": "Ones first! A plus F is ten plus fifteen, twenty-five. That's one sixteen and nine, so write nine and carry one.",
+    "hash": "b0d51073",
+    "lesson": "addition",
+    "scene": "hex",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.hex.2",
+    "text": "Now the sixteens. One plus two plus one is four. Write four.",
+    "hash": "ea9b7e4",
+    "lesson": "addition",
+    "scene": "hex",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.hex.3",
+    "text": "The answer is four nine in hex! Let's check in base ten. Forty-two plus thirty-one is seventy-three. Yes!",
+    "hash": "af298436",
+    "lesson": "addition",
+    "scene": "hex",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.octal.0",
+    "text": "Octal works the same way. Let's add one-seven and five.",
+    "hash": "9c3aaeb3",
+    "lesson": "addition",
+    "scene": "octal",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.octal.1",
+    "text": "Ones first! Seven plus five is twelve. That's one eight and four, so write four and carry one.",
+    "hash": "ddd4863b",
+    "lesson": "addition",
+    "scene": "octal",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.octal.2",
+    "text": "Now the eights. One plus one plus zero is two. Write two.",
+    "hash": "558f16c5",
+    "lesson": "addition",
+    "scene": "octal",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.octal.3",
+    "text": "The answer is two-four in octal! Let's check in base ten. Fifteen plus five is twenty. Yes!",
+    "hash": "a9af4320",
+    "lesson": "addition",
+    "scene": "octal",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.animals.0",
+    "text": "Now let's add animals! Dog-Frog plus Frog-Pig.",
+    "hash": "fee43b49",
+    "lesson": "addition",
+    "scene": "animals",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.animals.1",
+    "text": "Ones first! Frog plus Pig is two plus three, five. That's one five and zero, so write Cat and carry Dog.",
+    "hash": "62604908",
+    "lesson": "addition",
+    "scene": "animals",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.animals.2",
+    "text": "Now the fives. Dog plus Dog plus Frog is one plus one plus two, four. That's Duck, so write Duck.",
+    "hash": "4d1f8b33",
+    "lesson": "addition",
+    "scene": "animals",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.animals.3",
+    "text": "The answer is Duck-Cat! Let's check in base ten. Seven plus thirteen is twenty. Yes!",
+    "hash": "36f496a6",
+    "lesson": "addition",
+    "scene": "animals",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.colors.0",
+    "text": "Colors count in base three. Let's add yellow-green plus green-green.",
+    "hash": "628e7579",
+    "lesson": "addition",
+    "scene": "colors",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.colors.1",
+    "text": "Ones first! Green plus green is two plus two, four. That's one three and one, so write yellow and carry yellow.",
+    "hash": "628d9774",
+    "lesson": "addition",
+    "scene": "colors",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.colors.2",
+    "text": "Now the threes. Yellow plus yellow plus green is one plus one plus two, four. That's one three and one, so write yellow and carry yellow.",
+    "hash": "b7c73893",
+    "lesson": "addition",
+    "scene": "colors",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.colors.3",
+    "text": "Now the nines. The carried yellow moves into a new place all by itself. Write yellow.",
+    "hash": "aa8fae96",
+    "lesson": "addition",
+    "scene": "colors",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.colors.4",
+    "text": "The answer is yellow-yellow-yellow! Let's check in base ten. Five plus eight is thirteen. Yes!",
+    "hash": "46332c65",
+    "lesson": "addition",
+    "scene": "colors",
+    "step": 4,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "addition.try.0",
+    "text": "Your turn! Pick a number system. Pick how many columns, and if you want carries. Then add one column at a time: pick the digit to write, and say if it carries.",
+    "hash": "434a19d0",
+    "lesson": "addition",
+    "scene": "try",
+    "step": 0,
+    "interactive": true,
+    "movie": false
+  },
+  {
+    "id": "playground.welcome.0",
+    "text": "Welcome to the playground! Here you can play with everything you learned.",
+    "hash": "7ba71617",
+    "lesson": "playground",
+    "scene": "welcome",
+    "step": 0,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "playground.welcome.1",
+    "text": "In the converter, type any number and see it in every system at once.",
+    "hash": "70f4491c",
+    "lesson": "playground",
+    "scene": "welcome",
+    "step": 1,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "playground.welcome.2",
+    "text": "You can even invent your own number system, with robots, bananas and rockets!",
+    "hash": "82ef81c5",
+    "lesson": "playground",
+    "scene": "welcome",
+    "step": 2,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "playground.welcome.3",
+    "text": "And when you are ready, take the quiz and collect stars!",
+    "hash": "3d409b4e",
+    "lesson": "playground",
+    "scene": "welcome",
+    "step": 3,
+    "interactive": false,
+    "movie": false
+  },
+  {
+    "id": "playground.go.0",
+    "text": "Pick one to start playing!",
+    "hash": "5bb9f2ce",
+    "lesson": "playground",
+    "scene": "go",
+    "step": 0,
+    "interactive": true,
+    "movie": false
+  },
+  {
+    "id": "movie.start.0",
+    "text": "Welcome to the counting movie! Sit back, watch, and listen.",
+    "hash": "fc4c0587",
+    "lesson": "movie",
+    "scene": "start",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "base10.movie-chapter.0",
+    "text": "Chapter one. Counting in tens, on our fingers.",
+    "hash": "b799b4f7",
+    "lesson": "base10",
+    "scene": "movie-chapter",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "base10.movie-try.0",
+    "text": "This part is for you to try. Do it later, in the lesson!",
+    "hash": "d026f8df",
+    "lesson": "base10",
+    "scene": "movie-try",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "binary.movie-chapter.0",
+    "text": "Chapter two. Binary: counting on two hands.",
+    "hash": "e4366c1b",
+    "lesson": "binary",
+    "scene": "movie-chapter",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "binary.movie-try.0",
+    "text": "This part is for you to try. Do it later, in the lesson!",
+    "hash": "d026f8df",
+    "lesson": "binary",
+    "scene": "movie-try",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "octal-hex.movie-chapter.0",
+    "text": "Chapter three. Octal and hexadecimal.",
+    "hash": "cc80c953",
+    "lesson": "octal-hex",
+    "scene": "movie-chapter",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "octal-hex.movie-try.0",
+    "text": "This part is for you to try. Do it later, in the lesson!",
+    "hash": "d026f8df",
+    "lesson": "octal-hex",
+    "scene": "movie-try",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "silly.movie-chapter.0",
+    "text": "Chapter four. Silly number systems.",
+    "hash": "748fec44",
+    "lesson": "silly",
+    "scene": "movie-chapter",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "silly.movie-try.0",
+    "text": "This part is for you to try. Do it later, in the lesson!",
+    "hash": "d026f8df",
+    "lesson": "silly",
+    "scene": "movie-try",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "addition.movie-chapter.0",
+    "text": "Chapter five. Adding in every system.",
+    "hash": "c9921de",
+    "lesson": "addition",
+    "scene": "movie-chapter",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "addition.movie-try.0",
+    "text": "This part is for you to try. Do it later, in the lesson!",
+    "hash": "d026f8df",
+    "lesson": "addition",
+    "scene": "movie-try",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "playground.movie-chapter.0",
+    "text": "Chapter six. The playground.",
+    "hash": "b10943a6",
+    "lesson": "playground",
+    "scene": "movie-chapter",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "playground.movie-go.0",
+    "text": "Pick one and play with it yourself, later, in the playground!",
+    "hash": "cc30bc1d",
+    "lesson": "playground",
+    "scene": "movie-go",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  },
+  {
+    "id": "movie.end.0",
+    "text": "The end! Thank you for watching. Now it is your turn: open a lesson, and try it yourself!",
+    "hash": "fb5f0926",
+    "lesson": "movie",
+    "scene": "end",
+    "step": 0,
+    "interactive": false,
+    "movie": true
+  }
+]

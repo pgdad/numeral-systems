@@ -104,9 +104,40 @@ if (fs.existsSync(manifestPath)) {
   }
 }
 
+// Recorded narration (Phase 10): every audio-manifest entry must be a relative path to a file that exists in assets/audio/.
+const audioManifestPath = path.join(ROOT, 'js', 'engine', 'audio-manifest.js');
+let audioCount = 0;
+if (fs.existsSync(audioManifestPath)) {
+  const sandbox = {};
+  sandbox.window = sandbox;
+  try {
+    require('vm').runInNewContext(fs.readFileSync(audioManifestPath, 'utf8'), sandbox);
+  } catch (e) {
+    report('js/engine/audio-manifest.js', 0, 'does not run: ' + e.message);
+  }
+  const manifest = (sandbox.NumSys && sandbox.NumSys.audioManifest) || {};
+  for (const id of Object.keys(manifest)) {
+    const entry = manifest[id];
+    const src = typeof entry === 'string' ? entry : entry && entry.src;
+    audioCount++;
+    if (typeof src !== 'string' || !/^assets\/audio\/[^/\\]+$/.test(src)) {
+      report('js/engine/audio-manifest.js', 0, `"${id}": src must be a relative path like assets/audio/<id>.mp3 (got ${JSON.stringify(src)})`);
+    } else if (!fs.existsSync(path.join(ROOT, src))) {
+      report('js/engine/audio-manifest.js', 0, `"${id}": file "${src}" does not exist (run node tools/build-audio-manifest.js)`);
+    }
+  }
+}
+
+// The narration script (docs/narration.md, tools/narration.json) must match the lesson text.
+const exportTool = path.join(ROOT, 'tools', 'narration-export.js');
+if (fs.existsSync(exportTool)) {
+  const res = require('child_process').spawnSync(process.execPath, [exportTool, '--check'], { encoding: 'utf8' });
+  if (res.status !== 0) report('docs/narration.md', 0, (res.stderr || res.stdout || 'narration export failed').trim());
+}
+
 if (problems.length) {
   console.error(`lint-rules: ${problems.length} problem(s):`);
   problems.forEach((p) => console.error('  ' + p));
   process.exit(1);
 }
-console.log(`lint-rules: OK (${runtimeFiles.length} runtime files, ${scriptSrcs.length} scripts)`);
+console.log(`lint-rules: OK (${runtimeFiles.length} runtime files, ${scriptSrcs.length} scripts, ${audioCount} recorded lines)`);

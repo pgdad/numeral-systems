@@ -101,6 +101,8 @@
     order: 60,
     title: 'Playground',
     shortTitle: 'Playground',
+    spokenTitle: 'The playground', // Movie mode chapter card (js/movie.js)
+    tryLater: 'Pick one and play with it yourself, later, in the playground!', // Movie mode card for the "Pick one" scene
     blurb: 'Convert numbers, invent your own number system, and take a quiz.',
     ageHint: 'all',
     theme: 'playground',

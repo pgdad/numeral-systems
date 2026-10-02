@@ -16,11 +16,11 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 07 | Lesson: Silly systems | done | 2026-10-02 | 154 tests + silly autoplay/counter/quiz/wheel smoke (Chromium + Firefox) |
 | 08 | Lesson: Addition | done | 2026-10-02 | 164 tests + addition autoplay/solve/hint/deep-link smoke (Chromium + Firefox) |
 | 09 | Playground & games | done | 2026-10-02 | 173 tests + playground make/convert/quiz smoke, storage on and blocked (Chromium + Firefox) |
-| 10 | Movie mode & recorded audio | todo | | |
+| 10 | Movie mode & recorded audio | done | 2026-10-02 | 190 tests + movie/recorder smoke; full movie, piper audio + stale fallback verified (Chromium + Firefox) |
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 10 (Movie mode & recorded audio).
+**Next phase:** 11 (Polish, a11y, QA).
 
 ---
 
@@ -439,3 +439,61 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 - How to see it: open `index.html` and click the teal "Playground" card (the star), or the Playground link in the header
   (`index.html#/playground/make` opens Make Your Own, `#/playground/quiz` the quiz; `#/lesson/playground` is the narrated intro).
 
+### Phase 10 — Movie mode & recorded audio — 2026-10-02 — done
+- Built:
+  - **Movie mode** `js/movie.js` + `css/movie.css`: routes `#/movie` (all lessons) and `#/movie/:id` (one lesson), a big "Watch the movie"
+    button on home, and per-lesson movie links on About. A poster (Watch, chapter list with minutes, "about 13 minutes"), then an opening
+    card, a chapter card per lesson ("Chapter two. Binary: counting on two hands."), every non-interactive scene, a "Try this later in the
+    lesson!" card in place of each interactive scene, and a closing card, then "The End!" (confetti, links to every lesson, Watch again, Home).
+    A sticky bar has the title, "Chapter 2 of 6: Binary", the current part, a progress bar with numbered chapter markers (clickable), prev/
+    play-pause/next chapter, voice, sound effects, full screen and close. Start goes full screen (the page fallback where the API is refused).
+    Keys: Space, ←/→ (chapters; ← restarts a chapter once a step in), F, Esc. It pauses when the tab is hidden.
+  - **Player hook** (`js/engine/player.js`): `mount(stage, lesson, pos, {movie: {onUpdate, onEnd}})` (see D21). Without the option nothing changed.
+    The player API also gained `toggleVoice`. Lessons got `spokenTitle`, and the playground lesson got `tryLater`.
+  - **Narration export** `tools/narration-export.js` → `docs/narration.md` (readable script: 126 lines, ~13 min, size estimate) and
+    `tools/narration.json` (`[{id, text, hash, lesson, scene, step, interactive, movie}]`). `--check` is part of the lint, so **after changing
+    any `say` text, run `node tools/narration-export.js`** or `tools/check.sh` fails.
+  - **Audio tools:** `tools/build-audio-manifest.js` (scans `assets/audio/`, writes `js/engine/audio-manifest.js` with `{src, hash}` per id;
+    `--todo`, `--accept`, `--generated`; hash rules in D21) and `tools/generate-audio.sh` (say+afconvert / piper / espeak-ng, then
+    ffmpeg/lame/afconvert; `--only`, `--force`, `--convert`, `--engines`; a clear "what to install" message, exit 3, when nothing is found).
+    `docs/recording-your-voice.md` explains all three routes (own voice, generated, cloud TTS by hand) and the size budget (<10 MB; the whole
+    narration is ~3 MB at 48 kbps). `assets/audio/README.md` points there.
+  - **Record the narration** `js/recorder.js` (`#/record`, linked from About): a lesson picker (6 lessons + "Movie cards"), the current line big
+    with Record/Stop (R), Play (P), Previous/Next (←/→), a list of all lines with ✓ and durations, "Save recorded lines" (one download per line,
+    `<id>.webm`/`.ogg`/`.m4a`) and "Save the cue sheet" (JSON with the text hash of each line). It warns before closing the page with unsaved takes.
+    Friendly messages for no microphone or a refused one.
+  - **Video:** `docs/making-a-video.md` (QuickTime, Game Bar/Clipchamp, OBS, the in-app button, serving from localhost). The poster has an optional
+    "Record a video of it" button (Chrome/Edge: `getDisplayMedia` + `MediaRecorder` → "Save the video" `counting-movie.webm`).
+- Lint: the audio manifest may only point at existing relative `assets/audio/...` files, and the narration script must be current.
+- Tests: `tests/specs/movie.spec.js` (10 tests: routes, playlist order/weights, movie copies keep real scene objects and ids and validate, one-lesson
+  and unknown ids, an isolated registry, every narrated step listed once, words-only card lines, spoken titles, recorder helpers, stale-hash source
+  choice, and DOM card building in the browser). `tests/tools.test.js` (node:test, 8 tests: export coverage/markdown/json/up to date, audio scan,
+  hash rules with cue sheets, todo, manifest round trip, cue merge). `tools/smoke.js` `movieScenario`: poster chapters, `#/movie/playground` plays to
+  the end with no clicks (spoken = playlist text, progress 100%), whole-movie pause/resume, chapter skip by button, → key and marker through all six,
+  past the end, Watch again, leaving cleanly (no more speech, no full screen, captions hidden), and the recorder lists the lines. New routes are in `EXTRA_ROUTES`.
+- Verified (scratchpad drivers):
+  - The **whole movie** in Chromium with fake speech from one click: 375 sentences spoken = the playlist text, no console errors, ~6.5 min (with
+    real speech expect ~15 min). One-lesson movies for binary, silly (touch at 400px) and playground. No horizontal scroll at 1280 or 400px.
+  - Controls: pause (Space) really stops, resume, next/prev chapter (buttons, keys, markers), voice toggle mid-movie, end, Watch again, close.
+  - **Recorded audio**, on a scratch copy of the repo (nothing generated was committed): piper (pip, en_US-lessac-medium) + ffmpeg generated the 7
+    playground lines in 6 s (~22 KB each); a re-run skipped them; webm recordings from the recorder page were registered from their cue sheet and
+    `--convert`ed to mp3. In Chromium and Firefox the lesson then played all 5 lines from files (no speech). After changing one line's text, that
+    line used speech and the other four still used files; `generate-audio.sh` then remade only that line. The movie used the card files too.
+  - The recorder page with a fake microphone in Chromium and Firefox from `file://`: recorded, played back, re-recorded, switched to Movie cards, saved
+    three files and a cue sheet with the right ids and hashes.
+- Deviations: the recorder saves one file per line plus a cue
+  sheet, not one `.webm` per lesson (simpler to register and redo). No audio is committed: the manifest stays empty by design (D21).
+- Known issues / needs a human:
+  - The in-app **"Record a video of it"** could not be tested: headless Chromium accepts the capture but has no screen ("Could not start video
+    source"), so only the friendly failure message was checked. Try it once on a real Chrome/Edge (it may need `http://localhost`, see the doc).
+  - Listen to a real voice through the whole movie (~15 min), and the chapter card lines. Browser voices are often not captured by tab recording.
+  - Movie mode doesn't scroll for you: tall scenes (binary 2.4, octal 3.1/3.3) can sit under the captions bar at 1280×900, as in the lessons. Phase 11.
+  - Recordings on `#/record` live only in memory until saved (a `beforeunload` warning helps, but leaving via an in-app link loses them).
+    Phase 11 could keep them in IndexedDB.
+  - Safari is untested (no microphone on `file://` there; recorded `.webm` may not play in older Safari, so use `--convert`).
+- For Phase 11:
+  - A settings panel can share the movie's voice/sound buttons (`NS.narrator.setVoiceOn`, `NS.sound.setMuted`).
+  - When changing narration text, re-run `node tools/narration-export.js`. Recorded audio for changed lines falls back to speech by itself.
+  - The movie's captions use the global `#captions` bar like the lessons, so the captions-overlap fix applies to both.
+- How to see it: open `index.html` and press the big **Watch the movie** button (or go to `index.html#/movie`), then **Watch**.
+  One lesson: `index.html#/movie/binary`. Recording: About → "Record the narration" (`#/record`). The script: `docs/narration.md`.

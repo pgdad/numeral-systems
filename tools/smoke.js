@@ -33,7 +33,7 @@ const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0',
   '#/lesson/binary/3/2', '#/lesson/binary/5/0', '#/lesson/octal-hex/2/4', '#/lesson/octal-hex/4/0',
   '#/lesson/silly/3/2', '#/lesson/silly/4/0', '#/lesson/addition/1/6', '#/lesson/addition/6/0',
-  '#/playground/converter', '#/playground/make', '#/playground/quiz'];
+  '#/playground/converter', '#/playground/make', '#/playground/quiz', '#/movie', '#/movie/binary', '#/movie/nope', '#/record'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -96,6 +96,8 @@ async function run(browserName) {
     // The playground: converter, make your own, quiz, with storage working and blocked (Phase 09).
     await playgroundScenario(browser, failures, false);
     await playgroundScenario(browser, failures, true);
+    // Movie mode and the narration recorder (Phase 10).
+    await movieScenario(browser, failures);
   } finally {
     await browser.close();
   }
@@ -544,6 +546,84 @@ async function playgroundScenario(browser, failures, blocked) {
     const end = await page.waitForSelector('.pg-final', { timeout: 3000 }).catch(() => null);
     if (!end) failures.push(`${label}: the quiz did not end after ten questions`);
     else if (!/^You got \d+ stars? out of 10!$/.test(await page.textContent('.pg-final'))) failures.push(`${label}: quiz ended with "${await page.textContent('.pg-final')}"`);
+  } catch (e) {
+    failures.push(`${label}: ${e.message.split('\n')[0]}`);
+  }
+  console.log(`smoke: ${label} done (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+  await context.close();
+}
+
+// Movie mode: a one-lesson movie plays to "The End!" with no clicks after Start (spoken text = every step of the
+// playlist), then the whole movie: chapter skip by button, key and marker, pause/resume, Watch again, leaving cleanly.
+// Also the recorder page lists every narration line. (A full-movie run takes ~6 minutes; it is done by hand, see PROGRESS.)
+async function movieScenario(browser, failures) {
+  const label = 'movie';
+  const t0 = Date.now();
+  const { context, page } = await newPlayerPage(browser, failures, label, FAKE_SPEECH);
+  const now = () => page.textContent('.movie-now');
+  try {
+    await page.goto(INDEX + '#/');
+    await page.click('.btn-watch');
+    await page.waitForSelector('.movie-poster .movie-start');
+    const chapters = await page.$$eval('.movie-chapter-list li', (li) => li.length);
+    const lessons = await page.evaluate(() => NumSys.lessons.list().length);
+    if (chapters !== lessons) failures.push(`${label}: poster lists ${chapters} chapters for ${lessons} lessons`);
+
+    await page.goto(INDEX + '#/movie/playground');
+    await page.click('.movie-start');
+    const end = await page.waitForSelector('.movie-end', { timeout: 90000 }).catch(() => null);
+    if (!end) failures.push(`${label}: #/movie/playground did not reach the end by itself`);
+    const res = await page.evaluate(() => {
+      const expected = [];
+      NumSys.movie.helpers.playlist(NumSys.lessons, 'playground').forEach((e) => e.lesson.scenes.forEach((s) =>
+        s.steps.forEach((st) => expected.push(...NumSys.narrator.splitSentences(st.say)))));
+      return { expected, spoken: window.__spoken, pct: document.querySelector('.movie-progress-track').getAttribute('aria-valuenow') };
+    });
+    if (JSON.stringify(res.spoken) !== JSON.stringify(res.expected)) failures.push(`${label}: one-lesson movie spoke ${res.spoken.length} sentences, expected ${res.expected.length}`);
+    if (res.pct !== '100') failures.push(`${label}: progress at the end is ${res.pct}%`);
+
+    await page.goto(INDEX + '#/movie');
+    await page.click('.movie-start');
+    await page.waitForFunction(() => /scene-start/.test((document.querySelector('.player-stage') || {}).className || ''));
+    await page.keyboard.press('Space'); // focus is on the play button
+    await page.waitForFunction(() => document.querySelector('.movie').dataset.mode === 'paused', null, { timeout: 3000 })
+      .catch(() => failures.push(`${label}: Space did not pause`));
+    await page.click('.movie-play');
+    await page.waitForFunction(() => document.querySelector('.movie').dataset.mode === 'playing', null, { timeout: 3000 })
+      .catch(() => failures.push(`${label}: Play did not resume`));
+    for (let n = 1; n <= lessons; n++) {
+      if (n === 2) { await page.evaluate(() => document.activeElement.blur()); await page.keyboard.press('ArrowRight'); }
+      else if (n === 3) await page.click(`.movie-marker[aria-label^="Chapter ${n}:"]`);
+      else await page.click('button[aria-label="Next chapter"]');
+      const ok = await page.waitForFunction((k) => new RegExp('^Chapter ' + k + ' of ').test(document.querySelector('.movie-now').textContent) &&
+        /scene-movie-chapter/.test(document.querySelector('.player-stage').className), n, { timeout: 5000 }).catch(() => null);
+      if (!ok) { failures.push(`${label}: skipping to chapter ${n} shows "${await now()}"`); break; }
+    }
+    await page.click('button[aria-label="Next chapter"]');
+    const fin = await page.waitForSelector('.movie-end', { timeout: 20000 }).catch(() => null);
+    if (!fin) failures.push(`${label}: skipping past the last chapter did not reach the end`);
+    await page.click('.movie-again');
+    await page.waitForFunction(() => /scene-start/.test((document.querySelector('.player-stage') || {}).className || ''), null, { timeout: 5000 })
+      .catch(() => failures.push(`${label}: Watch again did not restart`));
+    await page.click('.movie-close');
+    await page.waitForSelector('.home');
+    const spoken = await page.evaluate(() => window.__spoken.length);
+    await page.waitForTimeout(800);
+    const after = await page.evaluate(() => ({ n: window.__spoken.length, fs: document.documentElement.classList.contains('is-fullscreen'),
+      captions: document.getElementById('captions').hidden }));
+    if (after.n !== spoken || after.fs || !after.captions) failures.push(`${label}: leaving the movie did not stop cleanly ${JSON.stringify(after)}`);
+
+    await page.goto(INDEX + '#/about');
+    await page.click('.about-record');
+    await page.waitForSelector('.rec-panel');
+    const rec = await page.evaluate(() => ({
+      first: document.querySelector('.rec-text').textContent, id: document.querySelector('.rec-id').textContent,
+      groups: document.querySelectorAll('.rec-select option').length, rows: document.querySelectorAll('.rec-row').length,
+      want: NumSys.movie.helpers.narrationLines(), lessons: NumSys.lessons.list().length
+    }));
+    if (rec.id !== rec.want[0].id || rec.first !== rec.want[0].text) failures.push(`${label}: recorder starts at "${rec.id}"`);
+    if (rec.groups !== rec.lessons + 1) failures.push(`${label}: recorder has ${rec.groups} groups`);
+    if (rec.rows !== rec.want.filter((l) => l.lessonId === rec.want[0].lessonId && !l.movie).length) failures.push(`${label}: recorder lists ${rec.rows} lines`);
   } catch (e) {
     failures.push(`${label}: ${e.message.split('\n')[0]}`);
   }

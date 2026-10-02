@@ -583,6 +583,7 @@
     order: 10,
     title: 'Base‑10: Counting on Our Fingers',
     shortTitle: 'Base‑10',
+    spokenTitle: 'Counting in tens, on our fingers', // Movie mode chapter card (js/movie.js)
     blurb: 'Ten fingers, ten digits, and the magic of bundling tens.',
     ageHint: '5+',
     theme: 'base10',

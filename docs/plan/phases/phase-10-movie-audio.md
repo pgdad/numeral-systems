@@ -41,13 +41,13 @@ files. It also offers optional ways to produce a real video file.
    localhost/https) that saves a `.webm`. Don't commit video files to git (D4).
 
 ## Acceptance criteria
-- [ ] Movie mode plays every lesson end to end with no clicks after Start (using browser speech).
-- [ ] `node tools/narration-export.js` produces `docs/narration.md` covering every step.
-- [ ] Audio generation works on this machine with at least one available engine, *or* the script
+- [x] Movie mode plays every lesson end to end with no clicks after Start (using browser speech).
+- [x] `node tools/narration-export.js` produces `docs/narration.md` covering every step.
+- [x] Audio generation works on this machine with at least one available engine, *or* the script
       exits with a clear message listing what to install. With a manifest present, the player uses the files;
       with a stale hash, it falls back to speech.
-- [ ] `docs/making-a-video.md` exists.
-- [ ] `tools/check.sh` passes (add a check that the manifest only references files that exist).
+- [x] `docs/making-a-video.md` exists.
+- [x] `tools/check.sh` passes (add a check that the manifest only references files that exist).
       PROGRESS.md is updated and committed.
 
 ## How to see it

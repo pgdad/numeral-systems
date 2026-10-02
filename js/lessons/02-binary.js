@@ -915,6 +915,7 @@
     order: 20,
     title: 'Binary: Count to 1023 on Two Hands',
     shortTitle: 'Binary',
+    spokenTitle: 'Binary: counting on two hands', // Movie mode chapter card (js/movie.js)
     blurb: 'Every finger is a switch. Ten fingers can count way past ten!',
     ageHint: '7+',
     theme: 'binary',

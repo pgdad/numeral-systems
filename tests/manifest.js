@@ -39,6 +39,8 @@
       'js/lessons/05-addition.js',
       'js/lessons/06-playground.js',
       'js/playground.js',
+      'js/movie.js',
+      'js/recorder.js',
       'js/app.js'
     ],
     specs: [
@@ -58,7 +60,8 @@
       'tests/specs/lesson-octal-hex.spec.js',
       'tests/specs/lesson-silly.spec.js',
       'tests/specs/lesson-addition.spec.js',
-      'tests/specs/playground.spec.js'
+      'tests/specs/playground.spec.js',
+      'tests/specs/movie.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);

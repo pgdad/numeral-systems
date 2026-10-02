@@ -1089,6 +1089,7 @@
     order: 30,
     title: 'Octal & Hexadecimal',
     shortTitle: 'Octal & Hex',
+    spokenTitle: 'Octal and hexadecimal', // Movie mode chapter card (js/movie.js)
     blurb: 'Eight-fingered aliens, sixteen digits, and secret color codes.',
     ageHint: '8+',
     theme: 'hex',

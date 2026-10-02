@@ -9,6 +9,10 @@ A browser app with animated, narrated lessons about how we write numbers:
 5. **Adding in every system.** Animated carrying, from tens to cats.
 6. **Playground.** A converter, make-your-own number system, and quizzes.
 
+**Watch the movie** on the home page plays every lesson hands-free, like a video (`docs/making-a-video.md`
+explains how to turn it into a video file). The lessons can talk in a recorded voice, even your own
+(`docs/recording-your-voice.md`); otherwise they use the browser's voice.
+
 It's just files: double-click `index.html` and it runs on PC or Mac with no
 install and no internet. To publish it, copy the folder to any static host or CDN
 (S3 + CloudFront, Akamai, Netlify, GitHub Pages). See `deploy/`.

@@ -1,5 +1,8 @@
 // Scene player: plays a lesson (scenes of steps) with narration, captions and controls.
-//   NS.player.mount(stage, lesson, {scene, step}) -> { destroy() }      (DECISIONS D11)
+//   NS.player.mount(stage, lesson, {scene, step}, options) -> { destroy() }      (DECISIONS D11)
+//   options.movie = {onUpdate({mode, pos}), onEnd()}: Movie mode (js/movie.js, DECISIONS D21). The player
+//   then starts at once, always autoplays, hides its own controls, leaves the URL and full screen alone,
+//   ignores the keyboard (the movie owns it) and calls onEnd() instead of showing the end card.
 //
 // How a step plays: narration (NS.narrator) and the step's do(ctx) animation run together;
 // the step is finished when both are. Jumping anywhere (Prev, chapter dots, deep links) is done
@@ -41,11 +44,12 @@
     if (path) path.setAttribute('d', ICONS[name]);
   }
 
-  function mount(stage, lesson, startPos) {
+  function mount(stage, lesson, startPos, options) {
     var PS = NS.playerState;
+    var movie = (options && options.movie) || null;
     var settings = {
       speed: U.storage.get('player.speed', 1),
-      autoplay: U.storage.get('player.autoplay', false)
+      autoplay: movie ? true : U.storage.get('player.autoplay', false)
     };
     if (SPEEDS.indexOf(settings.speed) === -1) settings.speed = 1;
 
@@ -108,9 +112,10 @@
       U.el('div', { class: 'control-group' }, replayBtn, restartBtn),
       U.el('div', { class: 'control-group control-settings' }, autoBtn, speedBtn, voiceBtn, soundBtn, fsBtn));
 
-    var root = U.el('section', { class: ['player', 'lesson-' + lesson.id, 'theme-' + (lesson.theme || 'base10')] },
+    var root = U.el('section', { class: ['player', 'lesson-' + lesson.id, 'theme-' + (lesson.theme || 'base10'), movie ? 'is-movie' : ''] },
       U.el('header', { class: 'player-head' },
-        U.el('h1', { class: 'view-heading', tabindex: '-1', text: lesson.title }), sceneTitle),
+        movie ? U.el('h2', { class: 'player-title', text: lesson.title })
+              : U.el('h1', { class: 'view-heading', tabindex: '-1', text: lesson.title }), sceneTitle),
       frame, progress, chapters, controls);
     stage.appendChild(root);
 
@@ -304,6 +309,7 @@
     }
 
     function setAutoplay(onOff) {
+      if (movie) return;
       settings.autoplay = !!onOff;
       U.storage.set('player.autoplay', settings.autoplay);
       updateUI();
@@ -372,6 +378,7 @@
       abortRun();
       NS.narrator.stop();
       mode = 'ended';
+      if (movie) { updateUI(); movie.onEnd(); return; }
       if (captions) captions.hidden = true;
       NS.sound.play('tada');
       var nl = nextLesson();
@@ -397,6 +404,7 @@
 
     // ---------------------------------------------------------------- UI sync
     function updateHash() {
+      if (movie) return;
       NS.router.replace(NS.router.href('lesson', { id: lesson.id, scene: pos.scene, step: pos.step }));
     }
 
@@ -436,12 +444,13 @@
       voiceBtn.title = voiceOn ? 'Voice on' : 'Voice off (captions only)';
       soundBtn.setAttribute('aria-pressed', String(!NS.sound.isMuted()));
       fsBtn.setAttribute('aria-pressed', String(isFullscreen()));
+      if (movie && movie.onUpdate) movie.onUpdate({ mode: mode, pos: { scene: pos.scene, step: pos.step } });
     }
 
     // ---------------------------------------------------------------- keyboard & visibility
     on(document, 'keydown', function (e) {
       // defaultPrevented: a lesson control (e.g. a clickable finger) already handled the key.
-      if (destroyed || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+      if (movie || destroyed || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
       var t = e.target;
       var tag = t && t.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
@@ -461,7 +470,7 @@
         updateUI();
       }
     });
-    on(document, 'fullscreenchange', syncFullscreenClass);
+    if (!movie) on(document, 'fullscreenchange', syncFullscreenClass);
     on(document, 'visibilitychange', function () { if (document.hidden && mode === 'playing') pause(); });
 
     // ---------------------------------------------------------------- public API
@@ -474,20 +483,22 @@
         teardownLive();
         listeners.forEach(function (off) { off(); });
         listeners = [];
-        if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
-        document.documentElement.classList.remove('is-fullscreen');
+        if (!movie) {
+          if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+          document.documentElement.classList.remove('is-fullscreen');
+        }
         if (captions) { captions.hidden = true; U.clear(captions); }
         NS.narrator.setCaptionElement(null);
       },
       // For lessons/tests/Movie mode:
       play: play, pause: pause, next: goNext, go: go,
-      setAutoplay: setAutoplay,
+      setAutoplay: setAutoplay, toggleVoice: toggleVoice,
       getMode: function () { return mode; },
       getPosition: function () { return { scene: pos.scene, step: pos.step }; }
     };
 
     updateUI();
-    prepare(pos);
+    if (movie) { startOverlay.hidden = true; play(); } else prepare(pos);
     return api;
   }
 
