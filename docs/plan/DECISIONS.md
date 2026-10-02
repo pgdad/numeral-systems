@@ -150,3 +150,16 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   always included, there are no duplicates, choices are sorted, and a too-small range offers every number. The best wrong answer is
   the digits misread as base ten (Dog-Duck → 14). Phase 09's quiz can reuse it.
 
+## D19. Addition: generated narration, carry flavors, column-by-column practice (Phase 08)
+- Worked examples are data (`EXAMPLES` in `js/lessons/05-addition.js`). Each column step's `say` is `columnLead(step)` ("Ones first!",
+  "Now the fives.") + `NS.addition.explainStep(step, set)`. That is always three sentences, so the animation cues are fixed: cue 0 lights the
+  column, cue 1 shows the sum bubble, and cue 2 writes the digit and then carries. Don't hand-type column narration.
+- `column-add.js` options: `names` (digit name under each symbol; on by default for color sets per D18, and the lesson also turns it on for
+  animals), and `hop`, the carry flavor: `arc` (base ten), `flip` (binary), `wobble` (octal), `spin` (hex), `leap` (animals), `bounce`
+  (colors). `playStep` is split into `showSum`, `writeDigit` and `carry` (plus `hideSum`) for narration-synced or interactive use.
+  A written digit plays its own sound when it has one (animals), and a landed carry does too (Dog → woof).
+- Practice problems come from `makeProblem(set, {columns: 1–3, carries}, rand)`: the first number has exactly `columns` digits (with one
+  column it may be zero), and the second is at least 1. `carries: true` means at least one column carries; `false` means none does. The child
+  answers each column's digit, then "Do we carry?" (only when carries are on). Hints come from `explainStep`: a first wrong digit gets the
+  sum sentence, and later ones get the whole explanation. A final carry drops in by itself. Every solved problem shows the base-ten check
+  ("7 + 13 = 20 ✓"). Phase 09's games can reuse `makeProblem`, `checkColumn` and `checkAnswer` from `NumSys.lessons.get('addition').helpers`.

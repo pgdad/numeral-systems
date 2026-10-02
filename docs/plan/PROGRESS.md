@@ -14,13 +14,13 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 05 | Lesson: Binary on two hands | done | 2026-10-01 | 134 tests + binary autoplay/challenge smoke (Chromium + Firefox) |
 | 06 | Lesson: Octal & Hex | done | 2026-10-01 | 144 tests + octal-hex autoplay/mixer/counter smoke (Chromium + Firefox) |
 | 07 | Lesson: Silly systems | done | 2026-10-02 | 154 tests + silly autoplay/counter/quiz/wheel smoke (Chromium + Firefox) |
-| 08 | Lesson: Addition | todo | | |
+| 08 | Lesson: Addition | done | 2026-10-02 | 164 tests + addition autoplay/solve/hint/deep-link smoke (Chromium + Firefox) |
 | 09 | Playground & games | todo | | |
 | 10 | Movie mode & recorded audio | todo | | |
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 08 (Addition). Phases 08–09 can run in any order.
+**Next phase:** 09 (Playground & games).
 
 ---
 
@@ -345,3 +345,45 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 - How to see it: open `index.html` and click the brown "Silly Number Systems" card (the three colored dots), or go to
   `index.html#/lesson/silly` (`#/lesson/silly/4/0` jumps to "You try it!").
 
+### Phase 08 — Lesson: Addition — 2026-10-02 — done
+- Built: `js/lessons/05-addition.js` (id `addition`, order 50, theme addition, glyph `+`, 7 scenes, 29 steps) and its styles in
+  `css/lessons.css` (all scoped under `.lesson-addition`, prefix `ad-`).
+  - 5.1–5.6 worked examples, all built by one `exampleScene()`: intro → one step per column → answer. Base ten 47 + 38 = 85, binary
+    101 + 11 = 1000, hex 2A + 1F = 49, octal 17 + 5 = 24, animals Dog-Frog + Frog-Pig = Duck-Cat, colors yellow-green + green-green =
+    yellow-yellow-yellow. Column narration = `columnLead` + `explainStep` (generated; see D19). Each column lights on the lead, shows the
+    sum bubble on the sum sentence, then writes the digit and the carry travels. The answer step hides the bubble, makes the answer row glow
+    and pops "Check in base 10: 7 + 13 = 20 ✓".
+  - Binary (5.2) first shows the four rule cards (0+0=0, 0+1=1, 1+1=10 (2), 1+1+1=11 (3)), one per sentence. They shrink when the example
+    starts. One-hand displays for 5 and 3 stand beside the columns (101 = 5, 11 = 3), and the answer hand shows 1000 = 8 at the end.
+  - 5.7 try (interactive): system picker (6 buttons with a sample of each system's digits), Columns 1/2/3, With/No carries, and New problem.
+    A random problem appears in a column-add. For each column: "Ones: Frog + Pig = ?" (spoken "Frog plus Pig. Which digit do we write?"),
+    every digit of the system as a tile button (hex is a 16-tile grid), then "Do we carry Dog?" with Carry!/No carry buttons (only when
+    carries are on). Wrong answers are crossed out and get hints from `explainStep`. A final carry drops in by itself. Solving gives a star,
+    tada, a burst, the base-ten check, spoken praise and a Next problem button (which gets focus).
+- Component changes (D19): `column-add.js` gained `names` (on by default for color sets, D18), `hop` flavors (arc/flip/wobble/spin/
+  leap/bounce), `showSum`/`writeDigit`/`carry`/`hideSum` (`playStep` now calls them), and digit sounds (animals make their noise when written,
+  and the Dog barks when the carry lands). The gallery's column addition is unchanged in behavior (default `arc`, names off for animals).
+- Tests: `tests/specs/lesson-addition.spec.js` (10 tests). They cover registration, words-only narration, length, every column step equals
+  `columnLead + explainStep` with three sentences, the CONTENT.md examples, the binary rules, and `makeProblem` (6 systems × 1–3 columns ×
+  carries on/off × 40 seeded runs: digit counts, b ≥ 1, carry present/absent, steps = addSteps). Also edge cases (binary 1 column: 0 + 1 and
+  1 + 1; clamping; a constant random source), `checkColumn`/`checkAnswer`, hints and questions. `tools/smoke.js` solves a base-ten problem
+  (mouse digits, keyboard carries) and checks the star, checks the hint for a wrong animal digit, solves an animal problem, and deep-links
+  `#/lesson/addition/1/6` (101 + 11 = 1000 with hands). New routes are in `EXTRA_ROUTES`.
+- Verified: the scratchpad walker played all 29 steps and compared each with the deep link to the next one: 0 mismatches in Chromium,
+  Firefox, reduced motion and at 400px. A scratchpad driver solved one problem in every system (with one wrong digit and one wrong carry each,
+  switching columns and carries along the way) with mouse in Chromium and Firefox, keyboard (Enter/Space) in both, and touch at 400px. All six
+  stars were awarded, and there was no horizontal scroll and no console errors. A sound spy on the animal scene heard whoosh, meow (Cat
+  written), carry, woof (Dog lands), quack (Duck written), tada, and nothing when muted. Mid-hop frames were checked for all six carry flavors.
+- Known issues / needs a human:
+  - Listen with a real voice. Hex reads "four nine" and "two A" (bare letters, D17); colors are lower case mid-sentence.
+  - Three-column hex/octal problems have big base-ten checks ("2686 + 2029 = 4715"). That's fine for "hard", but the grandparent may want the
+    default to stay at 2 columns (it is).
+  - At 1280×900 the try card is taller than the viewport once the picker shows, so the captions bar covers its bottom until you scroll
+    (same Phase 11 captions issue as earlier lessons).
+  - Safari is untested (the binary `flip` carry uses `rotateX`, which Safari supports).
+- For later phases:
+  - Phase 09: reuse `makeProblem`/`checkColumn`/`checkAnswer`/`hint` from this lesson's helpers for an addition game, and `NS.columnAdd`
+    with `names: true` for custom icon/color systems (D18).
+  - Phase 10 (movie mode): the try scene is interactive, so a movie stops there like the other lessons.
+- How to see it: open `index.html` and click the pink "+" card "Adding in Every System", or go to `index.html#/lesson/addition`
+  (`#/lesson/addition/6/0` jumps to "You try it!", `#/lesson/addition/1/0` to binary).

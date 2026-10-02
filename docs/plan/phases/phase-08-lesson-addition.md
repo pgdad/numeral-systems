@@ -28,11 +28,11 @@ It ends with an interactive "you solve it" mode.
    and the answer checker.
 
 ## Acceptance criteria
-- [ ] All six systems are demonstrated, and the narration is generated from engine data.
-- [ ] Carries are always visible and animated, with a different flavor per system.
-- [ ] The interactive mode works for all six systems with mouse, touch and keyboard.
-- [ ] Autoplay runs start to finish. Deep links work.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] All six systems are demonstrated, and the narration is generated from engine data.
+- [x] Carries are always visible and animated, with a different flavor per system.
+- [x] The interactive mode works for all six systems with mouse, touch and keyboard.
+- [x] Autoplay runs start to finish. Deep links work.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 `index.html#/lesson/addition`

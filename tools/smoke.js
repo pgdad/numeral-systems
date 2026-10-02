@@ -32,7 +32,7 @@ const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
 const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0',
   '#/lesson/binary/3/2', '#/lesson/binary/5/0', '#/lesson/octal-hex/2/4', '#/lesson/octal-hex/4/0',
-  '#/lesson/silly/3/2', '#/lesson/silly/4/0'];
+  '#/lesson/silly/3/2', '#/lesson/silly/4/0', '#/lesson/addition/1/6', '#/lesson/addition/6/0'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -418,6 +418,54 @@ async function lessonScenarios(browser, failures) {
           document.querySelector('.sl-costumes [data-costume="animals"]').getAttribute('aria-label') === 'Animals: Frog-Pig';
       }, null, { timeout: 5000 }).catch(() => null);
       if (!wheel) failures.push(`${label}: deep link #/lesson/silly/3/2 does not show six costumes of thirteen`);
+    }
+    if (id === 'addition') {
+      // Solve a problem column by column: digits from the grid, the answer digit (mouse), then the carry (keyboard).
+      const solve = async (base) => {
+        let carry = 0;
+        for (let guard = 0; guard < 12; guard++) {
+          const st = await page.evaluate(() => {
+            const vis = (s) => { const e = document.querySelector(s); return !!e && !e.hidden; };
+            const ca = document.querySelector('.ad-try .column-add');
+            const act = ca.querySelector('.ca-colbg.is-active');
+            const at = (row, p) => { const c = ca.querySelector(`.${row}[data-power="${p}"] [data-value]`); return c ? +c.dataset.value : 0; };
+            const p = act ? +act.dataset.power : 0;
+            return { done: vis('.ad-next'), digit: vis('.ad-picker'), carry: vis('.ad-carry-pick'), sum: at('ca-a', p) + at('ca-b', p) };
+          });
+          if (st.done) return true;
+          if (st.digit) {
+            const total = st.sum + carry;
+            await page.click(`.ad-pick[data-value="${total % base}"]`);
+            carry = total >= base ? 1 : 0;
+          } else if (st.carry) {
+            await page.focus(`.ad-carry-btn[data-value="${carry}"]`);
+            await page.keyboard.press('Enter');
+          }
+          await page.waitForTimeout(1600);
+        }
+        return false;
+      };
+      if (!(await solve(10)) || await page.textContent('.ad-star-count') !== '1') failures.push(`${label}: solving a base-ten problem did not earn a star`);
+      // A wrong digit gets a hint from explainStep.
+      await page.click('.ad-next');
+      await page.click('.ad-sys[data-value="animals"]');
+      const wrongDigit = await page.evaluate(() => {
+        const ca = document.querySelector('.ad-try .column-add');
+        const at = (row) => { const c = ca.querySelector(`.${row}[data-power="0"] [data-value]`); return c ? +c.dataset.value : 0; };
+        return (at('ca-a') + at('ca-b') + 1) % 5;
+      });
+      await page.click(`.ad-pick[data-value="${wrongDigit}"]`);
+      const hint = await page.textContent('.ad-feedback');
+      if (!/^Not quite\. (Cat|Dog|Frog|Pig|Duck) plus /.test(hint)) failures.push(`${label}: wrong animal digit gave the hint "${hint}"`);
+      if (!(await solve(5)) || await page.textContent('.ad-star-count') !== '2') failures.push(`${label}: solving an animal problem did not earn a star`);
+      // A deep link rebuilds the binary example: 101 + 11 = 1000, with the hands beside it.
+      await page.evaluate(() => { location.hash = '#/lesson/addition/1/6'; });
+      const bin = await page.waitForFunction(() => {
+        const r = [...document.querySelectorAll('.ad-binary .ca-result')].sort((x, y) => y.dataset.power - x.dataset.power).map((c) => c.textContent).join('');
+        const h = document.querySelector('.ad-binary .ad-hand');
+        return r === '1000' && h && h.getAttribute('aria-label') === 'First number: five';
+      }, null, { timeout: 5000 }).catch(() => null);
+      if (!bin) failures.push(`${label}: deep link #/lesson/addition/1/6 does not show 101 + 11 = 1000 with hands`);
     }
     console.log(`smoke: ${label} autoplay OK (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
     await context.close();

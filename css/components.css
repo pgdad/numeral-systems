@@ -375,6 +375,18 @@ a.lesson-card:active { transform: translateY(1px); }
 }
 .ca-choice:hover { transform: translateY(-2px); }
 .ca-choice.is-wrong { opacity: .4; border-style: dashed; }
+/* Named digits (colors always, D18): the name sits under the symbol. */
+.ca-named { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; min-height: 0; }
+.ca-cell .ca-named .symbol, .ca-named .symbol { flex: 1 1 auto; min-height: 0; width: 100%; height: auto; }
+.ca-name { font-weight: 800; font-size: calc(var(--ca) * .19); line-height: 1.05; color: var(--ink); white-space: nowrap; }
+.ca-carry .ca-name { font-size: calc(var(--ca) * .15); }
+.ca-named-digits .ca-grid { grid-template-rows: calc(var(--ca) * .8) var(--ca) var(--ca) .5rem var(--ca); }
+.ca-named-digits .ca-carry { padding: calc(var(--ca) * .04) calc(var(--ca) * .14); }
+.ca-bubble-sym.ca-named, .ca-note-sym.ca-named { width: auto; height: auto; }
+.ca-bubble-sym.ca-named .symbol { width: 2.6rem; height: 2.6rem; flex: none; }
+.ca-note-sym.ca-named .symbol { width: 1.6rem; height: 1.6rem; flex: none; }
+.ca-bubble .ca-name { font-size: .8rem; }
+.ca-choice .ca-name { font-size: .8rem; }
 
 /* ---------- Readout ---------- */
 .readout { display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; }
