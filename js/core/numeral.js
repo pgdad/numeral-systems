@@ -145,6 +145,18 @@
     if (tokens.length === 0) {
       return { ok: false, error: 'Type a number first!' };
     }
+    // Digit names may be several words ("red circle"): join neighbouring words when together they name a digit.
+    if (!Array.isArray(input) && set.kind !== 'text') {
+      var joined = [];
+      for (var t = 0; t < tokens.length; t++) {
+        for (var k = 3; k >= 2; k--) {
+          var words = tokens.slice(t, t + k);
+          if (words.length === k && findDigit(set, words.join(' ')) >= 0) { joined.push(words.join(' ')); t += k - 1; break; }
+        }
+        if (k < 2) joined.push(tokens[t]);
+      }
+      tokens = joined;
+    }
     var values = [];
     for (var i = 0; i < tokens.length; i++) {
       var tok = tokens[i];

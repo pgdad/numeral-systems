@@ -15,12 +15,12 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 06 | Lesson: Octal & Hex | done | 2026-10-01 | 144 tests + octal-hex autoplay/mixer/counter smoke (Chromium + Firefox) |
 | 07 | Lesson: Silly systems | done | 2026-10-02 | 154 tests + silly autoplay/counter/quiz/wheel smoke (Chromium + Firefox) |
 | 08 | Lesson: Addition | done | 2026-10-02 | 164 tests + addition autoplay/solve/hint/deep-link smoke (Chromium + Firefox) |
-| 09 | Playground & games | todo | | |
+| 09 | Playground & games | done | 2026-10-02 | 173 tests + playground make/convert/quiz smoke, storage on and blocked (Chromium + Firefox) |
 | 10 | Movie mode & recorded audio | todo | | |
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 09 (Playground & games).
+**Next phase:** 10 (Movie mode & recorded audio).
 
 ---
 
@@ -387,3 +387,55 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
   - Phase 10 (movie mode): the try scene is interactive, so a movie stops there like the other lessons.
 - How to see it: open `index.html` and click the pink "+" card "Adding in Every System", or go to `index.html#/lesson/addition`
   (`#/lesson/addition/6/0` jumps to "You try it!", `#/lesson/addition/1/0` to binary).
+
+### Phase 09 — Playground & games — 2026-10-02 — done
+- Built: `js/playground.js` (the `#/playground` view plus its pure helpers), `css/playground.css`, and `js/lessons/06-playground.js`
+  (lesson `playground`, order 60: four narrated steps that pop up the three corners, then an interactive "Pick one!" with links to them).
+  Routes `#/playground/converter|make|quiz` were added to the router (`router.href('playground', {tab})`), and `app.js` passes the tab to
+  `mount`. Tabs are real ARIA tabs (arrow keys, Home/End), remember the last tab during the visit, and update the hash.
+  - **Converter:** a row per system (decimal, binary, octal, hex, animals, colors, then the child's own systems), each with a text box and an
+    odometer. Typing in any box updates all the others. Bad input gets friendly help under that box ("2 isn't a digit in binary: binary only
+    uses 0–1!", "No minus numbers here…"), and the other boxes keep the last good number. Also: big −1/+1 buttons (and ↑/↓ in any box) that
+    roll the odometers, with carry hops; Surprise me!; Say it (reads the number in every system); Zero; and a clickable two-hands finger view
+    (0–1023, otherwise "Too big for ten fingers!"). Up to 40 digits are accepted (BigInt). Icon/color rows say "Too big to draw!" past 12 digits.
+  - **Make Your Own:** a name, the base (2–16, −/+), a slot per digit (tap one, then pick), and a picker with three modes: 16 pictures,
+    8 colors × 6 shapes, or a typed character. The next empty slot is selected automatically. Problems are listed as they happen ("2 digits
+    still need a symbol", "The digits worth 0 and 2 look the same (Robot)…"). Once the system is valid, a preview shows a counting odometer
+    (Count!) and a mini column addition (Add them!, New sum) with the base-ten check. Buttons: Save, Export (JSON into the share box, plus a
+    clipboard copy where allowed), Load it (from the box). The "Your number systems" list has Edit and a two-tap Delete. If storage is
+    blocked, the page says so and the system still works until the page is closed.
+  - **Quiz:** Easy/Medium/Hard (best score shown per level), then 10 questions with a progress bar and a star count. The questions:
+    "What number is this?" (shown in a system, answer in base ten), "Which one is 13 in binary?", "What comes next?", "What do they make
+    together?" (a sum in a system) and "Show 19 on your fingers in binary!" (tap the hands, then Check!). Each question is read aloud with
+    captions (🔊 reads it again). A right first answer gives a star, tada and a burst; a miss crosses the choice out ("Not quite. Try again!");
+    a second miss shows the answer with an explanation. The end screen shows the stars, a cheer, "New best score!", Play again and Pick a level.
+- Engine changes (DECISIONS D20): digit-set kind `mixed` and `NS.digitsets.digitKind`; `symbols.render` draws each digit by its own kind;
+  `numeral.parse` joins multi-word digit names ("Red circle"); two UI icons (`dice`, `swap`) in `icons.js`.
+- Tests: `tests/specs/playground.spec.js` (9 tests). They cover lesson/route registration, Robot-Banana-Rocket, mixed systems and multi-word
+  parsing, every validation message, export/import round trip and bad text, save/load/upsert with a memory store and a broken one,
+  converter sync (every system's text reads back to the same number for 0..300, separators, `0x`/`#`, friendly errors, BigInt, ±1 limits),
+  and 180 seeded quizzes (10 questions, all five types, the answer offered exactly once, no duplicate or look-alike choices, level limits, D5
+  finger targets, words-only speech). Also level pitching and the `explain` texts. `tests/specs/app.spec.js` now expects the playground
+  card to be ready on its own. `tools/smoke.js` has `playgroundScenario` (run twice: storage working and storage blocked). It builds
+  Robot-Banana-Rocket, saves it (checks the right message), exports, uses it in the converter (Banana-Rocket-Robot = 15), checks hex FF syncs
+  everywhere and binary 102 gives help, and then answers a whole Easy quiz. The three tab routes are in `EXTRA_ROUTES`, and the intro lesson
+  is covered by the existing autoplay smoke.
+- Verified with a scratchpad driver (`pgdrive.js`) in Chromium and Firefox at 1280px (mouse), keyboard-only in Firefox, touch at 400px in
+  Chromium, and with localStorage throwing. In each it created Robot-Banana-Rocket, counted and added in the preview, saved, exported, caught
+  a duplicate digit, imported it back, rejected bad text, reloaded (the system was still there, except with storage blocked, as intended),
+  used it in the converter, checked the sync, errors, BigInt, ±1 rollovers and finger taps, and ran all three quiz levels to the end screen.
+  No console errors and no horizontal scroll anywhere. Screenshots were checked at 400 and 1280px.
+- Bug found and fixed on the way: a new `NS.hands` starts with all fingers up, so the quiz folds them first (`setBits(0, {instant: true})`).
+  Remember this when creating hands for input.
+- Known issues / needs a human:
+  - Listen with a real voice: quiz questions read binary digit by digit ("one-zero-one-one…"), which is long on Hard.
+  - At 400px the captions bar covers the bottom of the finger question until you scroll (the same Phase 11 captions issue as the lessons).
+  - Safari is untested. Clipboard copy needs a secure context, so on `file://` it may just fill the box (that is the designed fallback).
+  - The mini addition in the preview takes about 6 seconds to play.
+- For later phases:
+  - Phase 10 (movie mode): the `playground` lesson's last scene is interactive, so a movie stops there like the others.
+  - Phase 11: the playground has its own Voice on/off button (`NS.narrator.setVoiceOn`, the same setting as the player), and its captions use
+    the global `#captions` bar, which it hides 2.5s after speaking. A settings panel should share these.
+- How to see it: open `index.html` and click the teal "Playground" card (the star), or the Playground link in the header
+  (`index.html#/playground/make` opens Make Your Own, `#/playground/quiz` the quiz; `#/lesson/playground` is the narrated intro).
+

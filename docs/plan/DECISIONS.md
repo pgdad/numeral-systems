@@ -163,3 +163,26 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   answers each column's digit, then "Do we carry?" (only when carries are on). Hints come from `explainStep`: a first wrong digit gets the
   sum sentence, and later ones get the whole explanation. A final carry drops in by itself. Every solved problem shows the base-ten check
   ("7 + 13 = 20 ✓"). Phase 09's games can reuse `makeProblem`, `checkColumn` and `checkAnswer` from `NumSys.lessons.get('addition').helpers`.
+
+## D20. Playground: custom systems, converter, quiz (Phase 09)
+- The view is `js/playground.js` (`NS.playground.mount(stage, {tab})`), loaded after the lessons. Its pure logic is on
+  `NS.playground.helpers` and is Node-tested. Routes: `#/playground` and `#/playground/:tab` (`converter` | `make` | `quiz`); switching
+  tabs updates the hash with `router.replace`. The home card links to `#/playground`; the registered lesson `playground` (order 60,
+  `js/lessons/06-playground.js`) is a short narrated intro ending in links to the three tabs.
+- **Custom systems** are saved as specs `{name, base: 2–16, digits: [{icon} | {color, shape} | {char}]}` and turned into ordinary digit sets
+  (`buildSystem`) with id `my-<slug of name>` (same name = same system) and theme `playground`. Each digit may be a picture, a colored shape or
+  one typed character; a set that mixes them has the new digit-set kind **`mixed`**, and `NS.digitsets.digitKind(digit, set)` says how one
+  digit is drawn (symbols.js uses it). A colored-shape digit is named by its color ("Red"), or by color and shape ("Red circle") when the color
+  is used twice; `numeral.parse` now reads multi-word digit names. Typed digits can't be whitespace, `-`, `,`, `–` or `_` (they separate
+  names), and digits that look alike (same picture, same color and shape, same letter ignoring case) are refused with a friendly message.
+- Saved specs live under storage key `numsys.playground.systems`; best quiz scores under `numsys.playground.best.<level>`. Storage goes through
+  `NS.util.storage`, so a blocked storage only means "not kept after closing": the system still works for the visit, the page says so, and
+  Export/Import (JSON text in a box, plus a clipboard copy when allowed) is the way to keep it. Saved systems are registered with
+  `NS.digitsets` when the playground opens; lessons never use them.
+- The **converter** accepts up to 40 digits (BigInt past 2^53), draws odometers (one spare dimmed place so carries can hop) up to 12 digits,
+  icon/color systems past that say "Too big to draw!", and the finger view covers 0–1023.
+- The **quiz** is 10 questions from `makeQuiz(level, {customSets, rand})`: two each of to-ten, from-ten, fingers, next and add, shuffled,
+  never in base ten itself. Levels set the systems (easy: binary, animals, colors; medium + octal; hard + hex; custom systems always),
+  the size of numbers, 3 or 4 choices, and the adding difficulty. Choices come from silly's `makeChoices` (with the misread or no-carry
+  answer as the preferred wrong one), adds from addition's `makeProblem`. A star for a right first try; a second miss shows the answer with
+  `explain(q)`. Finger targets follow D5/D16 (never 4 or 128).

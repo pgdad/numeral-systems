@@ -30,11 +30,11 @@ Three tabs: **Converter**, **Make Your Own System**, and **Quiz**.
    converter sync logic.
 
 ## Acceptance criteria
-- [ ] The converter keeps every representation in sync. Invalid input shows friendly help.
-- [ ] A custom "Robot-Banana-Rocket" base‑3 system can be created, used, saved, reloaded and exported.
-- [ ] The quiz runs 10 questions on each difficulty without errors.
-- [ ] Everything works with storage disabled (private window).
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] The converter keeps every representation in sync. Invalid input shows friendly help.
+- [x] A custom "Robot-Banana-Rocket" base‑3 system can be created, used, saved, reloaded and exported.
+- [x] The quiz runs 10 questions on each difficulty without errors.
+- [x] Everything works with storage disabled (private window).
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 `index.html#/playground`

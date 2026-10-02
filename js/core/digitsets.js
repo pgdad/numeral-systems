@@ -3,10 +3,11 @@
 // The playground registers custom sets with register().
 //
 // A digit set:
-//   { id, name, shortName, base, kind: 'text'|'icon'|'color', theme, caseInsensitive?,
+//   { id, name, shortName, base, kind: 'text'|'icon'|'color'|'mixed', theme, caseInsensitive?,
 //     speakJoin?: '-' (between spoken digits), placeName?: word for one group ("ten", "sixteen"),
 //     digits: [{value, label, speak, ...}] }
 // Icon digits add {icon, sound}; color digits add {color, shape, name}.
+// 'mixed' (playground systems, DECISIONS D20): each digit is an icon digit, a color digit, or a single character.
 (function (NS) {
   'use strict';
 
@@ -77,7 +78,15 @@
     }
   ];
 
-  var KINDS = { text: true, icon: true, color: true };
+  var KINDS = { text: true, icon: true, color: true, mixed: true };
+
+  // What one digit looks like: 'icon', 'color' or 'text' (a mixed set decides digit by digit).
+  function digitKind(d, set) {
+    if (set.kind !== 'mixed') return set.kind;
+    if (d.icon) return 'icon';
+    if (d.color && d.shape) return 'color';
+    return 'text';
+  }
 
   // Throws a helpful Error if the set is malformed; returns the set otherwise.
   function validate(set) {
@@ -86,7 +95,7 @@
     if (typeof set.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(set.id)) fail('id must be lowercase letters, digits or dashes');
     if (typeof set.name !== 'string' || !set.name.trim()) fail('needs a name');
     if (!Number.isInteger(set.base) || set.base < 2 || set.base > 36) fail('base must be a whole number from 2 to 36');
-    if (!KINDS[set.kind]) fail('kind must be text, icon or color');
+    if (!KINDS[set.kind]) fail('kind must be text, icon, color or mixed');
     if (!Array.isArray(set.digits) || set.digits.length !== set.base) {
       fail('needs exactly ' + set.base + ' digits (one per value 0..' + (set.base - 1) + ')');
     }
@@ -95,7 +104,8 @@
       if (!d || d.value !== i) fail('digit #' + i + ' must have value ' + i);
       if (typeof d.label !== 'string' || !d.label) fail('digit ' + i + ' needs a label');
       if (typeof d.speak !== 'string' || !d.speak) fail('digit ' + i + ' needs speak text');
-      if (set.kind === 'text' && Array.from(d.label).length !== 1) fail('text digit ' + i + ' must be a single character');
+      var k = d && digitKind(d, set);
+      if (k === 'text' && Array.from(d.label).length !== 1) fail('text digit ' + i + ' must be a single character');
       if (set.kind === 'icon' && !d.icon) fail('icon digit ' + i + ' needs an icon');
       if (set.kind === 'color' && !(d.color && d.shape)) fail('color digit ' + i + ' needs a color and a shape');
       var key = (set.caseInsensitive || set.kind !== 'text') ? d.label.toLowerCase() : d.label;
@@ -170,6 +180,7 @@
     register: register,
     unregister: unregister,
     validate: validate,
+    digitKind: digitKind,
     get: get,
     list: list,
     resolve: resolve,

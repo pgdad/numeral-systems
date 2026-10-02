@@ -12,10 +12,11 @@
   function render(digit, set, opts) {
     var U = NS.util;
     var s = setOf(set);
+    var kind = NS.digitsets.digitKind(digit, s);
     opts = opts || {};
     var attrs = {
       viewBox: '0 0 100 100',
-      class: ['symbol', 'symbol-' + s.kind, opts.class].filter(Boolean).join(' '),
+      class: ['symbol', 'symbol-' + kind, opts.class].filter(Boolean).join(' '),
       role: 'img',
       'aria-label': digit.speak || digit.label,
       focusable: 'false',
@@ -23,11 +24,11 @@
     };
     if (opts.size) { attrs.width = opts.size; attrs.height = opts.size; }
     var root;
-    if (s.kind === 'icon') {
+    if (kind === 'icon') {
       root = U.svg('svg', attrs);
       var art = NS.icons.render(digit.icon, {});
       while (art.firstChild) root.appendChild(art.firstChild);
-    } else if (s.kind === 'color') {
+    } else if (kind === 'color') {
       root = U.svg('svg', attrs);
       var shape = NS.icons.render(digit.shape, { kind: 'shape', color: digit.color });
       while (shape.firstChild) root.appendChild(shape.firstChild);

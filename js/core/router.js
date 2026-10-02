@@ -4,6 +4,7 @@
 //   #/lesson/:id                lesson from the start
 //   #/lesson/:id/:scene/:step   deep link (0-based scene and step indexes)
 //   #/playground                playground
+//   #/playground/:tab           playground on a tab (converter | make | quiz)
 //   #/about                     about page
 //   #/gallery                   component gallery (hidden from the menu, for building lessons and QA)
 // Anything else redirects home. parse() is pure so it can be unit-tested in Node.
@@ -15,6 +16,7 @@
     { name: 'lesson', pattern: ['lesson', ':id'] },
     { name: 'lesson', pattern: ['lesson', ':id', '#scene', '#step'] },
     { name: 'playground', pattern: ['playground'] },
+    { name: 'playground', pattern: ['playground', ':tab'] },
     { name: 'about', pattern: ['about'] },
     { name: 'gallery', pattern: ['gallery'] }
   ];
@@ -71,6 +73,7 @@
         if (params.scene !== undefined && params.step !== undefined) h += '/' + params.scene + '/' + params.step;
         return h;
       }
+      case 'playground': return '#/playground' + (params.tab ? '/' + encodeURIComponent(params.tab) : '');
       default: return '#/' + name;
     }
   }

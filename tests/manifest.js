@@ -37,6 +37,8 @@
       'js/lessons/03-octal-hex.js',
       'js/lessons/04-silly.js',
       'js/lessons/05-addition.js',
+      'js/lessons/06-playground.js',
+      'js/playground.js',
       'js/app.js'
     ],
     specs: [
@@ -55,7 +57,8 @@
       'tests/specs/lesson-binary.spec.js',
       'tests/specs/lesson-octal-hex.spec.js',
       'tests/specs/lesson-silly.spec.js',
-      'tests/specs/lesson-addition.spec.js'
+      'tests/specs/lesson-addition.spec.js',
+      'tests/specs/playground.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);

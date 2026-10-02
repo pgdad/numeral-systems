@@ -107,11 +107,12 @@ animated column-addition), and `countSequence(from, to, base)` (for odometer ani
 
 ```
 index.html                 app entry (also works from file://)
-css/base.css  css/components.css  css/lessons.css
+css/base.css  css/components.css  css/lessons.css  css/playground.css
 js/core/namespace.js  util.js  numeral.js  digitsets.js  addition.js  router.js  lessons.js
 js/engine/anim.js  sound.js  narrator.js  player.js  audio-manifest.js
 js/components/icons.js  symbols.js  digit-tile.js  readout.js  odometer.js  place-value.js  column-add.js  hands.js  gallery.js
 js/lessons/01-base10.js  02-binary.js  03-octal-hex.js  04-silly.js  05-addition.js  06-playground.js
+js/playground.js           the #/playground view (converter, make your own, quiz) + its pure helpers
 js/app.js
 assets/svg/  assets/audio/
 tests/manifest.js  harness.js  load-app.js  specs.test.js  specs/*.spec.js  browser.html

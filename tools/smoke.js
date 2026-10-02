@@ -32,7 +32,8 @@ const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
 const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0',
   '#/lesson/binary/3/2', '#/lesson/binary/5/0', '#/lesson/octal-hex/2/4', '#/lesson/octal-hex/4/0',
-  '#/lesson/silly/3/2', '#/lesson/silly/4/0', '#/lesson/addition/1/6', '#/lesson/addition/6/0'];
+  '#/lesson/silly/3/2', '#/lesson/silly/4/0', '#/lesson/addition/1/6', '#/lesson/addition/6/0',
+  '#/playground/converter', '#/playground/make', '#/playground/quiz'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -92,6 +93,9 @@ async function run(browserName) {
     await galleryScenario(browser, failures);
     // Every real lesson plays in autoplay to its "You try it!" scene (Phase 04+).
     await lessonScenarios(browser, failures);
+    // The playground: converter, make your own, quiz, with storage working and blocked (Phase 09).
+    await playgroundScenario(browser, failures, false);
+    await playgroundScenario(browser, failures, true);
   } finally {
     await browser.close();
   }
@@ -470,6 +474,81 @@ async function lessonScenarios(browser, failures) {
     console.log(`smoke: ${label} autoplay OK (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
     await context.close();
   }
+}
+
+// Build Robot-Banana-Rocket, save it, use it in the converter, check sync and errors, and answer quiz questions.
+// blocked: localStorage throws (a private window); everything must still work for the visit.
+async function playgroundScenario(browser, failures, blocked) {
+  const label = 'playground' + (blocked ? ' (storage blocked)' : '');
+  const t0 = Date.now();
+  const context = await browser.newContext({ viewport: { width: 1024, height: 900 } });
+  await context.addInitScript(NO_SPEECH);
+  if (blocked) {
+    await context.addInitScript(() => {
+      Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('blocked', 'SecurityError'); } });
+    });
+  }
+  const page = await context.newPage();
+  page.on('pageerror', (err) => failures.push(`${label}: pageerror: ${err.message}`));
+  page.on('console', (msg) => { if (msg.type() === 'error') failures.push(`${label}: console: ${msg.text()}`); });
+  try {
+    await page.goto(INDEX + '#/playground/make');
+    await page.waitForSelector('.pg-editor', { timeout: 5000 });
+    await page.fill('#pg-name', 'Robot-Banana-Rocket');
+    for (const icon of ['robot', 'banana', 'rocket']) await page.click(`.pg-pick[data-icon="${icon}"]`);
+    await page.click('.pg-save');
+    const status = await page.textContent('.pg-editor .pg-status');
+    const want = blocked ? /can't keep it/ : /^Saved!/;
+    if (!want.test(status)) failures.push(`${label}: saving said "${status}"`);
+    await page.click('.pg-export');
+    const exported = await page.inputValue('#pg-share');
+    if (!/"robot"/.test(exported)) failures.push(`${label}: export box holds "${exported.slice(0, 60)}"`);
+    // The converter: the new system has a row, and typing anywhere updates everything.
+    await page.click('#pg-tab-converter');
+    const custom = '.pg-row[data-set="my-robot-banana-rocket"] input';
+    if (!(await page.$(custom))) failures.push(`${label}: no Robot-Banana-Rocket row in the converter`);
+    else {
+      await page.fill(custom, 'Banana-Rocket-Robot');
+      const dec = await page.inputValue('#pg-in-decimal');
+      if (dec !== '15') failures.push(`${label}: Banana-Rocket-Robot became ${dec}, not 15`);
+    }
+    await page.fill('#pg-in-hex', 'FF');
+    const synced = await page.evaluate(() => ['decimal', 'binary', 'animals', 'colors'].map((id) => document.getElementById('pg-in-' + id).value).join(' '));
+    if (synced !== '255 11111111 Frog-Cat-Dog-Cat Yellow-Red-Red-Yellow-Yellow-Red') failures.push(`${label}: hex FF synced to "${synced}"`);
+    await page.fill('#pg-in-binary', '102');
+    const err = await page.textContent('#pg-in-binary-err');
+    if (!/isn't a digit in binary/.test(err) || await page.inputValue('#pg-in-decimal') !== '255') failures.push(`${label}: binary 102 gave "${err}"`);
+    // The quiz: Easy, answer every question (choices in order; fingers by keyboard).
+    await page.click('#pg-tab-quiz');
+    await page.click('.pg-level[data-level="easy"]');
+    await page.click('.pg-start');
+    for (let i = 0; i < 10; i++) {
+      await page.waitForSelector('.pg-question');
+      const text = await page.textContent('.pg-q-text');
+      const m = text.match(/^Show (\d+) on your fingers/);
+      if (m) {
+        for (const v of [512, 256, 128, 64, 32, 16, 8, 4, 2, 1]) {
+          if (+m[1] & v) { await page.focus(`.pg-finger-answer .hand-finger[aria-label*="worth ${v},"]`); await page.keyboard.press('Enter'); }
+        }
+        await page.click('.pg-check-fingers');
+      } else {
+        const n = await page.$$eval('.pg-choice', (els) => els.length);
+        for (let k = 1; k <= n && !(await page.isVisible('.pg-next')); k++) {
+          if (!(await page.$eval(`.pg-choice:nth-child(${k})`, (e) => e.disabled))) await page.click(`.pg-choice:nth-child(${k})`);
+        }
+      }
+      const next = await page.waitForSelector('.pg-next', { state: 'visible', timeout: 3000 }).catch(() => null);
+      if (!next) { failures.push(`${label}: quiz question ${i + 1} ("${text}") could not be answered`); break; }
+      await page.click('.pg-next');
+    }
+    const end = await page.waitForSelector('.pg-final', { timeout: 3000 }).catch(() => null);
+    if (!end) failures.push(`${label}: the quiz did not end after ten questions`);
+    else if (!/^You got \d+ stars? out of 10!$/.test(await page.textContent('.pg-final'))) failures.push(`${label}: quiz ended with "${await page.textContent('.pg-final')}"`);
+  } catch (e) {
+    failures.push(`${label}: ${e.message.split('\n')[0]}`);
+  }
+  console.log(`smoke: ${label} done (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
+  await context.close();
 }
 
 function NumSysOrder() {

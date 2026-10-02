@@ -7,7 +7,9 @@ describe('app home menu', function () {
     var entries = NumSys.app.homeEntries(NumSys.lessons.createRegistry());
     expect(entries.map(function (e) { return e.id; }))
       .toEqual(['base10', 'binary', 'octal-hex', 'silly', 'addition', 'playground']);
-    expect(entries.every(function (e) { return e.ready === false; })).toBe(true);
+    // The playground is its own view (#/playground), so it is ready even without lessons.
+    expect(entries.filter(function (e) { return e.ready; }).map(function (e) { return e.id; })).toEqual(['playground']);
+    expect(entries[entries.length - 1].href).toBe('#/playground');
   });
 
   it('marks registered lessons ready and keeps extra lessons', function () {

@@ -1,7 +1,7 @@
 // App boot: renders the home menu from the lesson registry and routes into #stage.
 // Later phases plug in through optional namespaces:
 //   NS.player.mount(stage, lesson, {scene, step}) -> {destroy()}   (Phase 02)
-//   NS.playground.mount(stage) -> {destroy()}                        (Phase 09)
+//   NS.playground.mount(stage, {tab}) -> {destroy()}                 (Phase 09)
 //   NS.gallery.mount(stage) -> {destroy()}                           (Phase 03, #/gallery)
 (function (NS) {
   'use strict';
@@ -62,7 +62,7 @@
         ageHint: (real && real.ageHint) || p.ageHint,
         theme: (real && real.theme) || p.theme,
         glyph: (real && real.glyph) || p.glyph,
-        ready: !!real || (p.route === 'playground' && !!NS.playground),
+        ready: !!real || (p.route === 'playground' && !!(NS.playground && NS.playground.mount)),
         href: p.route ? NS.router.href(p.route) : NS.router.href('lesson', { id: p.id })
       };
     });
@@ -130,9 +130,9 @@
     currentView = NS.player.mount(stage, lesson, { scene: params.scene, step: params.step });
   }
 
-  function renderPlayground() {
+  function renderPlayground(params) {
     document.title = S.playground + ' · ' + S.appTitle;
-    if (NS.playground) currentView = NS.playground.mount(stage);
+    if (NS.playground && NS.playground.mount) currentView = NS.playground.mount(stage, { tab: params.tab });
     else notReady(S.playground, S.playgroundSoon);
   }
 
@@ -168,7 +168,7 @@
 
     switch (route.name) {
       case 'lesson': renderLesson(route.params); break;
-      case 'playground': renderPlayground(); break;
+      case 'playground': renderPlayground(route.params); break;
       case 'about': renderAbout(); break;
       case 'gallery': renderGallery(); break;
       default: renderHome();
