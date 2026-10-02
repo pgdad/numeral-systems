@@ -35,6 +35,7 @@
       'js/lessons/01-base10.js',
       'js/lessons/02-binary.js',
       'js/lessons/03-octal-hex.js',
+      'js/lessons/04-silly.js',
       'js/app.js'
     ],
     specs: [
@@ -51,7 +52,8 @@
       'tests/specs/hands.spec.js',
       'tests/specs/lesson-base10.spec.js',
       'tests/specs/lesson-binary.spec.js',
-      'tests/specs/lesson-octal-hex.spec.js'
+      'tests/specs/lesson-octal-hex.spec.js',
+      'tests/specs/lesson-silly.spec.js'
     ]
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -42,7 +42,7 @@
       var header = U.el('div', { class: 'pv-head' },
         U.el('span', { class: 'pv-name' }),
         U.el('span', { class: 'pv-placevalue' }));
-      var tile = NS.digitTile.create({ set: set, value: 0, size: opts.tileSize || 'md', caption: false });
+      var tile = NS.digitTile.create({ set: set, value: 0, size: opts.tileSize || 'md', caption: set.kind === 'color' });
       var contrib = U.el('div', { class: 'pv-contrib' });
       var units = U.el('div', { class: 'pv-units', hidden: !opts.units });
       var col = U.el('div', { class: 'pv-col', dataset: { power: String(power) } }, header, U.el('div', { class: 'pv-digit' }, tile.el), contrib, units);

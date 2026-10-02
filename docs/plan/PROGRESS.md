@@ -13,14 +13,14 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
 | 04 | Lesson: Base‑10 & fingers | done | 2026-10-01 | 119 tests + lesson autoplay smoke (Chromium + Firefox) |
 | 05 | Lesson: Binary on two hands | done | 2026-10-01 | 134 tests + binary autoplay/challenge smoke (Chromium + Firefox) |
 | 06 | Lesson: Octal & Hex | done | 2026-10-01 | 144 tests + octal-hex autoplay/mixer/counter smoke (Chromium + Firefox) |
-| 07 | Lesson: Silly systems | todo | | |
+| 07 | Lesson: Silly systems | done | 2026-10-02 | 154 tests + silly autoplay/counter/quiz/wheel smoke (Chromium + Firefox) |
 | 08 | Lesson: Addition | todo | | |
 | 09 | Playground & games | todo | | |
 | 10 | Movie mode & recorded audio | todo | | |
 | 11 | Polish, a11y, QA | todo | | |
 | 12 | Packaging & CDN deploy | todo | | |
 
-**Next phase:** 07 (Silly systems). Phases 07–09 can run in any order.
+**Next phase:** 08 (Addition). Phases 08–09 can run in any order.
 
 ---
 
@@ -293,4 +293,55 @@ Sessions: update the table, then add a handoff note at the bottom (newest last).
     coordinates with `page.touchscreen.tap`; `page.tap(selector, {position})` misreports interception.
 - How to see it: open `index.html` and click the orange "7F" card "Octal & Hexadecimal", or go to `index.html#/lesson/octal-hex`
   (`#/lesson/octal-hex/4/0` jumps to "You try it!").
+
+### Phase 07 — Lesson: Silly systems — 2026-10-02 — done
+- Built: `js/lessons/04-silly.js` (id `silly`, order 40, theme silly, glyph `dots`, 5 scenes, 15 steps) and its styles in
+  `css/lessons.css` (all scoped under `.lesson-silly`, prefix `sl-`).
+  - 4.1 anything: big tiles 0–4 pop in, wiggle on "They could be anything", then turn over one by one into Cat, Dog, Frog, Pig, Duck,
+    each with its sound. "Cat is zero … Duck is four" (one sentence each) lights each tile and pops "= 0" … "= 4". Then a "5 animals → base 5" badge.
+  - 4.2 animals: a two-place animal odometer (leading place dimmed) with "= n" beside it. It counts Cat … Duck on cue, then the Duck
+    wiggles, **a Dog jumps** out of the ones place into the Fives place (carry hop), and the ones roll to Cat: "Dog-Cat means five!".
+    Then Dog-Dog … Dog-Duck, "And then?", Frog-Cat (another hop). Then it counts on to Frog-Pig, and an animal place-value board with
+    dot rings shows "10 + 3 = 13" as "Two fives. Plus three more."
+  - 4.3 colors: a traffic light whose lamps are a red circle, yellow triangle and green square, each with its name and "= 0/1/2".
+    A three-place color odometer counts red … green-red with hops. A place-value board highlights Ones, Threes, Nines, then
+    green-green-green: "18 + 6 + 2 = 26".
+  - 4.4 costumes: a centre circle with thirteen dots and the word "thirteen" (the amount itself), and six costume cards around it
+    (Base‑10 13, Binary 1101, Octal 15, Hex D, Frog-Pig, yellow-yellow-yellow). Each card flies out of the centre as its sentence is read.
+    Then they all spin into the middle and back out ("The number doesn't change"). **Deviation:** octal was added (CONTENT.md
+    listed five costumes; the phase file asks for six).
+  - 4.5 try (interactive), with three tabs:
+    - **Counters:** animal (0–124) and color (0–26) odometers with −/+ buttons, carry hops, the animal sound of the new digit, a
+      "Frog-Pig = 13" line and debounced speech.
+    - **Costumes:** a number box (0–124, typed or −/+; out-of-range input is clamped) and the six costume cards in a grid.
+    - **Quiz:** "What number is Dog-Duck?" first, then animal and color questions in turn, each with three answers. A wrong answer is
+      crossed out ("Not 14. Try again!"). A right answer gives a star, a burst, and the spoken explanation ("Dog-Duck is one five, plus four.
+      That makes nine!"). There is also Skip.
+- Engine/component changes (DECISIONS D18):
+  - `odometer.js`: `carryHop` (the carried digit jumps into the next place; `ctx.sound('carry')`), `dimLeading`, and `digitNames`
+    (on by default for color sets: the name under the shape). `runTo` waits for hops.
+  - `place-value.js`: color-set tiles show their name caption.
+  - The gallery odometers now use `carryHop` and `dimLeading`.
+- Tests: `tests/specs/lesson-silly.spec.js` (10 tests). They cover registration, words-only narration, length, animal/color sentences
+  generated from the digit sets (and every animal sound exists in `sound.js`), the counting cues and carries, `valueParts`/`explain`,
+  the six costume sentences, counter ranges, `makeChoices` (400 seeded runs: the answer is always included, sorted, no duplicates, in range;
+  small ranges `[0,1]`, `[0]`, `[0,1,2]`), and `quizQuestion` (Dog-Duck first with 14 as a distractor, then alternating sets in range).
+  `tools/smoke.js` presses +1 five times (expects Dog-Cat), checks the color digit names, answers the quiz (14 wrong, 9 right by keyboard → star), and
+  deep-links `#/lesson/silly/3/2` (six costumes of thirteen). New routes are in `EXTRA_ROUTES`.
+- Verified: the scratchpad walker played all 15 steps and compared each with the deep link to the next one: 0 mismatches in
+  Chromium, Firefox, reduced motion and at 400px. The interactive scene passed with mouse and keyboard (Enter/Space on −/+, typing in the number box,
+  Enter on a quiz answer) at 1280px in both browsers, and with touch at 400px. A sound spy confirmed each animal's noise plays on appear or change
+  (carry, then the landing animal), and nothing plays when muted. A CSS `filter: grayscale(1)` screenshot of 4.3 and 4.4 showed circle,
+  triangle and square plus the names, all clearly distinct.
+- Known issues / needs a human:
+  - Listen with a real voice: counting lines are one word each ("Cat. Dog."), and colors are read in lower case mid-sentence.
+    Check that "Dog-Duck" and "yellow-red" sound natural.
+  - Listen to the synthesized animal noises on real speakers (they're WebAudio blips, so they're cartoonish on purpose).
+  - Safari is untested.
+- For later phases:
+  - Phase 08: use `NS.odometer.create({carryHop: true})` or the column-add hop for animal carries, and show color digit names in
+    column addition (D18). `explain()`/`valueParts()` in this lesson's helpers phrase "two fives, plus three".
+  - Phase 09: `makeChoices`, `quizQuestion`, `costumeCards()` and `spell()` here are good starting points for the converter and the quiz.
+- How to see it: open `index.html` and click the brown "Silly Number Systems" card (the three colored dots), or go to
+  `index.html#/lesson/silly` (`#/lesson/silly/4/0` jumps to "You try it!").
 

@@ -137,3 +137,16 @@ Custom digit sets allow bases 2–36. Text digits must be single characters, and
   distance 64 of its target, or by a rule (purple: red and blue ≥ 96, |red − blue| ≤ 80, green ≤ 80). Sliders are native
   `<input type="range">` with a `<label>` and `aria-valuetext` like "255, hex F F".
 
+## D18. Silly systems: named colors, jumping carries, costumes (Phase 07)
+- **Color digits are never shown by color alone.** Every place that shows a color digit also shows its shape and its name:
+  digit tiles (caption), odometers (`digitNames`, on by default for color sets), place-value boards (tile captions for color sets),
+  and lesson widgets. Phase 08's column addition and Phase 09's playground must do the same for color digits.
+- Odometer options (generic, any set): `carryHop: true` makes the carried digit (a 1, so a Dog for animals) jump in an arc into the
+  next place before that place rolls (counting up by one only; `ctx.sound('carry')` plays). `dimLeading: true` dims leading-zero places.
+  `runTo` waits for a hop to land before the next number.
+- Narration says how a number is *written* digit by digit in every system ("In base ten, it's one-three", "Frog-Pig") via
+  the lesson's `spell()`, and what it is *worth* in words ("two fives, plus three").
+- Multiple-choice quizzes use `makeChoices(answer, {min, max, count, rand, prefer})` from `NumSys.lessons.get('silly').helpers`: the answer is
+  always included, there are no duplicates, choices are sorted, and a too-small range offers every number. The best wrong answer is
+  the digits misread as base ten (Dog-Duck → 14). Phase 09's quiz can reuse it.
+

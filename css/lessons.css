@@ -516,3 +516,184 @@
   .lesson-octal-hex .oh-ch-hex { font-size: 1.3rem; }
   .lesson-octal-hex .oh-count-btn { min-width: 4.2rem; font-size: 1.3rem; }
 }
+
+/* ---------- Lesson 4: Silly number systems (js/lessons/04-silly.js) ---------- */
+.lesson-silly .sl-scene { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); position: relative; }
+.lesson-silly .sl-row { display: flex; flex-wrap: wrap; gap: var(--sp-5) clamp(1.5rem, 5vw, 4rem); align-items: center; justify-content: center; width: 100%; }
+.lesson-silly .sl-tag { font: 900 1.3rem/1 var(--font-digits); color: var(--c-base10); white-space: nowrap; }
+
+/* 4.1 digits can be anything */
+.lesson-silly .sl-cells { display: flex; flex-wrap: wrap; gap: var(--sp-3) clamp(.6rem, 2vw, 1.4rem); justify-content: center; perspective: 600px; }
+.lesson-silly .sl-cell { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+.lesson-silly .sl-cells .digit-tile.tile-lg { --tile: clamp(4rem, 2.4rem + 6vw, 7.5rem); }
+.lesson-silly .sl-badge {
+  display: inline-flex; align-items: baseline; gap: .2em; font-size: var(--fs-h2); font-weight: 900; color: var(--c-animals);
+  padding: var(--sp-2) var(--sp-5); border: 4px dashed var(--c-animals); border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--c-animals) 10%, var(--surface));
+}
+.lesson-silly .sl-badge-big { font: 900 2.4em/1 var(--font-digits); }
+
+/* 4.2 / 4.3 counters */
+.lesson-silly .sl-countbox { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; justify-content: center; }
+.lesson-silly .sl-dec { display: inline-flex; align-items: baseline; gap: .3em; font: 900 var(--fs-digit-md)/1 var(--font-digits); color: var(--c-base10); }
+.lesson-silly .sl-eq { color: var(--ink-soft); }
+.lesson-silly .sl-dec-num { min-width: 1.5ch; border-radius: var(--radius); display: inline-block; }
+.lesson-silly .sl-countbox .odometer.odo-size-lg { --odo: clamp(4rem, 2.6rem + 4vw, 6.5rem); }
+.lesson-silly .sl-pv { max-width: 100%; }
+.lesson-silly .sl-colors-right { flex: 1 1 24rem; max-width: 40rem; display: flex; flex-direction: column; align-items: center; gap: var(--sp-5); }
+
+/* A symbol with its name under it */
+.lesson-silly .sl-named { display: inline-flex; flex-direction: column; align-items: center; gap: .15rem; }
+.lesson-silly .sl-named .symbol { width: 3rem; height: 3rem; }
+.lesson-silly .sl-named-label { font-weight: 800; font-size: .9rem; line-height: 1; }
+
+/* 4.3 traffic light */
+.lesson-silly .sl-light {
+  display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-4) var(--sp-3); border-radius: 2.5rem;
+  background: var(--ink); box-shadow: var(--shadow);
+}
+.lesson-silly .sl-lamp {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-4) var(--sp-2) var(--sp-2);
+  border-radius: 2rem; background: #3a3d55; min-width: 10rem;
+}
+.lesson-silly .sl-lamp .sl-named { flex-direction: row; gap: var(--sp-2); }
+.lesson-silly .sl-lamp .symbol { width: clamp(3rem, 2rem + 3vw, 4.5rem); height: clamp(3rem, 2rem + 3vw, 4.5rem); filter: brightness(.45) saturate(.5); transition: filter .3s; }
+.lesson-silly .sl-lamp .sl-named-label { color: #c9cbe0; font-size: 1.15rem; min-width: 3.6rem; }
+.lesson-silly .sl-lamp.is-on .symbol { filter: drop-shadow(0 0 10px rgba(255, 255, 200, .7)); }
+.lesson-silly .sl-lamp.is-on .sl-named-label { color: #fff; }
+.lesson-silly .sl-lamp .sl-tag { color: #fff; }
+
+/* 4.4 costume wheel */
+.lesson-silly .sl-wheel { position: relative; width: min(46rem, 100%); aspect-ratio: 16 / 10; }
+.lesson-silly .sl-center {
+  position: absolute; left: 50%; top: 50%; width: clamp(9rem, 22vw, 12rem); aspect-ratio: 1; margin: 0;
+  translate: -50% -50%; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface); border: 5px solid var(--c-animals); box-shadow: var(--shadow);
+}
+.lesson-silly .sl-dots { position: absolute; inset: 3%; width: 94%; height: 94%; }
+.lesson-silly .sl-dot { fill: var(--c-animals); }
+.lesson-silly .sl-center-word { font-size: clamp(.95rem, .7rem + .8vw, 1.25rem); font-weight: 900; color: var(--c-animals); }
+.lesson-silly .sl-spot { position: absolute; translate: -50% -50%; }
+.lesson-silly .sl-spot-0 { left: 50%; top: 9%; }
+.lesson-silly .sl-spot-1 { left: 85%; top: 25%; }
+.lesson-silly .sl-spot-2 { left: 85%; top: 75%; }
+.lesson-silly .sl-spot-3 { left: 50%; top: 91%; }
+.lesson-silly .sl-spot-4 { left: 15%; top: 75%; }
+.lesson-silly .sl-spot-5 { left: 15%; top: 25%; }
+.lesson-silly .sl-costume {
+  display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: var(--sp-2) var(--sp-3); min-width: 7.5rem;
+  border-radius: var(--radius-lg); background: var(--surface); border: 4px solid var(--theme-color); box-shadow: var(--shadow-sm);
+}
+.lesson-silly .sl-costume.theme-colors { border-color: #43a047; border-image: var(--c-colors) 1; border-radius: 0; }
+.lesson-silly .sl-costume-name { font-size: .85rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: var(--theme-color); }
+.lesson-silly .sl-costume.theme-colors .sl-costume-name { color: var(--ink); }
+.lesson-silly .sl-costume-face { display: flex; min-height: 3.6rem; align-items: center; }
+.lesson-silly .sl-costume-text { font: 900 clamp(1.8rem, 1.2rem + 2vw, 2.8rem)/1 var(--font-digits); color: var(--theme-color); }
+.lesson-silly .sl-costume-syms { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem; }
+.lesson-silly .sl-costume-syms .symbol { width: 2.6rem; height: 2.6rem; }
+.lesson-silly .sl-costume-syms .sl-named-label { font-size: .75rem; }
+.lesson-silly .sl-wheel.is-grid { width: min(48rem, 100%); aspect-ratio: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-3); }
+.lesson-silly .sl-wheel.is-grid .sl-costume { min-width: 0; }
+.lesson-silly .sl-wheel.is-grid .sl-costume[data-costume="animals"], .lesson-silly .sl-wheel.is-grid .sl-costume[data-costume="colors"] { grid-column: span 2; }
+.lesson-silly .sl-wheel.is-grid .sl-costume-text { font-size: clamp(1.5rem, 1rem + 1.4vw, 2.3rem); overflow-wrap: anywhere; text-align: center; }
+.lesson-silly .sl-wheel.is-grid [data-costume="binary"] .sl-costume-text { font-size: clamp(1.25rem, .9rem + 1vw, 1.8rem); }
+.lesson-silly .sl-wheel.is-grid .sl-costume-syms .symbol { width: 3rem; height: 3rem; }
+
+/* 4.5 you try it */
+.lesson-silly .sl-tabs { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
+.lesson-silly .sl-tab { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); font-weight: 800; }
+.lesson-silly .sl-tab-icon { width: 2rem; height: 2rem; }
+.lesson-silly .sl-tab[aria-pressed="true"] { background: var(--c-animals); color: #fff; border-color: var(--c-animals); }
+.lesson-silly .sl-tab-panel { width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--sp-4); }
+.lesson-silly .sl-tab-panel[hidden] { display: none; }
+.lesson-silly .sl-tip { margin: 0; font-size: var(--fs-lead); font-weight: 700; text-align: center; max-width: 42rem; }
+.lesson-silly .sl-counters { display: flex; flex-wrap: wrap; gap: var(--sp-5); justify-content: center; }
+.lesson-silly .sl-counter {
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-sm); max-width: 100%;
+}
+.lesson-silly .sl-counter-name { margin: 0; font-size: var(--fs-lead); color: var(--theme-color); }
+.lesson-silly .sl-counter.theme-colors .sl-counter-name { color: var(--ink); }
+.lesson-silly .sl-counter-row { display: flex; align-items: center; gap: var(--sp-2); }
+.lesson-silly .sl-counter .sl-countbox { gap: var(--sp-2); }
+.lesson-silly .sl-counter .odometer { --odo: clamp(3rem, 2.2rem + 2vw, 4.2rem); }
+.lesson-silly .sl-counter .sl-dec { font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.4rem); }
+.lesson-silly .sl-step { width: calc(var(--tap) + .4rem); height: calc(var(--tap) + .4rem); padding: 0; display: inline-grid; place-items: center; border-radius: 50%; flex: none; }
+.lesson-silly .sl-step svg { width: 1.5rem; height: 1.5rem; }
+.lesson-silly .sl-step.is-up:not(:disabled) { background: var(--c-animals); border-color: var(--c-animals); color: #fff; }
+.lesson-silly .sl-step:disabled { opacity: .35; cursor: default; }
+.lesson-silly .sl-read { margin: 0; font-weight: 800; color: var(--ink-soft); }
+.lesson-silly .sl-wheel-form { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); }
+.lesson-silly .sl-wheel-label { font-size: var(--fs-lead); font-weight: 800; }
+.lesson-silly .sl-wheel-input-row { display: flex; align-items: center; gap: var(--sp-2); }
+.lesson-silly .sl-input {
+  width: 6.5rem; min-height: calc(var(--tap) + .4rem); font: 900 2rem var(--font-digits); text-align: center;
+  border: 4px solid var(--c-animals); border-radius: var(--radius); background: var(--surface); color: var(--ink);
+}
+.lesson-silly .sl-input:focus-visible { outline: 4px solid var(--focus); outline-offset: 3px; }
+.lesson-silly .sl-card {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5); border-radius: var(--radius-lg); background: var(--surface);
+  border: 4px solid var(--c-animals); box-shadow: var(--shadow); max-width: 100%; min-width: min(26rem, 100%);
+}
+.lesson-silly .sl-card.is-won { border-color: #ffc400; background: #fff6d6; }
+.lesson-silly .sl-stars { position: absolute; top: var(--sp-2); right: var(--sp-3); display: inline-flex; align-items: center; gap: var(--sp-1); font: 900 1.5rem var(--font-digits); }
+.lesson-silly .sl-star-icon { width: 2rem; height: 2rem; color: #f5b400; }
+.lesson-silly .sl-prompt { margin: 0; padding: 0 2.5rem; font-size: var(--fs-h2); font-weight: 900; text-align: center; }
+.lesson-silly .sl-quiz-number .sl-costume-syms { gap: var(--sp-3); }
+.lesson-silly .sl-quiz-number .symbol { width: clamp(4rem, 3rem + 3vw, 6rem); height: clamp(4rem, 3rem + 3vw, 6rem); }
+.lesson-silly .sl-quiz-number .sl-named-label { font-size: 1.1rem; }
+.lesson-silly .sl-choices { display: flex; gap: var(--sp-3); flex-wrap: wrap; justify-content: center; }
+.lesson-silly .sl-choice { min-width: 5rem; min-height: calc(var(--tap) + .6rem); font: 900 2rem var(--font-digits); }
+.lesson-silly .sl-choice.is-right { background: var(--c-binary); border-color: var(--c-binary); color: #fff; }
+.lesson-silly .sl-choice.is-wrong { opacity: .4; text-decoration: line-through; }
+.lesson-silly .sl-feedback { margin: 0; min-height: 1.4em; font-weight: 800; text-align: center; }
+.lesson-silly .sl-skip { min-height: var(--tap); }
+.lesson-silly .sl-burst-anchor { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+.lesson-silly .sl-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 4; }
+.lesson-silly .sl-burst-star {
+  position: absolute; width: 3rem; height: 3rem; max-width: none; left: -1.5rem; top: -1.5rem;
+  animation: sl-burst 1.4s ease-out forwards;
+}
+@keyframes sl-burst {
+  0% { transform: rotate(var(--a)) translateY(0) scale(.3); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-8rem) scale(1.1) rotate(180deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-silly .sl-burst-star { animation: none; transform: translateY(-4rem) scale(1.3); }
+}
+
+@media (max-width: 700px) {
+  /* The wheel becomes a list: the number first, then its costumes in a grid. */
+  .lesson-silly .sl-wheel { aspect-ratio: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-2); }
+  .lesson-silly .sl-center { position: relative; left: auto; top: auto; translate: none; grid-column: 1 / -1; justify-self: center; width: 8rem; }
+  .lesson-silly .sl-spot { position: static; translate: none; display: flex; justify-content: center; }
+  .lesson-silly .sl-spot .sl-costume { width: 100%; min-width: 0; }
+  .lesson-silly .sl-wheel.is-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lesson-silly .sl-spot-4, .lesson-silly .sl-spot-5 { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .lesson-silly .sl-scene { gap: var(--sp-3); }
+  .lesson-silly .sl-cells { gap: .4rem; }
+  .lesson-silly .sl-cells .digit-tile.tile-lg { --tile: 3.6rem; }
+  .lesson-silly .sl-tag { font-size: 1rem; }
+  .lesson-silly .sl-badge { font-size: var(--fs-lead); padding: var(--sp-1) var(--sp-3); }
+  .lesson-silly .sl-light { flex-direction: row; padding: var(--sp-2); border-radius: 1.6rem; gap: var(--sp-2); }
+  .lesson-silly .sl-lamp { min-width: 0; flex-direction: column; gap: .25rem; padding: var(--sp-2) .6rem; border-radius: 1.2rem; }
+  .lesson-silly .sl-lamp .sl-named { flex-direction: column; gap: .2rem; }
+  .lesson-silly .sl-lamp .symbol { width: 2.8rem; height: 2.8rem; }
+  .lesson-silly .sl-lamp .sl-named-label { min-width: 0; font-size: .95rem; }
+  .lesson-silly .sl-center { width: 9rem; }
+  .lesson-silly .sl-center-word { font-size: .85rem; }
+  .lesson-silly .sl-counter { padding: var(--sp-2); }
+  .lesson-silly .sl-counter .odometer { --odo: 2.7rem; }
+  .lesson-silly .sl-step { width: var(--tap); height: var(--tap); }
+  .lesson-silly .sl-counter .sl-countbox { flex-direction: column; gap: .2rem; }
+  .lesson-silly .sl-prompt { font-size: var(--fs-lead); }
+  .lesson-silly .sl-costume-syms .symbol { width: 2.1rem; height: 2.1rem; }
+  .lesson-silly .sl-costume-text { font-size: 1.6rem; }
+  .lesson-silly .sl-quiz-number .sl-costume-syms .symbol { width: 3.6rem; height: 3.6rem; }
+  .lesson-silly .sl-quiz-number .sl-costume-syms { gap: var(--sp-2); }
+  .lesson-silly .sl-card { padding: var(--sp-3); }
+}

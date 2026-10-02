@@ -31,7 +31,8 @@ const shotsDir = process.env.SMOKE_SCREENSHOTS;
 const WIDTHS = shotsDir ? [400, 1024, 1920] : [1024];
 // Extra routes later phases want smoke-tested (e.g. '#/gallery', '#/movie').
 const EXTRA_ROUTES = ['#/lesson/demo/1/2', '#/gallery', '#/lesson/base10/3/2', '#/lesson/base10/4/0',
-  '#/lesson/binary/3/2', '#/lesson/binary/5/0', '#/lesson/octal-hex/2/4', '#/lesson/octal-hex/4/0'];
+  '#/lesson/binary/3/2', '#/lesson/binary/5/0', '#/lesson/octal-hex/2/4', '#/lesson/octal-hex/4/0',
+  '#/lesson/silly/3/2', '#/lesson/silly/4/0'];
 
 async function run(browserName) {
   const browser = await pw[browserName].launch();
@@ -391,6 +392,32 @@ async function lessonScenarios(browser, failures) {
         return g && g.getAttribute('aria-label') === 'Binary 11 1111 1111';
       }, null, { timeout: 5000 }).catch(() => null);
       if (!grouped) failures.push(`${label}: deep link #/lesson/octal-hex/2/4 does not show the nibble groups`);
+    }
+    if (id === 'silly') {
+      // Animal counter: five +1 presses carry Duck over to Dog-Cat; color digits always show their names.
+      for (let i = 0; i < 5; i++) await page.click('.sl-step[data-set="animals"][data-delta="1"]');
+      const dogCat = await page.waitForFunction(() =>
+        document.querySelector('.sl-try .odometer').getAttribute('aria-label') === 'Odometer showing Dog-Cat', null, { timeout: 3000 }).catch(() => null);
+      if (!dogCat) failures.push(`${label}: five +1 presses did not show Dog-Cat`);
+      const names = await page.$$eval('.sl-try .odometer.odo-kind-color .odo-cell-name', (els) => els.map((e) => e.textContent).join(' '));
+      if (names !== 'Red Red Red') failures.push(`${label}: color counter digit names are "${names}"`);
+      // Quiz: the first question is Dog-Duck; 14 is wrong, 9 earns a star (keyboard).
+      await page.click('.sl-tab[data-tab="quiz"]');
+      const q = await page.textContent('.sl-prompt');
+      if (q !== 'What number is Dog-Duck?') failures.push(`${label}: first quiz question is "${q}"`);
+      await page.click('.sl-choice[data-value="14"]');
+      await page.focus('.sl-choice[data-value="9"]');
+      await page.keyboard.press('Enter');
+      const star = await page.waitForFunction(() => document.querySelector('.sl-star-count').textContent === '1', null, { timeout: 3000 }).catch(() => null);
+      if (!star) failures.push(`${label}: answering 9 did not earn a star`);
+      // A deep link rebuilds the costume wheel: all six costumes of thirteen.
+      await page.evaluate(() => { location.hash = '#/lesson/silly/3/2'; });
+      const wheel = await page.waitForFunction(() => {
+        const cards = [...document.querySelectorAll('.sl-costumes .sl-costume')];
+        return cards.length === 6 && cards.every((c) => getComputedStyle(c).opacity === '1') &&
+          document.querySelector('.sl-costumes [data-costume="animals"]').getAttribute('aria-label') === 'Animals: Frog-Pig';
+      }, null, { timeout: 5000 }).catch(() => null);
+      if (!wheel) failures.push(`${label}: deep link #/lesson/silly/3/2 does not show six costumes of thirteen`);
     }
     console.log(`smoke: ${label} autoplay OK (${((Date.now() - t0) / 1000).toFixed(0)}s)`);
     await context.close();

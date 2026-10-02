@@ -148,9 +148,9 @@
 
     // ---------- Odometers ----------
     (function () {
-      var sec = section('odometer', 'Odometers', 'Rolling counters in any system. Rolls over like a car odometer.');
+      var sec = section('odometer', 'Odometers', 'Rolling counters in any system. Rolls over like a car odometer, and the carry jumps.');
       [['decimal', 3], ['binary', 4], ['hex', 2], ['animals', 3], ['colors', 3]].forEach(function (cfg) {
-        var odo = NS.odometer.create({ set: cfg[0], places: cfg[1], labels: 'names' });
+        var odo = NS.odometer.create({ set: cfg[0], places: cfg[1], labels: 'names', carryHop: true, dimLeading: true });
         var mode = 'names';
         sec.body.appendChild(U.el('h3', { text: odo.digitSet.name }));
         sec.body.appendChild(odo.el);

@@ -7,9 +7,15 @@
 //   odo.highlightPlace(0, ctx)                glow the ones place (powers: 0 = ones)
 //
 // labels: false | 'names' ("Ones, Twos, Fours") | 'numbers' ("1s, 2s, 4s").
+// digitNames: show each digit's name under its symbol (default: on for color sets, so colors
+//   never rely on color alone). carryHop: when counting up rolls a place over, the carried
+//   digit (a "1": a Dog for animals) jumps in an arc into the next place before it rolls.
+// dimLeading: places in front of the number (leading zeros) are dimmed.
 // Numbers wrap around like a real odometer: with 3 decimal places, 999 + 1 rolls over to 000.
 (function (NS) {
   'use strict';
+
+  var HOP_MS = 700;
 
   function create(opts) {
     var U = NS.util, A = NS.anim;
@@ -19,6 +25,7 @@
     var modulo = Math.pow(set.base, places);
     var value = wrap(opts.value || 0);
     var labelMode = opts.labels === undefined ? 'names' : opts.labels;
+    var digitNames = opts.digitNames === undefined ? set.kind === 'color' : !!opts.digitNames;
 
     function wrap(n) { return ((n % modulo) + modulo) % modulo; }
     function digitsOf(n) { return NS.numeral.padDigits(NS.numeral.toDigits(n, set.base), places); }
@@ -34,12 +41,45 @@
       columns[power] = { el: col, window: win, label: label, cell: null, value: null };
     }
     var el = U.el('div', {
-      class: ['odometer', 'theme-' + set.theme, 'odo-kind-' + set.kind, 'odo-size-' + (opts.size || 'md'), opts.class],
+      class: ['odometer', 'theme-' + set.theme, 'odo-kind-' + set.kind, 'odo-size-' + (opts.size || 'md'),
+        digitNames ? 'odo-named' : '', opts.class],
       role: 'img'
     }, row);
 
     function cellFor(v) {
-      return U.el('span', { class: 'odo-cell' }, NS.symbols.renderValue(v, set));
+      var sym = NS.symbols.renderValue(v, set);
+      if (!digitNames) return U.el('span', { class: 'odo-cell' }, sym);
+      return U.el('span', { class: 'odo-cell has-name' }, sym,
+        U.el('span', { class: 'odo-cell-name', 'aria-hidden': 'true', text: set.digits[v].label }));
+    }
+
+    function dim() {
+      if (!opts.dimLeading) return;
+      var length = NS.numeral.toDigits(value, set.base).length;
+      columns.forEach(function (c, power) { c.el.classList.toggle('is-lead', power >= length); });
+    }
+
+    // The carried digit jumps out of place `from` and lands on place `from + 1`.
+    function hop(from, ctx) {
+      var a = columns[from].window.getBoundingClientRect();
+      var b = columns[from + 1].window.getBoundingClientRect();
+      var box = el.getBoundingClientRect();
+      var jumper = U.el('span', { class: 'odo-hop', 'aria-hidden': 'true' }, NS.symbols.renderValue(1, set));
+      jumper.style.left = (a.left - box.left) + 'px';
+      jumper.style.top = (a.top - box.top) + 'px';
+      jumper.style.width = a.width + 'px';
+      jumper.style.height = a.height + 'px';
+      el.appendChild(jumper);
+      var dx = b.left - a.left;
+      var lift = Math.max(a.height * 0.9, 40);
+      if (ctx.sound) ctx.sound('carry');
+      function done() { if (jumper.parentNode) jumper.parentNode.removeChild(jumper); }
+      return A.run(jumper, [
+        { transform: 'translate(0px, 0px) scale(.6) rotate(0deg)', opacity: 0 },
+        { transform: 'translate(0px, ' + (-lift * 0.3) + 'px) scale(.9) rotate(0deg)', opacity: 1, offset: 0.15 },
+        { transform: 'translate(' + (dx / 2) + 'px, ' + (-lift) + 'px) scale(1.15) rotate(-20deg)', opacity: 1, offset: 0.55 },
+        { transform: 'translate(' + dx + 'px, 0px) scale(1) rotate(0deg)', opacity: 1 }
+      ], { duration: HOP_MS, easing: 'ease-in-out' }, ctx, 'transient').then(done, function (e) { done(); throw e; });
     }
 
     function drawLabels() {
@@ -96,11 +136,22 @@
       var target = wrap(n);
       var dir = o.dir || (n >= value ? 1 : -1);
       var digits = digitsOf(target);
+      var before = digitsOf(value);
+      // Counting up by one: each place that rolls over to zero sends a carry into the next place.
+      var hops = opts.carryHop && ctx && !ctx.instant && !ctx.reducedMotion && dir > 0 && target === value + 1;
       value = target;
       describe();
+      dim();
       var duration = o.duration || 420;
       return Promise.all(digits.map(function (d, i) {
-        return roll(places - 1 - i, d, dir, ctx, duration);
+        var power = places - 1 - i;
+        var carried = hops && power > 0 && d !== before[i] && digits[i + 1] === 0 && before[i + 1] === set.base - 1;
+        if (!carried) return roll(power, d, dir, ctx, duration);
+        // Wait for any carry into the place below to land, then this carry jumps.
+        var waitBelow = A.wait(HOP_MS * (power - 1), ctx);
+        return waitBelow.then(function () { return hop(power - 1, ctx); })
+          .then(function () { return roll(power, d, dir, ctx, duration); },
+            function (e) { place(power, d); throw e; });
       }));
     }
 
@@ -118,6 +169,7 @@
         o = o || {};
         var target = U.clamp(n, 0, modulo - 1);
         if (ctx.instant) { set_(target, ctx); if (o.onStep) o.onStep({ n: target }); return Promise.resolve(); }
+        var hopMs = opts.carryHop && !ctx.reducedMotion ? HOP_MS : 0;
         var seq = NS.numeral.countSequence(value, target, set.base).slice(1);
         var ms = o.msPerStep || 500;
         var minMs = o.minMs || 40;
@@ -130,7 +182,9 @@
             if (o.accelerate) ms = Math.max(minMs, ms * 0.88);
             set_(entry.n, ctx, { dir: dir, duration: Math.min(420, stepMs * 0.75) }).catch(function () {});
             if (o.onStep) o.onStep(entry);
-            return A.wait(stepMs, ctx);
+            // Leave time for a carry to land before the next number.
+            var carried = hopMs && dir > 0 && entry.changedPlaces && entry.changedPlaces.length > 1;
+            return A.wait(carried ? Math.max(stepMs, hopMs + 200) : stepMs, ctx);
           });
         });
         return chain;
@@ -152,6 +206,7 @@
     };
 
     digitsOf(value).forEach(function (d, i) { place(places - 1 - i, d); });
+    dim();
     drawLabels();
     describe();
     return api;

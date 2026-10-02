@@ -29,11 +29,11 @@ count like traffic lights. It ends with the "costume wheel" for a single number.
    and the registration checks.
 
 ## Acceptance criteria
-- [ ] Animal and color odometers count correctly, with visible, funny carries.
-- [ ] Silly sounds play and can be muted. Speech says the animal names correctly.
-- [ ] Color digits are distinguishable in grayscale (verify with a CSS `filter: grayscale(1)` check).
-- [ ] Autoplay runs start to finish. Deep links work. Interactives work with touch and keyboard.
-- [ ] `tools/check.sh` passes. PROGRESS.md is updated and committed.
+- [x] Animal and color odometers count correctly, with visible, funny carries.
+- [x] Silly sounds play and can be muted. Speech says the animal names correctly.
+- [x] Color digits are distinguishable in grayscale (verify with a CSS `filter: grayscale(1)` check).
+- [x] Autoplay runs start to finish. Deep links work. Interactives work with touch and keyboard.
+- [x] `tools/check.sh` passes. PROGRESS.md is updated and committed.
 
 ## How to see it
 `index.html#/lesson/silly`
