@@ -57,7 +57,7 @@ All planning state lives in this repo. Nothing relies on session memory.
 ## Commands
 
 - `tools/check.sh`: runs all checks (unit tests, static rule lint, and the optional browser smoke test). Must pass before committing.
-- `node --test tests/`: unit tests only.
+- `node --test tests/*.test.js`: unit tests only. (Name the files: Node 22+ no longer searches a folder given as `tests/`.)
 - `node tools/smoke.js`: headless-browser smoke test. It needs Playwright, which is optional:
   set `PLAYWRIGHT_MODULE=/path/to/node_modules/playwright` if it isn't installed globally. Add
   `SMOKE_SCREENSHOTS=<dir>` for screenshots at 400/1024/1920px. Add new routes to `EXTRA_ROUTES` in it.

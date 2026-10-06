@@ -1,6 +1,6 @@
 // Node-only tests for the Phase 10 narration tools (tools/narration-export.js, tools/build-audio-manifest.js).
 // They use the file system, so they live here rather than in tests/specs/ (which also run in the browser).
-// Run with: node --test tests/
+// Run with: node --test tests/*.test.js
 'use strict';
 
 const { describe, it } = require('node:test');

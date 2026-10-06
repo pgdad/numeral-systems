@@ -5,8 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-echo "== unit tests (node --test tests/)"
-node --test tests/
+echo "== unit tests (node --test tests/*.test.js)"
+node --test tests/*.test.js
 
 echo "== rule lint"
 node tools/lint-rules.js

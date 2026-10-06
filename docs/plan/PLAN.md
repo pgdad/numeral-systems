@@ -172,7 +172,7 @@ file plus additive CSS.
 
 ## Verification strategy (all phases)
 
-1. **Unit tests**: `node --test tests/`. These need no dependencies and cover all
+1. **Unit tests**: `node --test tests/*.test.js`. These need no dependencies and cover all
    pure logic, plus "every lesson registers, every step has `say` text, and ids are unique."
 2. **Static rule lint**: `tools/lint-rules.js` fails on `type="module"`, `fetch(`,
    `XMLHttpRequest`, absolute `src="/`/`href="/` paths, any `http(s)://` URL in

@@ -1,6 +1,6 @@
 // Node-only tests for the Phase 12 packaging and deploy tooling (tools/serve.js, deploy/*.sh).
 // They start a local server and run shell scripts, so they live here rather than in tests/specs/.
-// Run with: node --test tests/
+// Run with: node --test tests/*.test.js
 'use strict';
 
 const { describe, it, before, after } = require('node:test');

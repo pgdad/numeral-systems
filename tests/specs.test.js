@@ -1,5 +1,5 @@
 // Runs every spec file listed in tests/manifest.js under node:test.
-// Run with: node --test tests/
+// Run with: node --test tests/*.test.js
 'use strict';
 
 const { describe, it } = require('node:test');
