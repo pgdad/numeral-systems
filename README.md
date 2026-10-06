@@ -1,5 +1,7 @@
 # Counting Is Fun: Number Systems for Grandkids
 
+**Try it:** https://pgdad.github.io/numeral-systems/
+
 A browser app with animated, narrated lessons about how we write numbers:
 
 1. **Base‑10 on your fingers.** Why we count in tens.

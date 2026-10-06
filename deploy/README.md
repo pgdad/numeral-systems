@@ -131,10 +131,11 @@ See `akamai.md`. It covers:
 Any host that serves static files works. Upload the **contents** of `dist/`, not the folder itself, unless you want it
 as a sub-folder. Then set the headers from `headers.md` where the host allows it.
 
-- **GitHub Pages**: push the contents of `dist/` to a `gh-pages` branch, or use a workflow with
-  `actions/upload-pages-artifact` (path `dist`). The site then lives at `https://<user>.github.io/<repo>/`. That is a
-  sub-path, which works because every path is relative. Pages can't set custom headers, and its caching (10 minutes)
-  is fine.
+- **GitHub Pages** (this repo uses it: https://pgdad.github.io/numeral-systems/): `.github/workflows/pages.yml` runs
+  the unit tests and lint, builds with `tools/build-dist.sh`, and deploys `dist/` on every push to `master` (or by
+  hand: Actions → Pages → Run workflow). One-time setup: Settings → Pages → Source: *GitHub Actions*. The site lives
+  at `https://<user>.github.io/<repo>/`, a sub-path, which works because every path is relative. Pages can't set
+  custom headers, and its caching (10 minutes) is fine. In a fork, change the URL comment at the top of the workflow.
 - **Netlify** / **Cloudflare Pages**: drag and drop the `dist/` folder onto the dashboard ("Deploy manually" /
   "Upload assets"), or connect the repo with build command `SKIP_CHECK=1 tools/build-dist.sh` and output folder `dist`.
   For headers, add a `_headers` file next to `index.html` before uploading:
